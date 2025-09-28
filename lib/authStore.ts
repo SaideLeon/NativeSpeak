@@ -9,6 +9,8 @@ import { create } from 'zustand';
 
 interface User {
   email: string;
+  firstName: string;
+  lastName: string;
 }
 
 interface AuthState {
@@ -17,7 +19,7 @@ interface AuthState {
   error: string | null;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
-  register: (email: string, pass: string) => Promise<void>;
+  register: (email: string, pass: string, firstName: string, lastName: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => void;
 }
@@ -32,17 +34,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
   isLoading: true,
 
-  register: async (email, pass) => {
+  register: async (email, pass, firstName, lastName) => {
     set({ error: null, isLoading: true });
     try {
       const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
       if (users[email]) {
         throw new Error('User with this email already exists.');
       }
-      users[email] = { pass }; // In a real app, you would hash the password
+      // In a real app, you would hash the password
+      users[email] = { pass, firstName, lastName }; 
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
       
-      const user = { email };
+      const user = { email, firstName, lastName };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: any) {
@@ -59,7 +62,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error('Invalid email or password.');
       }
       
-      const user = { email };
+      const user = { email, firstName: users[email].firstName, lastName: users[email].lastName };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: any) {

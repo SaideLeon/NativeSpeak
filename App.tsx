@@ -19,15 +19,16 @@
  * limitations under the License.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import ControlTray from './components/console/control-tray/ControlTray';
 import ErrorScreen from './components/demo/ErrorScreen';
 import StreamingConsole from './components/demo/streaming-console/StreamingConsole';
-
+import AuthModal from './components/AuthModal';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import { LiveAPIProvider } from './contexts/LiveAPIContext';
 import { useAuthStore } from './lib/authStore';
+import LandingPage from './components/LandingPage';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -36,22 +37,14 @@ if (typeof API_KEY !== 'string') {
   );
 }
 
-function AuthPrompt() {
-  return (
-    <div className="auth-prompt">
-      <h2>Welcome to NativeSpeak!</h2>
-      <p>Please log in or register to start your English conversation practice.</p>
-    </div>
-  )
-}
-
-
 /**
  * Main application component that provides a streaming interface for Live API.
  * Manages video streaming state and provides controls for webcam/screen capture.
  */
 function App() {
   const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
 
   useEffect(() => {
     checkAuth();
@@ -66,17 +59,22 @@ function App() {
     <div className="App">
       <LiveAPIProvider apiKey={API_KEY}>
         <ErrorScreen />
-        <Header />
+        <Header onLoginClick={() => setIsAuthModalOpen(true)} />
         <Sidebar />
         <div className="streaming-console">
           <main>
             <div className="main-app-area">
-              {isAuthenticated ? <StreamingConsole /> : <AuthPrompt />}
+              {isAuthenticated ? (
+                <StreamingConsole /> 
+              ) : (
+                <LandingPage onStartClick={() => setIsAuthModalOpen(true)} />
+              )}
             </div>
 
             {isAuthenticated && <ControlTray></ControlTray>}
           </main>
         </div>
+        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
       </LiveAPIProvider>
     </div>
   );

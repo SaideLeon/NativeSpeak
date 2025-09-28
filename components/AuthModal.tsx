@@ -16,6 +16,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   
   const { login, register, error } = useAuthStore();
 
@@ -30,7 +32,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             useAuthStore.setState({ error: "Passwords do not match." });
             return;
         }
-        await register(email, password);
+        await register(email, password, firstName, lastName);
       }
       onClose(); // Close modal on success
     } catch (e) {
@@ -43,6 +45,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
     setEmail('');
     setPassword('');
     setConfirmPassword('');
+    setFirstName('');
+    setLastName('');
     useAuthStore.setState({ error: null });
   };
 
@@ -58,8 +62,32 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
           <button className={cn({ active: isLoginView })} onClick={toggleView}>Login</button>
           <button className={cn({ active: !isLoginView })} onClick={toggleView}>Register</button>
         </div>
-        <h2>{isLoginView ? 'Welcome Back' : 'Create Account'}</h2>
+        <h2>{isLoginView ? 'Bem-vindo de volta' : 'Crie sua conta'}</h2>
         <form onSubmit={handleSubmit}>
+          {!isLoginView && (
+            <div className="name-fields">
+              <div className="form-field">
+                <label htmlFor="auth-firstname">Nome</label>
+                <input
+                  id="auth-firstname"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  />
+              </div>
+              <div className="form-field">
+                <label htmlFor="auth-lastname">Sobrenome</label>
+                <input
+                  id="auth-lastname"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  />
+              </div>
+            </div>
+          )}
           <div className="form-field">
             <label htmlFor="auth-email">Email</label>
             <input
@@ -71,7 +99,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
             />
           </div>
           <div className="form-field">
-            <label htmlFor="auth-password">Password</label>
+            <label htmlFor="auth-password">Senha</label>
             <input
               id="auth-password"
               type="password"
@@ -82,7 +110,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
           </div>
           {!isLoginView && (
             <div className="form-field">
-              <label htmlFor="auth-confirm-password">Confirm Password</label>
+              <label htmlFor="auth-confirm-password">Confirmar Senha</label>
               <input
                 id="auth-confirm-password"
                 type="password"
@@ -95,7 +123,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
           {error && <p className="auth-error">{error}</p>}
           <div className="modal-actions">
             <button type="submit" className="submit-button">
-              {isLoginView ? 'Login' : 'Register'}
+              {isLoginView ? 'Login' : 'Registrar'}
             </button>
           </div>
         </form>
