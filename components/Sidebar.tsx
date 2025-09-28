@@ -8,6 +8,7 @@ import { DEFAULT_LIVE_API_MODEL, AVAILABLE_VOICES } from '@/lib/constants';
 import { useLiveAPIContext } from '@/contexts/LiveAPIContext';
 import { useState } from 'react';
 import ToolEditorModal from './ToolEditorModal';
+import TodoList from './TodoList';
 
 const AVAILABLE_MODELS = [
   DEFAULT_LIVE_API_MODEL
@@ -120,6 +121,9 @@ export default function Sidebar() {
             >
               <span className="icon">add</span> Add function call
             </button>
+          </div>
+          <div className="sidebar-section">
+            <TodoList />
           </div>
         </div>
       </aside>
