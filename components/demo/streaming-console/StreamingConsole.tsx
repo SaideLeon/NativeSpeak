@@ -139,7 +139,8 @@ export default function StreamingConsole() {
       if (!text && !groundingChunks) return;
 
       const turns = useLogStore.getState().turns;
-      const last = turns.at(-1);
+      // FIX: Property 'at' does not exist on type 'ConversationTurn[]'. Replaced with bracket notation.
+      const last = turns[turns.length - 1];
 
       if (last?.role === 'agent' && !last.isFinal) {
         const updatedTurn: Partial<ConversationTurn> = {
@@ -158,7 +159,9 @@ export default function StreamingConsole() {
     };
 
     const handleTurnComplete = () => {
-      const last = useLogStore.getState().turns.at(-1);
+      const turns = useLogStore.getState().turns;
+      // FIX: Property 'at' does not exist on type 'ConversationTurn[]'. Replaced with bracket notation.
+      const last = turns[turns.length - 1];
       if (last && !last.isFinal) {
         updateLastTurn({ isFinal: true });
       }
@@ -211,12 +214,13 @@ export default function StreamingConsole() {
                   <div className="grounding-chunks">
                     <strong>Sources:</strong>
                     <ul>
+                      {/* FIX: Filter for chunks that have a web property with a valid URI. */}
                       {t.groundingChunks
-                        .filter(chunk => chunk.web)
+                        .filter(chunk => chunk.web && chunk.web.uri)
                         .map((chunk, index) => (
                           <li key={index}>
                             <a
-                              href={chunk.web!.uri}
+                              href={chunk.web!.uri!}
                               target="_blank"
                               rel="noopener noreferrer"
                             >

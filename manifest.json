@@ -1,0 +1,9 @@
+{
+  "short_name": "NativeSpeak",
+  "name": "NativeSpeak",
+  "description": "Your AI partner for mastering English conversation. Practice speaking, get instant feedback, and improve fluency.",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1E3A8A",
+  "background_color": "#0F172A"
+}

@@ -145,8 +145,10 @@ export interface LiveClientToolResponse {
 }
 export interface GroundingChunk {
   web?: {
-    uri: string;
-    title: string;
+    // FIX: Type 'GroundingChunk[]' is not assignable to type 'GroundingChunk[]'.
+    // Made properties optional and nullable to match the library type.
+    uri?: string | null;
+    title?: string | null;
   };
 }
 
