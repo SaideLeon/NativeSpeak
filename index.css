@@ -1192,11 +1192,19 @@ select {
   cursor: pointer;
   transition: all var(--transition-normal);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 .logout-button:hover {
   background: var(--hover-bg);
   color: var(--text-primary);
+}
+
+.logout-icon {
+  display: none;
+  font-size: 1.25rem;
 }
 
 .login-button {
@@ -1213,6 +1221,10 @@ select {
 .login-button:hover {
   opacity: 0.9;
   box-shadow: var(--shadow-medium);
+}
+
+.login-text-short {
+  display: none;
 }
 
 .auth-prompt {
@@ -1245,6 +1257,44 @@ select {
   
   header h1 {
     font-size: 1.25rem;
+  }
+  
+  header h1::after {
+    display: none;
+  }
+
+  .header-right {
+    gap: var(--space-sm);
+  }
+  
+  .user-welcome {
+    display: none;
+  }
+
+  .logout-button {
+    padding: var(--space-sm);
+    gap: 0;
+  }
+  
+  .logout-text {
+    display: none;
+  }
+  
+  .logout-icon {
+    display: block;
+  }
+
+  .login-text-full {
+    display: none;
+  }
+  
+  .login-text-short {
+    display: inline;
+  }
+  
+  .login-button {
+    font-size: 0.8rem;
+    padding: var(--space-sm) var(--space-md);
   }
   
   .transcription-container {
