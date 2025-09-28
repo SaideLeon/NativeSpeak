@@ -4,7 +4,7 @@
   "description": "Your AI partner for mastering English conversation. Practice speaking, get instant feedback, and improve fluency.",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }

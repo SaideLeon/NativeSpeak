@@ -2,10 +2,12 @@ const CACHE_NAME = 'nativespeak-cache-v1';
 
 // Add files that are part of the "app shell"
 const appShellFiles = [
-  '/',
-  '/index.html',
-  '/index.css',
-  // Note: /index.tsx is dynamically imported and will be cached by the fetch handler
+  './',
+  './index.html',
+  './index.css',
+  './index.tsx',
+  './icon.svg',
+  './manifest.json',
 ];
 
 self.addEventListener('install', event => {
