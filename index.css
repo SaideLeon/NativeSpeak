@@ -523,7 +523,7 @@ header .export-button {
 }
 
 @property --volume {
-  syntax: 'length';
+  syntax: '<length>';
   inherit: false;
   initial-value: 0px;
 }
@@ -751,6 +751,14 @@ header .export-button {
 .transcription-text-content {
   white-space: pre-wrap;
   overflow-wrap: break-word;
+}
+
+.transcription-entry.user .transcription-text-content {
+  color: var(--accent-blue);
+}
+
+.transcription-entry.agent .transcription-text-content {
+  color: var(--accent-green);
 }
 
 .transcription-entry.interim .transcription-text-content {

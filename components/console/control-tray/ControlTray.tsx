@@ -34,6 +34,7 @@ function ControlTray({ children }: ControlTrayProps) {
   const [audioRecorder] = useState(() => new AudioRecorder());
   const [muted, setMuted] = useState(false);
   const connectButtonRef = useRef<HTMLButtonElement>(null);
+  const micButtonRef = useRef<HTMLButtonElement>(null);
 
   const { client, connected, connect, disconnect } = useLiveAPIContext();
 
@@ -70,6 +71,28 @@ function ControlTray({ children }: ControlTrayProps) {
       audioRecorder.off('data', onData);
     };
   }, [connected, client, muted, audioRecorder]);
+
+  useEffect(() => {
+    const onVolume = (volume: number) => {
+      if (micButtonRef.current) {
+        // Scale volume (0-1) for a better visual effect, cap at 20px
+        const scaledVolume = Math.min(volume * 50, 20);
+        micButtonRef.current.style.setProperty('--volume', `${scaledVolume}px`);
+      }
+    };
+
+    if (connected && !muted && audioRecorder) {
+      audioRecorder.on('volume', onVolume);
+    } else {
+      if (micButtonRef.current) {
+        micButtonRef.current.style.setProperty('--volume', `0px`);
+      }
+    }
+
+    return () => {
+      audioRecorder.off('volume', onVolume);
+    };
+  }, [connected, muted, audioRecorder]);
 
   const handleMicClick = () => {
     if (connected) {
@@ -122,6 +145,7 @@ function ControlTray({ children }: ControlTrayProps) {
     <section className="control-tray">
       <nav className={cn('actions-nav')}>
         <button
+          ref={micButtonRef}
           className={cn('action-button mic-button')}
           onClick={handleMicClick}
           title={micButtonTitle}
