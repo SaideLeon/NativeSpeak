@@ -103,7 +103,7 @@ export const useUI = create<{
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
 }>(set => ({
-  isSidebarOpen: true,
+  isSidebarOpen: false,
   toggleSidebar: () => set(state => ({ isSidebarOpen: !state.isSidebarOpen })),
 }));
 
