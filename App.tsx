@@ -7,7 +7,8 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may
+ * obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -18,6 +19,7 @@
  * limitations under the License.
  */
 
+import { useEffect } from 'react';
 import ControlTray from './components/console/control-tray/ControlTray';
 import ErrorScreen from './components/demo/ErrorScreen';
 import StreamingConsole from './components/demo/streaming-console/StreamingConsole';
@@ -25,6 +27,7 @@ import StreamingConsole from './components/demo/streaming-console/StreamingConso
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import { LiveAPIProvider } from './contexts/LiveAPIContext';
+import { useAuthStore } from './lib/authStore';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -33,11 +36,32 @@ if (typeof API_KEY !== 'string') {
   );
 }
 
+function AuthPrompt() {
+  return (
+    <div className="auth-prompt">
+      <h2>Welcome to NativeSpeak!</h2>
+      <p>Please log in or register to start your English conversation practice.</p>
+    </div>
+  )
+}
+
+
 /**
  * Main application component that provides a streaming interface for Live API.
  * Manages video streaming state and provides controls for webcam/screen capture.
  */
 function App() {
+  const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+  
+  // To prevent flash of unauthenticated content
+  if (isLoading) {
+    return null; // or a loading spinner
+  }
+
   return (
     <div className="App">
       <LiveAPIProvider apiKey={API_KEY}>
@@ -47,11 +71,10 @@ function App() {
         <div className="streaming-console">
           <main>
             <div className="main-app-area">
-              <StreamingConsole />
-
+              {isAuthenticated ? <StreamingConsole /> : <AuthPrompt />}
             </div>
 
-            <ControlTray></ControlTray>
+            {isAuthenticated && <ControlTray></ControlTray>}
           </main>
         </div>
       </LiveAPIProvider>
