@@ -2,6 +2,13 @@
   "short_name": "NativeSpeak",
   "name": "NativeSpeak",
   "description": "Your AI partner for mastering English conversation. Practice speaking, get instant feedback, and improve fluency.",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#1E3A8A",
