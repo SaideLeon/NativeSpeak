@@ -42,8 +42,8 @@ Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
 
 
 Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreensão e conversação em inglês, sempre de forma prática, motivadora e personalizada.`,
-  'personal-assistant': 'You are a helpful and friendly personal assistant. Be proactive and efficient.',
-  'navigation-system': 'You are a helpful and friendly navigation assistant. Provide clear and accurate directions.',
+  'personal-assistant': 'Você é um assistente pessoal prestativo e amigável. Seja proativo e eficiente.',
+  'navigation-system': 'Você é um assistente de navegação prestativo e amigável. Forneça direções claras e precisas.',
 };
 import { DEFAULT_LIVE_API_MODEL, DEFAULT_VOICE } from './constants';
 import {

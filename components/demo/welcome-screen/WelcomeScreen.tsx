@@ -13,8 +13,8 @@ const welcomeContent: Record<
   { title: string; description: string; prompts: string[] }
 > = {
   'customer-support': {
-    title: 'Everyday Conversation',
-    description: 'Practice common social interactions and daily chats.',
+    title: 'Conversa do Dia a Dia',
+    description: 'Pratique interações sociais comuns e conversas diárias.',
     prompts: [
       'How was your weekend?',
       "Let's talk about our hobbies.",
@@ -22,9 +22,9 @@ const welcomeContent: Record<
     ],
   },
   'personal-assistant': {
-    title: 'Job Interview Practice',
+    title: 'Prática para Entrevista de Emprego',
     description:
-      'Prepare for professional interviews and answer common questions.',
+      'Prepare-se para entrevistas profissionais e responda a perguntas comuns.',
     prompts: [
       'Tell me about yourself.',
       'What are your biggest strengths?',
@@ -32,8 +32,8 @@ const welcomeContent: Record<
     ],
   },
   'navigation-system': {
-    title: 'Travel & Directions',
-    description: 'Practice asking for directions and navigating a new city.',
+    title: 'Viagens e Direções',
+    description: 'Pratique pedir informações e se locomover em uma cidade nova.',
     prompts: [
       'How do I get to the museum?',
       'Excuse me, where is the nearest subway station?',
@@ -54,11 +54,11 @@ const WelcomeScreen: React.FC = () => {
             <select
               value={template}
               onChange={e => setTemplate(e.target.value as Template)}
-              aria-label="Select a practice scenario"
+              aria-label="Selecione um cenário de prática"
             >
-              <option value="customer-support">Everyday Conversation</option>
-              <option value="personal-assistant">Job Interview</option>
-              <option value="navigation-system">Travel & Directions</option>
+              <option value="customer-support">Conversa do Dia a Dia</option>
+              <option value="personal-assistant">Entrevista de Emprego</option>
+              <option value="navigation-system">Viagens e Direções</option>
             </select>
             <span className="icon">arrow_drop_down</span>
           </div>

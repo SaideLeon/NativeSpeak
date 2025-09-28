@@ -29,7 +29,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
       } else {
         if (password !== confirmPassword) {
             // This should be handled by the store, but a local check is faster.
-            useAuthStore.setState({ error: "Passwords do not match." });
+            useAuthStore.setState({ error: "As senhas não coincidem." });
             return;
         }
         await register(email, password, firstName, lastName);

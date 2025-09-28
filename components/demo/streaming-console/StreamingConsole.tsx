@@ -247,10 +247,10 @@ export default function StreamingConsole() {
             >
               <div className="transcription-source">
                 {t.role === 'user'
-                  ? 'You'
+                  ? 'Você'
                   : t.role === 'agent'
                   ? 'Tutor'
-                  : 'System'}
+                  : 'Sistema'}
               </div>
               <div className="message-bubble">
                 <div className="transcription-text-content">
@@ -258,7 +258,7 @@ export default function StreamingConsole() {
                 </div>
                 {t.groundingChunks && t.groundingChunks.length > 0 && (
                   <div className="grounding-chunks">
-                    <strong>Sources:</strong>
+                    <strong>Fontes:</strong>
                     <ul>
                       {/* FIX: Filter for chunks that have a web property with a valid URI. */}
                       {t.groundingChunks

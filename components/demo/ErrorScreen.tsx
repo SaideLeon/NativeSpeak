@@ -29,9 +29,9 @@ export default function ErrorScreen() {
   }, [client]);
 
   const quotaErrorMessage =
-    'Gemini Live API in AI Studio has a limited free quota each day. Come back tomorrow to continue.';
+    'A API Gemini Live no AI Studio tem uma cota diária gratuita limitada. Volte amanhã para continuar.';
 
-  let errorMessage = 'Something went wrong. Please try again.';
+  let errorMessage = 'Algo deu errado. Por favor, tente novamente.';
   let rawMessage: string | null = error?.message || null;
   let tryAgainOption = true;
   if (error?.message?.includes('RESOURCE_EXHAUSTED')) {
@@ -70,7 +70,7 @@ export default function ErrorScreen() {
             setError(null);
           }}
         >
-          Close
+          Fechar
         </button>
       ) : null}
       {rawMessage ? (

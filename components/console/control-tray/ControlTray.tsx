@@ -135,11 +135,11 @@ function ControlTray({ children }: ControlTrayProps) {
 
   const micButtonTitle = connected
     ? muted
-      ? 'Unmute microphone'
-      : 'Mute microphone'
-    : 'Connect and start microphone';
+      ? 'Ativar microfone'
+      : 'Desativar microfone'
+    : 'Conectar e iniciar microfone';
 
-  const connectButtonTitle = connected ? 'Stop streaming' : 'Start streaming';
+  const connectButtonTitle = connected ? 'Parar streaming' : 'Iniciar streaming';
 
   return (
     <section className="control-tray">
@@ -161,16 +161,16 @@ function ControlTray({ children }: ControlTrayProps) {
         <button
           className={cn('action-button')}
           onClick={handleExportLogs}
-          aria-label="Export Logs"
-          title="Export session logs"
+          aria-label="Exportar Logs"
+          title="Exportar logs da sessão"
         >
           <span className="icon">download</span>
         </button>
         <button
           className={cn('action-button')}
           onClick={useLogStore.getState().clearTurns}
-          aria-label="Reset Chat"
-          title="Reset session logs"
+          aria-label="Redefinir Conversa"
+          title="Redefinir logs da sessão"
         >
           <span className="icon">refresh</span>
         </button>

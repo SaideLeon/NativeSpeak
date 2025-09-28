@@ -103,7 +103,7 @@ export function useLiveApi({
 
       for (const fc of toolCall.functionCalls) {
         // Log the function call trigger
-        const triggerMessage = `Triggering function call: **${
+        const triggerMessage = `Disparando chamada de função: **${
           fc.name
         }**\n\`\`\`json\n${JSON.stringify(fc.args, null, 2)}\n\`\`\``;
         useLogStore.getState().addTurn({
@@ -122,7 +122,7 @@ export function useLiveApi({
 
       // Log the function call response
       if (functionResponses.length > 0) {
-        const responseMessage = `Function call response:\n\`\`\`json\n${JSON.stringify(
+        const responseMessage = `Resposta da chamada de função:\n\`\`\`json\n${JSON.stringify(
           functionResponses,
           null,
           2,

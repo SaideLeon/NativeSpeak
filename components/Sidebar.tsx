@@ -22,7 +22,7 @@ export default function Sidebar() {
     <>
       <aside className={c('sidebar', { open: isSidebarOpen })}>
         <div className="sidebar-header">
-          <h3>Settings</h3>
+          <h3>Configurações</h3>
           <button onClick={toggleSidebar} className="close-button">
             <span className="icon">close</span>
           </button>
@@ -31,7 +31,7 @@ export default function Sidebar() {
           <div className="sidebar-section">
             <fieldset disabled={connected}>
               <label>
-                Model
+                Modelo
                 <select value={model} onChange={e => setModel(e.target.value)}>
                   {/* This is an experimental model name that should not be removed from the options. */}
                   {AVAILABLE_MODELS.map(m => (
@@ -42,7 +42,7 @@ export default function Sidebar() {
                 </select>
               </label>
               <label>
-                Voice
+                Voz
                 <select value={voice} onChange={e => setVoice(e.target.value)}>
                   {AVAILABLE_VOICES.map(v => (
                     <option key={v} value={v}>

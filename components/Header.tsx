@@ -24,21 +24,21 @@ export default function Header({ onLoginClick }: HeaderProps) {
           {isAuthenticated && user ? (
             <div className="header-user-info">
               <span className="user-welcome">Olá, {user.firstName}!</span>
-              <button onClick={logout} className="logout-button" title="Logout">
-                <span className="logout-text">Logout</span>
+              <button onClick={logout} className="logout-button" title="Sair">
+                <span className="logout-text">Sair</span>
                 <span className="icon logout-icon">logout</span>
               </button>
             </div>
           ) : (
             <button className="login-button" onClick={onLoginClick}>
-              <span className="login-text-full">Login / Register</span>
-              <span className="login-text-short">Login</span>
+              <span className="login-text-full">Entrar / Registrar</span>
+              <span className="login-text-short">Entrar</span>
             </button>
           )}
           <button
             className="settings-button"
             onClick={toggleSidebar}
-            aria-label="Settings"
+            aria-label="Configurações"
           >
             <span className="icon">tune</span>
           </button>

@@ -9,17 +9,17 @@ import { FunctionResponseScheduling } from '@google/genai';
 export const navigationSystemTools: FunctionCall[] = [
   {
     name: 'find_route',
-    description: 'Finds a route to a specified destination.',
+    description: 'Encontra uma rota para um destino especificado.',
     parameters: {
       type: 'OBJECT',
       properties: {
         destination: {
           type: 'STRING',
-          description: 'The destination address or landmark.',
+          description: 'O endereço ou ponto de referência de destino.',
         },
         modeOfTransport: {
           type: 'STRING',
-          description: 'The mode of transport (e.g., driving, walking, cycling).',
+          description: 'O modo de transporte (ex: dirigir, caminhar, pedalar).',
         },
       },
       required: ['destination'],
@@ -29,17 +29,17 @@ export const navigationSystemTools: FunctionCall[] = [
   },
   {
     name: 'find_nearby_places',
-    description: 'Finds nearby places of a certain type.',
+    description: 'Encontra lugares próximos de um determinado tipo.',
     parameters: {
       type: 'OBJECT',
       properties: {
         placeType: {
           type: 'STRING',
-          description: 'The type of place to search for (e.g., restaurant, gas station, park).',
+          description: 'O tipo de lugar a ser procurado (ex: restaurante, posto de gasolina, parque).',
         },
         radius: {
           type: 'NUMBER',
-          description: 'The search radius in kilometers.',
+          description: 'O raio de busca em quilômetros.',
         },
       },
       required: ['placeType'],
@@ -49,13 +49,13 @@ export const navigationSystemTools: FunctionCall[] = [
   },
   {
     name: 'get_traffic_info',
-    description: 'Gets real-time traffic information for a specified location.',
+    description: 'Obtém informações de trânsito em tempo real para um local especificado.',
     parameters: {
       type: 'OBJECT',
       properties: {
         location: {
           type: 'STRING',
-          description: 'The location to get traffic information for.',
+          description: 'O local para obter informações de trânsito.',
         },
       },
       required: ['location'],

@@ -40,7 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
       if (users[email]) {
-        throw new Error('User with this email already exists.');
+        throw new Error('Já existe um usuário com este e-mail.');
       }
       const studyStartDate = new Date().toISOString();
       // In a real app, you would hash the password
@@ -61,7 +61,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
       if (!users[email] || users[email].pass !== pass) {
-        throw new Error('Invalid email or password.');
+        throw new Error('E-mail ou senha inválidos.');
       }
       
       const user = { 

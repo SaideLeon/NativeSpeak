@@ -9,21 +9,21 @@ import { FunctionCall } from '../state';
 export const customerSupportTools: FunctionCall[] = [
   {
     name: 'start_return',
-    description: 'Starts the return process for an item, collecting necessary details from the user.',
+    description: 'Inicia o processo de devolução de um item, coletando os detalhes necessários do usuário.',
     parameters: {
       type: 'OBJECT',
       properties: {
         orderId: {
           type: 'STRING',
-          description: 'The ID of the order containing the item to be returned.',
+          description: 'O ID do pedido que contém o item a ser devolvido.',
         },
         itemName: {
           type: 'STRING',
-          description: 'The name of the item the user wants to return.',
+          description: 'O nome do item que o usuário deseja devolver.',
         },
         reason: {
           type: 'STRING',
-          description: 'The reason the user is returning the item.',
+          description: 'O motivo pelo qual o usuário está devolvendo o item.',
         },
       },
       required: ['orderId', 'itemName', 'reason'],
@@ -33,21 +33,21 @@ export const customerSupportTools: FunctionCall[] = [
   },
   {
     name: 'get_order_status',
-    description: 'Provides the current status of a user\'s order, searching by order ID or customer details.',
+    description: 'Fornece o status atual do pedido de um usuário, pesquisando pelo ID do pedido ou detalhes do cliente.',
     parameters: {
       type: 'OBJECT',
       properties: {
         orderId: {
           type: 'STRING',
-          description: 'The ID of the order to check. Ask for this first.',
+          description: 'O ID do pedido a ser verificado. Peça por isso primeiro.',
         },
         customerName: {
           type: 'STRING',
-          description: 'The name of the customer, if order ID is not available.',
+          description: 'O nome do cliente, se o ID do pedido não estiver disponível.',
         },
         customerEmail: {
           type: 'STRING',
-          description: 'The email of the customer, if order ID is not available.',
+          description: 'O e-mail do cliente, se o ID do pedido não estiver disponível.',
         },
       },
     },
@@ -56,13 +56,13 @@ export const customerSupportTools: FunctionCall[] = [
   },
   {
     name: 'speak_to_representative',
-    description: 'Escalates the conversation to a human customer support representative.',
+    description: 'Escalona a conversa para um representante de suporte humano.',
     parameters: {
       type: 'OBJECT',
       properties: {
         reason: {
           type: 'STRING',
-          description: 'A brief summary of the user\'s issue for the representative.',
+          description: 'Um breve resumo do problema do usuário para o representante.',
         },
       },
       required: ['reason'],

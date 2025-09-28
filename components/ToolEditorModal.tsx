@@ -42,7 +42,7 @@ export default function ToolEditorModal({
       parsedParameters = JSON.parse(parametersStr);
       setJsonError(null);
     } catch (error) {
-      setJsonError('Invalid JSON format for parameters.');
+      setJsonError('Formato JSON inválido para os parâmetros.');
       return;
     }
 
@@ -58,9 +58,9 @@ export default function ToolEditorModal({
   return (
     <Modal onClose={onClose}>
       <div className="tool-editor-modal">
-        <h2>Edit Function Call</h2>
+        <h2>Editar Chamada de Função</h2>
         <div className="form-field">
-          <label htmlFor="tool-name">Name</label>
+          <label htmlFor="tool-name">Nome</label>
           <input
             id="tool-name"
             type="text"
@@ -69,7 +69,7 @@ export default function ToolEditorModal({
           />
         </div>
         <div className="form-field">
-          <label htmlFor="tool-description">Description</label>
+          <label htmlFor="tool-description">Descrição</label>
           <textarea
             id="tool-description"
             value={description}
@@ -78,7 +78,7 @@ export default function ToolEditorModal({
           />
         </div>
         <div className="form-field">
-          <label htmlFor="tool-scheduling">Scheduling Behavior</label>
+          <label htmlFor="tool-scheduling">Comportamento de Agendamento</label>
           <select
             id="tool-scheduling"
             value={scheduling}
@@ -87,20 +87,20 @@ export default function ToolEditorModal({
             }
           >
             <option value={FunctionResponseScheduling.INTERRUPT}>
-              Interrupt
+              Interromper
             </option>
             <option value={FunctionResponseScheduling.WHEN_IDLE}>
-              When Idle
+              Quando Ocioso
             </option>
-            <option value={FunctionResponseScheduling.SILENT}>Silent</option>
+            <option value={FunctionResponseScheduling.SILENT}>Silencioso</option>
           </select>
           <p className="scheduling-description">
-            Determines when the model's response is spoken. 'Interrupt' speaks
-            immediately.
+            Determina quando a resposta do modelo é falada. 'Interromper' fala
+            imediatamente.
           </p>
         </div>
         <div className="form-field">
-          <label htmlFor="tool-parameters">Parameters (JSON Schema)</label>
+          <label htmlFor="tool-parameters">Parâmetros (Esquema JSON)</label>
           <textarea
             id="tool-parameters"
             className="json-editor"
@@ -111,10 +111,10 @@ export default function ToolEditorModal({
         </div>
         <div className="modal-actions">
           <button onClick={onClose} className="cancel-button">
-            Cancel
+            Cancelar
           </button>
           <button onClick={handleSave} className="save-button">
-            Save
+            Salvar
           </button>
         </div>
       </div>
