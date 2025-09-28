@@ -11,6 +11,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  studyStartDate: string;
 }
 
 interface AuthState {
@@ -41,11 +42,12 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (users[email]) {
         throw new Error('User with this email already exists.');
       }
+      const studyStartDate = new Date().toISOString();
       // In a real app, you would hash the password
-      users[email] = { pass, firstName, lastName }; 
+      users[email] = { pass, firstName, lastName, studyStartDate }; 
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
       
-      const user = { email, firstName, lastName };
+      const user = { email, firstName, lastName, studyStartDate };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: any) {
@@ -62,7 +64,12 @@ export const useAuthStore = create<AuthState>((set) => ({
         throw new Error('Invalid email or password.');
       }
       
-      const user = { email, firstName: users[email].firstName, lastName: users[email].lastName };
+      const user = { 
+        email, 
+        firstName: users[email].firstName, 
+        lastName: users[email].lastName,
+        studyStartDate: users[email].studyStartDate,
+      };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
     } catch (e: any) {
@@ -81,6 +88,18 @@ export const useAuthStore = create<AuthState>((set) => ({
       const session = localStorage.getItem(SESSION_KEY);
       if (session) {
         const user = JSON.parse(session);
+
+        // Backwards compatibility for users without a start date
+        if (!user.studyStartDate) {
+          const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+          if (users[user.email]?.studyStartDate) {
+            user.studyStartDate = users[user.email].studyStartDate;
+          } else {
+            user.studyStartDate = new Date().toISOString();
+          }
+          localStorage.setItem(SESSION_KEY, JSON.stringify(user)); // Resave session
+        }
+
         set({ isAuthenticated: true, user, isLoading: false });
       } else {
         set({ isLoading: false });

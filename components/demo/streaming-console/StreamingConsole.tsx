@@ -15,6 +15,7 @@ import {
   ConversationTurn,
 } from '@/lib/state';
 import { useTodoStore } from '../../../lib/todoStore';
+import { useAuthStore } from '../../../lib/authStore';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -56,6 +57,7 @@ export default function StreamingConsole() {
   const { systemPrompt, voice } = useSettings();
   const { tools } = useTools();
   const { todos } = useTodoStore();
+  const { user } = useAuthStore();
   const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +95,28 @@ export default function StreamingConsole() {
         goalsContext += '--- FIM DO CONTEXTO ---';
     }
 
-    const fullSystemPrompt = systemPrompt + goalsContext;
+    let timeContext = '';
+    if (user && user.studyStartDate) {
+        const startDate = new Date(user.studyStartDate);
+        const now = new Date();
+
+        const optionsDate: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        
+        const formattedStartDate = startDate.toLocaleDateString('pt-BR', optionsDate);
+        const formattedCurrentDateTime = now.toLocaleString('pt-BR', {
+            year: 'numeric', month: 'long', day: 'numeric', 
+            hour: '2-digit', minute: '2-digit',
+        });
+
+        timeContext += '\n\n--- CONTEXTO DO ALUNO E HORA ATUAL ---\n';
+        timeContext += 'Use estas informações para personalizar saudações (bom dia, boa tarde) e comentar sobre o progresso do aluno ao longo do tempo.\n\n';
+        timeContext += `Data de início dos estudos do aluno: ${formattedStartDate}\n`;
+        timeContext += `Data e hora atuais: ${formattedCurrentDateTime}\n`;
+        timeContext += '--- FIM DO CONTEXTO ---';
+    }
+
+
+    const fullSystemPrompt = systemPrompt + goalsContext + timeContext;
 
 
     // Using `any` for config to accommodate `speechConfig`, which is not in the
@@ -120,7 +143,7 @@ export default function StreamingConsole() {
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, todos]);
+  }, [setConfig, systemPrompt, tools, voice, todos, user]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();
