@@ -75,6 +75,7 @@ export default function StreamingConsole() {
         ],
       }));
 
+    let context = '';
     const inProgressTasks = todos
       .filter(t => t.status === 'inProgress' && !t.isHeader)
       .map(t => `- ${t.text}`);
@@ -82,41 +83,38 @@ export default function StreamingConsole() {
       .filter(t => t.status === 'completed' && !t.isHeader)
       .map(t => `- ${t.text}`);
 
-    let goalsContext = '';
-    if (inProgressTasks.length > 0 || completedTasks.length > 0) {
-        goalsContext += '\n\n--- CONTEXTO DAS METAS DE ESTUDO DO ALUNO ---\n';
-        goalsContext += 'Você deve usar estas metas para personalizar a conversação, motivar o aluno e celebrar suas conquistas.\n';
-        if (inProgressTasks.length > 0) {
-            goalsContext += '\nMetas em progresso:\n' + inProgressTasks.join('\n') + '\n';
+    const hasGoals = inProgressTasks.length > 0 || completedTasks.length > 0;
+    const hasTimeInfo = user && user.studyStartDate;
+
+    if (hasGoals || hasTimeInfo) {
+        context += '\n\n--- INFORMAÇÕES CONTEXTUAIS DO ALUNO ---\n';
+        context += 'Use as informações a seguir para personalizar a conversação, oferecer motivação e saudações contextuais.\n';
+
+        if (hasTimeInfo) {
+            const startDate = new Date(user!.studyStartDate);
+            const now = new Date();
+            const formattedStartDate = startDate.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+            const formattedCurrentDateTime = now.toLocaleString('pt-BR', {
+                year: 'numeric', month: 'long', day: 'numeric', 
+                hour: '2-digit', minute: '2-digit',
+            });
+            context += `\n- Data de início dos estudos: ${formattedStartDate}`;
+            context += `\n- Data e hora atuais: ${formattedCurrentDateTime}\n`;
         }
-        if (completedTasks.length > 0) {
-            goalsContext += '\nMetas concluídas recentemente:\n' + completedTasks.join('\n') + '\n';
+
+        if (hasGoals) {
+            if (inProgressTasks.length > 0) {
+                context += '\nMetas em progresso (foco atual):\n' + inProgressTasks.join('\n') + '\n';
+            }
+            if (completedTasks.length > 0) {
+                context += '\nMetas concluídas recentemente (celebre estas conquistas):\n' + completedTasks.join('\n') + '\n';
+            }
         }
-        goalsContext += '--- FIM DO CONTEXTO ---';
+
+        context += '--- FIM DAS INFORMAÇÕES CONTEXTUAIS ---';
     }
-
-    let timeContext = '';
-    if (user && user.studyStartDate) {
-        const startDate = new Date(user.studyStartDate);
-        const now = new Date();
-
-        const optionsDate: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-        
-        const formattedStartDate = startDate.toLocaleDateString('pt-BR', optionsDate);
-        const formattedCurrentDateTime = now.toLocaleString('pt-BR', {
-            year: 'numeric', month: 'long', day: 'numeric', 
-            hour: '2-digit', minute: '2-digit',
-        });
-
-        timeContext += '\n\n--- CONTEXTO DO ALUNO E HORA ATUAL ---\n';
-        timeContext += 'Use estas informações para personalizar saudações (bom dia, boa tarde) e comentar sobre o progresso do aluno ao longo do tempo.\n\n';
-        timeContext += `Data de início dos estudos do aluno: ${formattedStartDate}\n`;
-        timeContext += `Data e hora atuais: ${formattedCurrentDateTime}\n`;
-        timeContext += '--- FIM DO CONTEXTO ---';
-    }
-
-
-    const fullSystemPrompt = systemPrompt + goalsContext + timeContext;
+    
+    const fullSystemPrompt = systemPrompt + context;
 
 
     // Using `any` for config to accommodate `speechConfig`, which is not in the
