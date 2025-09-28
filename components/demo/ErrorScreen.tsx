@@ -28,63 +28,46 @@ export default function ErrorScreen() {
     };
   }, [client]);
 
+  if (!error) {
+    return null;
+  }
+
   const quotaErrorMessage =
     'A API Gemini Live no AI Studio tem uma cota diária gratuita limitada. Volte amanhã para continuar.';
 
-  let errorMessage = 'Algo deu errado. Por favor, tente novamente.';
-  let rawMessage: string | null = error?.message || null;
-  let tryAgainOption = true;
-  if (error?.message?.includes('RESOURCE_EXHAUSTED')) {
-    errorMessage = quotaErrorMessage;
-    rawMessage = null;
-    tryAgainOption = false;
-  }
+  const isQuotaError = error?.message?.includes('RESOURCE_EXHAUSTED');
 
-  if (!error) {
-    return <div style={{ display: 'none' }} />;
-  }
+  const errorMessage = isQuotaError ? quotaErrorMessage : 'Algo deu errado. Por favor, tente novamente.';
+  const errorTitle = isQuotaError ? 'Cota Atingida' : 'Ocorreu um Erro';
+  const errorIcon = isQuotaError ? 'hourglass_disabled' : 'error';
+  const rawMessage = isQuotaError ? null : error?.message || null;
+  const isCloseButtonDisabled = isQuotaError;
 
   return (
-    <div className="error-screen">
-      <div
-        style={{
-          fontSize: 48,
-        }}
-      >
-        💔
-      </div>
-      <div
-        className="error-message-container"
-        style={{
-          fontSize: 22,
-          lineHeight: 1.2,
-          opacity: 0.5,
-        }}
-      >
-        {errorMessage}
-      </div>
-      {tryAgainOption ? (
-        <button
-          className="close-button"
-          onClick={() => {
-            setError(null);
-          }}
-        >
-          Fechar
-        </button>
-      ) : null}
-      {rawMessage ? (
-        <div
-          className="error-raw-message-container"
-          style={{
-            fontSize: 15,
-            lineHeight: 1.2,
-            opacity: 0.4,
-          }}
-        >
-          {rawMessage}
+    <div className="error-modal-overlay">
+      <div className="error-modal-content">
+        <div className="error-modal-header">
+          <span className="icon">{errorIcon}</span>
+          <h2>{errorTitle}</h2>
         </div>
-      ) : null}
+        <p>{errorMessage}</p>
+        {rawMessage && (
+          <div className="error-raw-message-container">
+            {rawMessage}
+          </div>
+        )}
+        <div className="modal-actions">
+          <button
+            className="close-button"
+            onClick={() => {
+              setError(null);
+            }}
+            disabled={isCloseButtonDisabled}
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
