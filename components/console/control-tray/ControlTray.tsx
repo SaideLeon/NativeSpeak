@@ -146,7 +146,9 @@ function ControlTray({ children }: ControlTrayProps) {
       <nav className={cn('actions-nav')}>
         <button
           ref={micButtonRef}
-          className={cn('action-button mic-button')}
+          className={cn('action-button mic-button', {
+            recording: connected && !muted,
+          })}
           onClick={handleMicClick}
           title={micButtonTitle}
         >

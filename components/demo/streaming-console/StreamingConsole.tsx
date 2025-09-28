@@ -2,8 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { useEffect, useRef, useState } from 'react';
-import PopUp from '../popup/PopUp';
+import { useEffect, useRef } from 'react';
 import WelcomeScreen from '../welcome-screen/WelcomeScreen';
 // FIX: Import LiveServerContent to correctly type the content handler.
 import { LiveConnectConfig, Modality, LiveServerContent } from '@google/genai';
@@ -57,11 +56,6 @@ export default function StreamingConsole() {
   const { tools } = useTools();
   const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [showPopUp, setShowPopUp] = useState(true);
-
-  const handleClosePopUp = () => {
-    setShowPopUp(false);
-  };
 
   // Set the configuration for the Live API
   useEffect(() => {
@@ -191,7 +185,6 @@ export default function StreamingConsole() {
 
   return (
     <div className="transcription-container">
-      {showPopUp && <PopUp onClose={handleClosePopUp} />}
       {turns.length === 0 ? (
         <WelcomeScreen />
       ) : (
@@ -199,44 +192,46 @@ export default function StreamingConsole() {
           {turns.map((t, i) => (
             <div
               key={i}
-              className={`transcription-entry ${t.role} ${!t.isFinal ? 'interim' : ''
-                }`}
+              className={`transcription-entry ${t.role} ${
+                !t.isFinal ? 'interim' : ''
+              }`}
             >
-              <div className="transcription-header">
-                <div className="transcription-source">
-                  {t.role === 'user'
-                    ? 'You'
-                    : t.role === 'agent'
-                      ? 'Agent'
-                      : 'System'}
-                </div>
-                <div className="transcription-timestamp">
-                  {formatTimestamp(t.timestamp)}
-                </div>
+              <div className="transcription-source">
+                {t.role === 'user'
+                  ? 'You'
+                  : t.role === 'agent'
+                  ? 'Tutor'
+                  : 'System'}
               </div>
-              <div className="transcription-text-content">
-                {renderContent(t.text)}
-              </div>
-              {t.groundingChunks && t.groundingChunks.length > 0 && (
-                <div className="grounding-chunks">
-                  <strong>Sources:</strong>
-                  <ul>
-                    {t.groundingChunks
-                      .filter(chunk => chunk.web)
-                      .map((chunk, index) => (
-                        <li key={index}>
-                          <a
-                            href={chunk.web!.uri}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {chunk.web!.title || chunk.web!.uri}
-                          </a>
-                        </li>
-                      ))}
-                  </ul>
+              <div className="message-bubble">
+                <div className="transcription-text-content">
+                  {renderContent(t.text)}
                 </div>
-              )}
+                {t.groundingChunks && t.groundingChunks.length > 0 && (
+                  <div className="grounding-chunks">
+                    <strong>Sources:</strong>
+                    <ul>
+                      {t.groundingChunks
+                        .filter(chunk => chunk.web)
+                        .map((chunk, index) => (
+                          <li key={index}>
+                            <a
+                              href={chunk.web!.uri}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {chunk.web!.title || chunk.web!.uri}
+                            </a>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              <div className="transcription-timestamp">
+                {formatTimestamp(t.timestamp)}
+              </div>
             </div>
           ))}
         </div>

@@ -7,32 +7,37 @@ import React from 'react';
 import './WelcomeScreen.css';
 import { useTools, Template } from '../../../lib/state';
 
-const welcomeContent: Record<Template, { title: string; description: string; prompts: string[] }> = {
+// Re-themed content for English learning scenarios, but using existing template keys.
+const welcomeContent: Record<
+  Template,
+  { title: string; description: string; prompts: string[] }
+> = {
   'customer-support': {
-    title: 'Customer Support',
-    description: 'Handle customer inquiries and see how function calls can automate tasks.',
+    title: 'Everyday Conversation',
+    description: 'Practice common social interactions and daily chats.',
     prompts: [
-      "I'd like to return an item.",
-      "What's the status of my order?",
-      'Can I speak to a representative?',
+      'How was your weekend?',
+      "Let's talk about our hobbies.",
+      'What kind of music do you like?',
     ],
   },
   'personal-assistant': {
-    title: 'Personal Assistant',
-    description: 'Manage your schedule, send emails, and set reminders.',
+    title: 'Job Interview Practice',
+    description:
+      'Prepare for professional interviews and answer common questions.',
     prompts: [
-      'Create a calendar event for a meeting tomorrow at 10am.',
-      'Send an email to jane@example.com.',
-      'Set a reminder to buy milk.',
+      'Tell me about yourself.',
+      'What are your biggest strengths?',
+      'Do you have any questions for me?',
     ],
   },
   'navigation-system': {
-    title: 'Navigation System',
-    description: 'Find routes, nearby places, and get traffic information.',
+    title: 'Travel & Directions',
+    description: 'Practice asking for directions and navigating a new city.',
     prompts: [
-      'Find a route to the nearest coffee shop.',
-      'Are there any parks nearby?',
-      "What's the traffic like on the way to the airport?",
+      'How do I get to the museum?',
+      'Excuse me, where is the nearest subway station?',
+      "I'd like to book a table for two.",
     ],
   },
 };
@@ -46,10 +51,14 @@ const WelcomeScreen: React.FC = () => {
         <div className="title-container">
           <span className="welcome-icon">mic</span>
           <div className="title-selector">
-            <select value={template} onChange={(e) => setTemplate(e.target.value as Template)} aria-label="Select a template">
-              <option value="customer-support">Customer Support</option>
-              <option value="personal-assistant">Personal Assistant</option>
-              <option value="navigation-system">Navigation System</option>
+            <select
+              value={template}
+              onChange={e => setTemplate(e.target.value as Template)}
+              aria-label="Select a practice scenario"
+            >
+              <option value="customer-support">Everyday Conversation</option>
+              <option value="personal-assistant">Job Interview</option>
+              <option value="navigation-system">Travel & Directions</option>
             </select>
             <span className="icon">arrow_drop_down</span>
           </div>
@@ -57,7 +66,9 @@ const WelcomeScreen: React.FC = () => {
         <p>{description}</p>
         <div className="example-prompts">
           {prompts.map((prompt, index) => (
-            <div key={index} className="prompt">{prompt}</div>
+            <div key={index} className="prompt">
+              {prompt}
+            </div>
           ))}
         </div>
       </div>

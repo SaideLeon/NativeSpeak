@@ -11,8 +11,10 @@ export default function Header() {
     <header>
       <div className="header-left">
         <h1>NativeSpeak</h1>
-        <p>An interactive sandbox for experimenting with native audio streaming.</p>
-        <p>Build your own voice-enabled AI experiment.</p>
+        <div className="subtitle">
+          <p>Your AI partner for mastering English conversation.</p>
+          <p>Practice speaking, get instant feedback, and improve fluency.</p>
+        </div>
       </div>
       <div className="header-right">
         <button
