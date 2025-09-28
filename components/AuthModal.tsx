@@ -18,8 +18,22 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [masterKey, setMasterKey] = useState('');
   
-  const { login, register, error } = useAuthStore();
+  const { login, register, error, isSystemUnlocked } = useAuthStore();
+
+  const handleActivationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Use a dummy email, as it's not checked for the master key
+      await login('admin@system.local', masterKey);
+      // On success, the store will update, component will re-render, and the modal will close
+      onClose();
+    } catch (e) {
+      // Error is set in the store, no need to do anything here
+      console.error(e);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +68,38 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
     setIsLoginView(!isLoginView);
     resetForm();
   }
+  
+  if (!isSystemUnlocked) {
+    return (
+      <Modal onClose={onClose}>
+        <div className="auth-modal">
+          <h2>Ativação do Sistema</h2>
+          <p className="auth-prompt-text">
+            Um administrador precisa ativar o sistema com a Chave Suprema para permitir o registro e login de usuários.
+          </p>
+          <form onSubmit={handleActivationSubmit}>
+            <div className="form-field">
+              <label htmlFor="auth-master-key">Chave Suprema</label>
+              <input
+                id="auth-master-key"
+                type="password"
+                value={masterKey}
+                onChange={(e) => setMasterKey(e.target.value)}
+                required
+              />
+            </div>
+            {error && <p className="auth-error">{error}</p>}
+            <div className="modal-actions">
+              <button type="submit" className="submit-button">
+                Ativar Sistema
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
+    );
+  }
+
 
   return (
     <Modal onClose={onClose}>
