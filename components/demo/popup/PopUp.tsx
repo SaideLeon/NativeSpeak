@@ -14,7 +14,7 @@ const PopUp: React.FC<PopUpProps> = ({ onClose }) => {
   return (
     <div className="popup-overlay">
       <div className="popup-content">
-        <h2>Welcome to Native Audio Function Call Sandbox</h2>
+        <h2>Welcome to NativeSpeak</h2>
         <p>Your starting point for building with native audio and function calling.</p>
         <p>To get started:</p>
         <ol>

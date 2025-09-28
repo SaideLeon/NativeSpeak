@@ -10,9 +10,9 @@ export default function Header() {
   return (
     <header>
       <div className="header-left">
-        <h1>Native Audio Function Call Sandbox</h1>
-        <p>Copy the app and ask the Code Assistant to add function calls.</p>
-        <p>Build your own function call experiment.</p>
+        <h1>NativeSpeak</h1>
+        <p>An interactive sandbox for experimenting with native audio streaming.</p>
+        <p>Build your own voice-enabled AI experiment.</p>
       </div>
       <div className="header-right">
         <button
