@@ -86,15 +86,21 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-md);
+  padding: var(--space-sm) var(--space-md); /* slightly less padding */
   background: var(--bg-card);
   border: 1px solid var(--border-color);
+  border-left: 3px solid transparent;
   border-radius: var(--radius-md);
   transition: all var(--transition-normal);
 }
 
+.todo-item.inProgress {
+  border-left-color: var(--accent-orange);
+}
+
 .todo-item.completed {
   background: var(--bg-secondary);
+  border-left-color: var(--accent-green);
   opacity: 0.7;
 }
 
@@ -128,48 +134,30 @@
   color: var(--error);
 }
 
-/* Custom checkbox styles for the todo list */
-.todo-checkbox-wrapper {
-  position: relative;
+/* Status button styles */
+.todo-status-button {
+  background: none;
+  border: none;
   cursor: pointer;
+  padding: 0;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
   display: flex;
   align-items: center;
 }
 
-.todo-checkbox-wrapper input[type="checkbox"] {
-  opacity: 0;
-  position: absolute;
-  width: 0;
-  height: 0;
+.todo-status-button:hover {
+  color: var(--text-primary);
 }
 
-.todo-checkbox-visual {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-color);
-  border-radius: 50%; /* Make it round */
-  background: var(--bg-secondary);
-  transition: all var(--transition-normal);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+.todo-status-button .icon {
+  font-size: 22px;
 }
 
-.todo-checkbox-visual::after {
-  content: '✓';
-  color: white;
-  font-weight: bold;
-  transform: scale(0);
-  transition: transform var(--transition-fast);
-  font-size: 0.75rem;
+.todo-item.inProgress .todo-status-button {
+  color: var(--accent-orange);
 }
 
-.todo-checkbox-wrapper input[type="checkbox"]:checked + .todo-checkbox-visual {
-  background: var(--accent-green);
-  border-color: var(--accent-green);
-}
-
-.todo-checkbox-wrapper input[type="checkbox"]:checked + .todo-checkbox-visual::after {
-  transform: scale(1);
+.todo-item.completed .todo-status-button {
+  color: var(--accent-green);
 }

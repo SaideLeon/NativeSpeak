@@ -14,6 +14,7 @@ import {
   useTools,
   ConversationTurn,
 } from '@/lib/state';
+import { useTodoStore } from '../../../lib/todoStore';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -54,6 +55,7 @@ export default function StreamingConsole() {
   const { client, setConfig } = useLiveAPIContext();
   const { systemPrompt, voice } = useSettings();
   const { tools } = useTools();
+  const { todos } = useTodoStore();
   const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +73,29 @@ export default function StreamingConsole() {
         ],
       }));
 
+    const inProgressTasks = todos
+      .filter(t => t.status === 'inProgress' && !t.isHeader)
+      .map(t => `- ${t.text}`);
+    const completedTasks = todos
+      .filter(t => t.status === 'completed' && !t.isHeader)
+      .map(t => `- ${t.text}`);
+
+    let goalsContext = '';
+    if (inProgressTasks.length > 0 || completedTasks.length > 0) {
+        goalsContext += '\n\n--- CONTEXTO DAS METAS DE ESTUDO DO ALUNO ---\n';
+        goalsContext += 'Você deve usar estas metas para personalizar a conversação, motivar o aluno e celebrar suas conquistas.\n';
+        if (inProgressTasks.length > 0) {
+            goalsContext += '\nMetas em progresso:\n' + inProgressTasks.join('\n') + '\n';
+        }
+        if (completedTasks.length > 0) {
+            goalsContext += '\nMetas concluídas recentemente:\n' + completedTasks.join('\n') + '\n';
+        }
+        goalsContext += '--- FIM DO CONTEXTO ---';
+    }
+
+    const fullSystemPrompt = systemPrompt + goalsContext;
+
+
     // Using `any` for config to accommodate `speechConfig`, which is not in the
     // current TS definitions but is used in the working reference example.
     const config: any = {
@@ -87,7 +112,7 @@ export default function StreamingConsole() {
       systemInstruction: {
         parts: [
           {
-            text: systemPrompt,
+            text: fullSystemPrompt,
           },
         ],
       },
@@ -95,7 +120,7 @@ export default function StreamingConsole() {
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice]);
+  }, [setConfig, systemPrompt, tools, voice, todos]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();

@@ -4,7 +4,7 @@ import './TodoList.css';
 import cn from 'classnames';
 
 const TodoList: React.FC = () => {
-  const { todos, addTodo, removeTodo, toggleTodo } = useTodoStore();
+  const { todos, addTodo, removeTodo, cycleTodoStatus } = useTodoStore();
   const [newTodoText, setNewTodoText] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,16 +46,22 @@ const TodoList: React.FC = () => {
           ) : (
             <li
               key={todo.id}
-              className={cn('todo-item', { completed: todo.completed })}
+              className={cn('todo-item', {
+                completed: todo.status === 'completed',
+                inProgress: todo.status === 'inProgress',
+              })}
             >
-              <label className="todo-checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() => toggleTodo(todo.id)}
-                />
-                <span className="todo-checkbox-visual"></span>
-              </label>
+              <button
+                onClick={() => cycleTodoStatus(todo.id)}
+                className="todo-status-button"
+                aria-label={`Change status for ${todo.text}`}
+              >
+                <span className="icon">
+                  {todo.status === 'todo' && 'radio_button_unchecked'}
+                  {todo.status === 'inProgress' && 'progress_activity'}
+                  {todo.status === 'completed' && 'check_circle'}
+                </span>
+              </button>
               <span className="todo-text">{todo.text}</span>
               <button
                 onClick={() => removeTodo(todo.id)}
