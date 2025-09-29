@@ -1,28 +1,39 @@
+/* Tema da Tela de Boas-Vindas para Aprendizado de Idiomas */
 .welcome-screen {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--text-secondary);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .welcome-content {
-  max-width: 600px;
+  max-width: 700px;
+  padding: var(--space-xl);
 }
 
 .welcome-icon {
-  font-size: 60px;
-  color: var(--gray-700);
-  margin-bottom: 20px;
+  font-size: 4rem;
+  color: var(--primary-light);
+  margin-bottom: var(--space-md);
+  text-shadow: var(--glow-primary);
   font-family: 'Material Symbols Outlined';
 }
 
 .title-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-lg);
 }
 
 .title-selector {
@@ -31,17 +42,17 @@
 }
 
 .title-selector select {
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--gray-300);
-  background-color: transparent;
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: transparent;
   border: none;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 30px;
-  /* Space for the icon */
   cursor: pointer;
+  text-align: center;
+  padding-right: 2.5rem; /* Espaço para o ícone */
+  position: relative;
   text-transform: capitalize;
 }
 
@@ -50,28 +61,55 @@
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  font-size: 30px;
-  color: var(--gray-300);
+  font-size: 2.5rem;
+  color: var(--text-muted);
   pointer-events: none;
-  /* Allows clicks to pass through to the select */
 }
 
-.welcome-content p {
-  font-size: 18px;
-  margin-bottom: 30px;
+.welcome-content > p {
+  font-size: 1.125rem;
+  margin-bottom: var(--space-xl);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .example-prompts {
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: var(--space-md);
+  flex-wrap: wrap;
 }
 
 .prompt {
-  background-color: var(--Neutral-15);
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-family: 'Roboto Mono', monospace;
-  font-size: 14px;
-  color: var(--gray-200);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-normal);
+  cursor: default;
+}
+
+.prompt:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .title-selector select {
+    font-size: 1.75rem;
+  }
+
+  .title-selector .icon {
+    font-size: 1.75rem;
+  }
+
+  .welcome-content > p {
+    font-size: 1rem;
+  }
 }

@@ -8,6 +8,23 @@ import { FunctionResponseScheduling } from '@google/genai';
 
 export const personalAssistantTools: FunctionCall[] = [
   {
+    name: 'get_current_time',
+    description:
+      'Obtém a hora atual exata para um local específico. Se nenhum local for fornecido, retorna a hora local.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        location: {
+          type: 'STRING',
+          description:
+            'A cidade ou país para verificar a hora (ex: "Londres", "Japão").',
+        },
+      },
+    },
+    isEnabled: true,
+    scheduling: FunctionResponseScheduling.INTERRUPT,
+  },
+  {
     name: 'create_calendar_event',
     description: 'Cria um novo evento no calendário do usuário.',
     parameters: {

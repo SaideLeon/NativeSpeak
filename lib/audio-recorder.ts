@@ -25,16 +25,6 @@ import VolMeterWorket from './worklets/vol-meter';
 import { createWorketFromSrc } from './audioworklet-registry';
 import EventEmitter from 'eventemitter3';
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  var binary = '';
-  var bytes = new Uint8Array(buffer);
-  var len = bytes.byteLength;
-  for (var i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
-}
-
 // FIX: Refactored to use composition over inheritance for EventEmitter
 export class AudioRecorder {
   // FIX: Use an internal EventEmitter instance
@@ -77,11 +67,11 @@ export class AudioRecorder {
       this.recordingWorklet.port.onmessage = async (ev: MessageEvent) => {
         // Worklet processes recording floats and messages converted buffer
         const arrayBuffer = ev.data.data.int16arrayBuffer;
-
         if (arrayBuffer) {
-          const arrayBufferString = arrayBufferToBase64(arrayBuffer);
-          // FIX: Changed this.emit to this.emitter.emit
-          this.emitter.emit('data', arrayBufferString);
+          // Emit the raw ArrayBuffer for WAV processing and a base64 string for live streaming.
+          this.emitter.emit('data', {
+            buffer: arrayBuffer,
+          });
         }
       };
       this.source.connect(this.recordingWorklet);

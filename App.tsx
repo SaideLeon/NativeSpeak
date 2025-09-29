@@ -32,6 +32,8 @@ import LandingPage from './components/LandingPage';
 import LegalModal from './components/LegalModal';
 import TermsAcceptanceModal from './components/TermsAcceptanceModal';
 import Subtitles from './components/Subtitles';
+import Tutorial from './components/Tutorial';
+import { useUI } from './lib/state';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -46,6 +48,7 @@ if (typeof API_KEY !== 'string') {
  */
 function App() {
   const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
+  const { isTutorialOpen, setTutorialOpen } = useUI();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeLegalDoc, setActiveLegalDoc] = useState<
     'privacy' | 'terms' | null
@@ -54,6 +57,19 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Show tutorial on first login
+  useEffect(() => {
+    if (isAuthenticated && !user?.needsToAcceptTerms) {
+      const tutorialCompleted = localStorage.getItem(
+        'native_speak_tutorial_completed'
+      );
+      if (!tutorialCompleted) {
+        // Use a small timeout to let the main UI render first
+        setTimeout(() => setTutorialOpen(true), 500);
+      }
+    }
+  }, [isAuthenticated, user, setTutorialOpen]);
 
   // To prevent flash of unauthenticated content
   if (isLoading) {
@@ -95,6 +111,14 @@ function App() {
           />
         )}
         {showTermsModal && <TermsAcceptanceModal />}
+        {isTutorialOpen && (
+          <Tutorial
+            onClose={() => {
+              setTutorialOpen(false);
+              localStorage.setItem('native_speak_tutorial_completed', 'true');
+            }}
+          />
+        )}
       </LiveAPIProvider>
     </div>
   );
