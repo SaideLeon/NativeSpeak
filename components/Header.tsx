@@ -4,6 +4,7 @@
 */
 import { useUI } from '@/lib/state';
 import { useAuthStore } from '../lib/authStore';
+import SessionTimer from './SessionTimer';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -19,6 +20,7 @@ export default function Header({ onLoginClick }: HeaderProps) {
       <header>
         <div className="header-left">
           <h1>NativeSpeak</h1>
+          <SessionTimer />
         </div>
         <div className="header-right">
           {isAuthenticated && user ? (
