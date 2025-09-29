@@ -13,6 +13,7 @@ import {
   useLogStore,
   useTools,
   ConversationTurn,
+  useUI,
 } from '@/lib/state';
 import { useTodoStore } from '../../../lib/todoStore';
 import { useAuthStore } from '../../../lib/authStore';
@@ -60,6 +61,34 @@ export default function StreamingConsole() {
   const { user } = useAuthStore();
   const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { setSubtitleText } = useUI();
+  const subtitleTimeoutRef = useRef<number | null>(null);
+
+  // Effect to manage subtitles based on conversation turns
+  useEffect(() => {
+    const lastTurn = turns[turns.length - 1];
+
+    // Always clear the previous timeout when a new turn update comes in
+    if (subtitleTimeoutRef.current) {
+      clearTimeout(subtitleTimeoutRef.current);
+      subtitleTimeoutRef.current = null;
+    }
+
+    // If the last turn is from the agent and has text, display it as a subtitle
+    if (lastTurn && lastTurn.role === 'agent' && lastTurn.text) {
+      setSubtitleText(lastTurn.text);
+
+      // If the turn is final, set a timer to clear the subtitle
+      if (lastTurn.isFinal) {
+        subtitleTimeoutRef.current = window.setTimeout(() => {
+          setSubtitleText('');
+        }, 3000); // Clear after 3 seconds
+      }
+    } else {
+        // If the last turn is not an agent's turn, or there are no turns, clear subtitles immediately.
+        setSubtitleText('');
+    }
+  }, [turns, setSubtitleText]);
 
   // Set the configuration for the Live API
   useEffect(() => {

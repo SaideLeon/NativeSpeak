@@ -1565,3 +1565,47 @@ html, .modal, .sidebar-content, .transcription-view {
 .legal-modal-content a:hover {
   text-decoration: underline;
 }
+
+/* Subtitles */
+.subtitles-container {
+    position: fixed;
+    bottom: 150px; /* Position above the control tray */
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    color: var(--text-primary);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    max-width: 90%;
+    width: fit-content;
+    max-width: 800px;
+    text-align: center;
+    z-index: 99;
+    opacity: 0;
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+    pointer-events: none;
+    box-shadow: var(--shadow-medium);
+}
+
+.subtitles-container.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.subtitle-text {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .subtitles-container {
+        bottom: 130px; /* Adjust for smaller control tray */
+        padding: var(--space-xs) var(--space-md);
+    }
+    .subtitle-text {
+        font-size: 0.95rem;
+    }
+}
