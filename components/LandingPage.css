@@ -155,6 +155,138 @@
   position: relative;
 }
 
+/* Pricing Section */
+.pricing-section {
+  text-align: center;
+}
+
+.pricing-section h2 {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.pricing-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2xl);
+  font-size: 1.1rem;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+.pricing-card {
+  background: var(--bg-card);
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  height: 100%;
+}
+
+.pricing-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-medium);
+}
+
+.pricing-card.popular {
+  border: 2px solid var(--primary-light);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-large), var(--glow-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.popular-badge {
+  position: absolute;
+  top: 15px;
+  right: -45px;
+  background: var(--primary-light);
+  color: white;
+  padding: 8px 40px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transform: rotate(45deg);
+  letter-spacing: 0.5px;
+}
+
+.pricing-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  text-align: left;
+  flex-grow: 1;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--text-secondary);
+}
+
+.plan-features .icon {
+  color: var(--accent-green);
+  font-size: 1.25rem;
+}
+
+.plan-button {
+  margin-top: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  width: 100%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.plan-button:hover {
+  background: var(--hover-bg);
+  border-color: var(--primary-light);
+}
+
+.pricing-card.popular .plan-button {
+  background: var(--bg-gradient);
+  color: white;
+  border: none;
+  box-shadow: var(--glow-primary);
+}
+
 /* Footer */
 .landing-footer {
   text-align: center;

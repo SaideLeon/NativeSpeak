@@ -78,7 +78,92 @@ const LandingPage: React.FC<LandingPageProps> = ({
             <div className="step-number">3</div>
             <span className="icon">mic</span>
             <h3>Comece a Falar</h3>
-            <p>Pressione o microfone e converse em inglês. A IA cuidará do resto.</p>
+            <p>
+              Pressione o microfone e converse em inglês. A IA cuidará do
+              resto.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="pricing-section">
+        <h2>Escolha o Plano Ideal para Você</h2>
+        <p className="pricing-subtitle">
+          Comece com 50 créditos grátis ao se registrar. Sem compromisso.
+        </p>
+        <div className="pricing-grid">
+          <div className="pricing-card">
+            <h3>Básico</h3>
+            <div className="price">
+              1.600 MZN <span>/ mês</span>
+            </div>
+            <ul className="plan-features">
+              <li>
+                <span className="icon">check_circle</span> 3.000 Créditos de
+                Conversação
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Acesso a todos os
+                cenários
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Feedback instantâneo
+              </li>
+            </ul>
+            <button className="plan-button" onClick={onStartClick}>
+              Começar
+            </button>
+          </div>
+          <div className="pricing-card popular">
+            <div className="popular-badge">MAIS POPULAR</div>
+            <h3>Padrão</h3>
+            <div className="price">
+              4.500 MZN <span>/ mês</span>
+            </div>
+            <ul className="plan-features">
+              <li>
+                <span className="icon">check_circle</span> 10.000 Créditos de
+                Conversação
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Acesso a todos os
+                cenários
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Feedback instantâneo
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Suporte prioritário
+              </li>
+            </ul>
+            <button className="plan-button" onClick={onStartClick}>
+              Começar
+            </button>
+          </div>
+          <div className="pricing-card">
+            <h3>Premium</h3>
+            <div className="price">
+              7.000 MZN <span>/ mês</span>
+            </div>
+            <ul className="plan-features">
+              <li>
+                <span className="icon">check_circle</span> 20.000 Créditos de
+                Conversação
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Acesso a todos os
+                cenários
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Feedback instantâneo
+              </li>
+              <li>
+                <span className="icon">check_circle</span> Suporte prioritário
+              </li>
+            </ul>
+            <button className="plan-button" onClick={onStartClick}>
+              Começar
+            </button>
           </div>
         </div>
       </section>
