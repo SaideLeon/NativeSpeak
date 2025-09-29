@@ -13,7 +13,7 @@ interface User {
   firstName: string;
   lastName: string;
   studyStartDate: string;
-  termsAcceptedOn?: string;
+  termsAccepted?: boolean;
   needsToAcceptTerms?: boolean; // Transient state property
 }
 
@@ -85,14 +85,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         throw new Error('Já existe um usuário com este e-mail.');
       }
       const studyStartDate = new Date().toISOString();
-      const termsAcceptedOn = new Date().toISOString();
       // In a real app, you would hash the password
       users[email] = {
         pass,
         firstName,
         lastName,
         studyStartDate,
-        termsAcceptedOn,
+        termsAccepted: true,
       };
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
@@ -101,7 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         firstName,
         lastName,
         studyStartDate,
-        termsAcceptedOn,
+        termsAccepted: true,
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
@@ -126,7 +125,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           firstName: 'Administrador',
           lastName: 'Supremo',
           studyStartDate: new Date().toISOString(),
-          termsAcceptedOn: new Date().toISOString(),
+          termsAccepted: true,
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(superAdminUser));
         set({
@@ -162,14 +161,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         throw new Error('E-mail ou senha inválidos.');
       }
 
-      const needsToAcceptTerms = !users[email].termsAcceptedOn;
+      const needsToAcceptTerms = !users[email].termsAccepted;
 
       const user: User = {
         email,
         firstName: users[email].firstName,
         lastName: users[email].lastName,
         studyStartDate: users[email].studyStartDate,
-        termsAcceptedOn: users[email].termsAcceptedOn,
+        termsAccepted: users[email].termsAccepted,
         ...(needsToAcceptTerms && { needsToAcceptTerms: true }),
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
@@ -199,14 +198,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
       if (users[user.email]) {
-        const termsAcceptedOn = new Date().toISOString();
-        users[user.email].termsAcceptedOn = termsAcceptedOn;
+        users[user.email].termsAccepted = true;
         localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
         const updatedUser = {
           ...user,
           needsToAcceptTerms: false,
-          termsAcceptedOn,
+          termsAccepted: true,
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
         set({ user: updatedUser });
@@ -231,10 +229,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const dbUser = users[user.email];
 
         // Check against the source of truth (USERS_KEY)
-        if (dbUser && !dbUser.termsAcceptedOn) {
+        if (dbUser && !dbUser.termsAccepted) {
           user.needsToAcceptTerms = true;
         } else if (dbUser) {
-          user.termsAcceptedOn = dbUser.termsAcceptedOn; // Sync just in case
+          user.termsAccepted = dbUser.termsAccepted; // Sync just in case
         }
 
         // Backwards compatibility for users without a start date
