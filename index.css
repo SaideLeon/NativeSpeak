@@ -865,6 +865,42 @@ select {
   transform: rotate(90deg);
 }
 
+.modal-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.modal-actions button {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all var(--transition-normal);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.modal-actions .save-button {
+  background-color: var(--primary-light);
+  color: white;
+}
+
+.modal-actions .save-button:hover {
+  background-color: var(--primary-blue);
+  box-shadow: var(--shadow-soft);
+}
+
+.modal-actions .cancel-button {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.modal-actions .cancel-button:hover {
+  background-color: var(--hover-bg);
+}
+
 .tool-editor-modal .form-field {
   display: flex;
   flex-direction: column;
@@ -884,34 +920,8 @@ select {
 }
 
 .tool-editor-modal .modal-actions {
-  display: flex;
   justify-content: flex-end;
-  gap: 12px;
   margin-top: 8px;
-}
-
-.tool-editor-modal .modal-actions button {
-  padding: 10px 20px;
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-
-.tool-editor-modal .modal-actions .save-button {
-  background-color: var(--primary-light);
-  color: white;
-}
-
-.tool-editor-modal .modal-actions .save-button:hover {
-  opacity: 0.9;
-}
-
-.tool-editor-modal .modal-actions .cancel-button {
-  background-color: var(--bg-card);
-}
-
-.tool-editor-modal .modal-actions .cancel-button:hover {
-  background-color: var(--hover-bg);
 }
 
 /* Welcome Screen - Language Learning Theme */
