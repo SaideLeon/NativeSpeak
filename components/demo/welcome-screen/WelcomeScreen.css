@@ -18,6 +18,35 @@
   font-family: 'Material Symbols Outlined';
 }
 
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+  background-color: var(--bg-card);
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.mode-selector button {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.mode-selector button.active {
+  background-color: var(--primary-light);
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
 .title-container {
   display: flex;
   flex-direction: column;

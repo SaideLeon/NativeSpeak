@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react';
 import WelcomeScreen from '../welcome-screen/WelcomeScreen';
 // FIX: Import LiveServerContent to correctly type the content handler.
 import { LiveConnectConfig, Modality, LiveServerContent } from '@google/genai';
+import cn from 'classnames';
 
 import { useLiveAPIContext } from '../../../contexts/LiveAPIContext';
 import {
@@ -14,9 +15,11 @@ import {
   useTools,
   ConversationTurn,
   useUI,
+  lessonSystemPrompts,
 } from '@/lib/state';
 import { useTodoStore } from '../../../lib/todoStore';
 import { useAuthStore } from '../../../lib/authStore';
+import { useLearningStore } from '../../../lib/learningStore';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -47,7 +50,14 @@ const renderContent = (text: string) => {
       if (boldPart.startsWith('**') && boldPart.endsWith('**')) {
         return <strong key={boldIndex}>{boldPart.slice(2, -2)}</strong>;
       }
-      return boldPart;
+      // Split by lists
+      const listParts = boldPart.split(/(\n\s*\d+\.\s.*)/g);
+      return listParts.map((listPart, listIndex) => {
+        if (listPart.match(/^\n\s*\d+\.\s/)) {
+            return <div key={listIndex} style={{paddingLeft: '20px'}}>{listPart.trim()}</div>
+        }
+        return listPart;
+      });
     });
   });
 };
@@ -63,6 +73,8 @@ export default function StreamingConsole() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { setSubtitleText } = useUI();
   const subtitleTimeoutRef = useRef<number | null>(null);
+  const { mode, lessonTopic } = useLearningStore();
+
 
   // Effect to manage subtitles based on conversation turns
   useEffect(() => {
@@ -143,7 +155,12 @@ export default function StreamingConsole() {
         context += '--- FIM DAS INFORMAÇÕES CONTEXTUAIS ---';
     }
     
-    const fullSystemPrompt = systemPrompt + context;
+    const activeSystemPrompt =
+      mode === 'guided'
+        ? lessonSystemPrompts[lessonTopic]
+        : systemPrompt;
+
+    const fullSystemPrompt = activeSystemPrompt + context;
 
 
     // Using `any` for config to accommodate `speechConfig`, which is not in the
@@ -170,7 +187,7 @@ export default function StreamingConsole() {
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, todos, user]);
+  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();
@@ -262,7 +279,11 @@ export default function StreamingConsole() {
   }, [turns]);
 
   return (
-    <div className="transcription-container">
+    <div
+      className={cn('transcription-container', {
+        'is-welcome': turns.length === 0,
+      })}
+    >
       {turns.length === 0 ? (
         <WelcomeScreen />
       ) : (

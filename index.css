@@ -243,6 +243,11 @@ header .header-right {
   pointer-events: none;
 }
 
+.transcription-container.is-welcome {
+  align-items: center;
+  pointer-events: auto;
+}
+
 .transcription-view {
   width: 100%;
   max-width: 800px;
