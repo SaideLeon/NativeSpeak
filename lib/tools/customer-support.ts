@@ -8,36 +8,64 @@ import { FunctionCall } from '../state';
 
 export const customerSupportTools: FunctionCall[] = [
   {
-    name: 'generate_image_for_vocabulary',
-    description:
-      'Gera uma imagem para ajudar a ensinar um novo vocabulário. Use isso para substantivos visuais (frutas, animais, objetos).',
+    name: 'start_return',
+    description: 'Inicia o processo de devolução de um item, coletando os detalhes necessários do usuário.',
     parameters: {
       type: 'OBJECT',
       properties: {
-        prompt: {
+        orderId: {
           type: 'STRING',
-          description:
-            'Um prompt descritivo em inglês para a imagem a ser gerada (ex: "a photograph of a pineapple", "an illustration of a friendly lion").',
+          description: 'O ID do pedido que contém o item a ser devolvido.',
+        },
+        itemName: {
+          type: 'STRING',
+          description: 'O nome do item que o usuário deseja devolver.',
+        },
+        reason: {
+          type: 'STRING',
+          description: 'O motivo pelo qual o usuário está devolvendo o item.',
         },
       },
-      required: ['prompt'],
+      required: ['orderId', 'itemName', 'reason'],
     },
     isEnabled: true,
     scheduling: FunctionResponseScheduling.INTERRUPT,
   },
   {
-    name: 'get_current_time',
-    description:
-      'Obtém a hora atual exata para um local específico. Se nenhum local for fornecido, retorna a hora local.',
+    name: 'get_order_status',
+    description: 'Fornece o status atual do pedido de um usuário, pesquisando pelo ID do pedido ou detalhes do cliente.',
     parameters: {
       type: 'OBJECT',
       properties: {
-        location: {
+        orderId: {
           type: 'STRING',
-          description:
-            'A cidade ou país para verificar a hora (ex: "Londres", "Japão").',
+          description: 'O ID do pedido a ser verificado. Peça por isso primeiro.',
+        },
+        customerName: {
+          type: 'STRING',
+          description: 'O nome do cliente, se o ID do pedido não estiver disponível.',
+        },
+        customerEmail: {
+          type: 'STRING',
+          description: 'O e-mail do cliente, se o ID do pedido não estiver disponível.',
         },
       },
+    },
+    isEnabled: true,
+    scheduling: FunctionResponseScheduling.INTERRUPT,
+  },
+  {
+    name: 'speak_to_representative',
+    description: 'Escalona a conversa para um representante de suporte humano.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        reason: {
+          type: 'STRING',
+          description: 'Um breve resumo do problema do usuário para o representante.',
+        },
+      },
+      required: ['reason'],
     },
     isEnabled: true,
     scheduling: FunctionResponseScheduling.INTERRUPT,

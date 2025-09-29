@@ -10,8 +10,9 @@ interface HeaderProps {
   onLoginClick: () => void;
 }
 
+
 export default function Header({ onLoginClick }: HeaderProps) {
-  const { toggleSidebar, setTutorialOpen } = useUI();
+  const { toggleSidebar } = useUI();
   const { isAuthenticated, user, logout } = useAuthStore();
 
   return (
@@ -34,16 +35,6 @@ export default function Header({ onLoginClick }: HeaderProps) {
             <button className="login-button" onClick={onLoginClick}>
               <span className="login-text-full">Entrar / Registrar</span>
               <span className="login-text-short">Entrar</span>
-            </button>
-          )}
-          {isAuthenticated && (
-            <button
-              className="help-button"
-              onClick={() => setTutorialOpen(true)}
-              aria-label="Ajuda / Tutorial"
-              title="Mostrar tutorial"
-            >
-              <span className="icon">help_outline</span>
             </button>
           )}
           <button

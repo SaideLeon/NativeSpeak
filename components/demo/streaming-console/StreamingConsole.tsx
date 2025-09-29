@@ -2,15 +2,10 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import WelcomeScreen from '../welcome-screen/WelcomeScreen';
-import {
-  LiveConnectConfig,
-  Modality,
-  LiveServerContent,
-  GoogleGenAI,
-  Type,
-} from '@google/genai';
+// FIX: Import LiveServerContent to correctly type the content handler.
+import { LiveConnectConfig, Modality, LiveServerContent } from '@google/genai';
 
 import { useLiveAPIContext } from '../../../contexts/LiveAPIContext';
 import {
@@ -19,12 +14,9 @@ import {
   useTools,
   ConversationTurn,
   useUI,
-  PronunciationFeedback,
 } from '@/lib/state';
 import { useTodoStore } from '../../../lib/todoStore';
 import { useAuthStore } from '../../../lib/authStore';
-import { encodeWAV } from '@/lib/utils';
-import PronunciationFeedbackDisplay from '@/components/PronunciationFeedback';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -60,7 +52,6 @@ const renderContent = (text: string) => {
   });
 };
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 export default function StreamingConsole() {
   const { client, setConfig } = useLiveAPIContext();
@@ -68,13 +59,7 @@ export default function StreamingConsole() {
   const { tools } = useTools();
   const { todos } = useTodoStore();
   const { user } = useAuthStore();
-  const {
-    turns,
-    getAndClearAudioChunks,
-    updateLastTurn,
-    addTurn,
-    updateTurn,
-  } = useLogStore();
+  const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { setSubtitleText } = useUI();
   const subtitleTimeoutRef = useRef<number | null>(null);
@@ -83,21 +68,25 @@ export default function StreamingConsole() {
   useEffect(() => {
     const lastTurn = turns[turns.length - 1];
 
+    // Always clear the previous timeout when a new turn update comes in
     if (subtitleTimeoutRef.current) {
       clearTimeout(subtitleTimeoutRef.current);
       subtitleTimeoutRef.current = null;
     }
 
+    // If the last turn is from the agent and has text, display it as a subtitle
     if (lastTurn && lastTurn.role === 'agent' && lastTurn.text) {
       setSubtitleText(lastTurn.text);
 
+      // If the turn is final, set a timer to clear the subtitle
       if (lastTurn.isFinal) {
         subtitleTimeoutRef.current = window.setTimeout(() => {
           setSubtitleText('');
-        }, 3000);
+        }, 3000); // Clear after 3 seconds
       }
     } else {
-      setSubtitleText('');
+        // If the last turn is not an agent's turn, or there are no turns, clear subtitles immediately.
+        setSubtitleText('');
     }
   }, [turns, setSubtitleText]);
 
@@ -127,50 +116,39 @@ export default function StreamingConsole() {
     const hasTimeInfo = user && user.studyStartDate;
 
     if (hasGoals || hasTimeInfo) {
-      context += '\n\n--- INFORMAÇÕES CONTEXTUAIS DO ALUNO ---\n';
-      context +=
-        'Use as informações a seguir para personalizar a conversação, oferecer motivação e saudações contextuais.\n';
+        context += '\n\n--- INFORMAÇÕES CONTEXTUAIS DO ALUNO ---\n';
+        context += 'Use as informações a seguir para personalizar a conversação, oferecer motivação e saudações contextuais.\n';
 
-      if (hasTimeInfo) {
-        const startDate = new Date(user!.studyStartDate);
-        const now = new Date();
-        const formattedStartDate = startDate.toLocaleDateString('pt-BR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        });
-        const formattedCurrentDateTime = now.toLocaleString('pt-BR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-        context += `\n- Data de início dos estudos: ${formattedStartDate}`;
-        context += `\n- Data e hora atuais: ${formattedCurrentDateTime}\n`;
-      }
-
-      if (hasGoals) {
-        if (inProgressTasks.length > 0) {
-          context +=
-            '\nMetas em progresso (foco atual):\n' +
-            inProgressTasks.join('\n') +
-            '\n';
+        if (hasTimeInfo) {
+            const startDate = new Date(user!.studyStartDate);
+            const now = new Date();
+            const formattedStartDate = startDate.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+            const formattedCurrentDateTime = now.toLocaleString('pt-BR', {
+                year: 'numeric', month: 'long', day: 'numeric', 
+                hour: '2-digit', minute: '2-digit',
+            });
+            context += `\n- Data de início dos estudos: ${formattedStartDate}`;
+            context += `\n- Data e hora atuais: ${formattedCurrentDateTime}\n`;
         }
-        if (completedTasks.length > 0) {
-          context +=
-            '\nMetas concluídas recentemente (celebre estas conquistas):\n' +
-            completedTasks.join('\n') +
-            '\n';
-        }
-      }
 
-      context += '--- FIM DAS INFORMAÇÕES CONTEXTUAIS ---';
+        if (hasGoals) {
+            if (inProgressTasks.length > 0) {
+                context += '\nMetas em progresso (foco atual):\n' + inProgressTasks.join('\n') + '\n';
+            }
+            if (completedTasks.length > 0) {
+                context += '\nMetas concluídas recentemente (celebre estas conquistas):\n' + completedTasks.join('\n') + '\n';
+            }
+        }
+
+        context += '--- FIM DAS INFORMAÇÕES CONTEXTUAIS ---';
     }
-
+    
     const fullSystemPrompt = systemPrompt + context;
 
-    const config: LiveConnectConfig = {
+
+    // Using `any` for config to accommodate `speechConfig`, which is not in the
+    // current TS definitions but is used in the working reference example.
+    const config: any = {
       responseModalities: [Modality.AUDIO],
       speechConfig: {
         voiceConfig: {
@@ -194,128 +172,25 @@ export default function StreamingConsole() {
     setConfig(config);
   }, [setConfig, systemPrompt, tools, voice, todos, user]);
 
-  const handleCheckPronunciation = useCallback(
-    async (turnIndex: number) => {
-      const turn = turns[turnIndex];
-      if (!turn || !turn.audioData || !turn.text) return;
-
-      updateTurn(turnIndex, { isAnalyzing: true });
-
-      try {
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: {
-            parts: [
-              {
-                inlineData: {
-                  mimeType: 'audio/wav',
-                  data: turn.audioData,
-                },
-              },
-              {
-                text: `Analise a pronúncia do áudio em inglês com base no texto fornecido. Texto: "${turn.text}". Forneça feedback apenas sobre a pronúncia, não sobre gramática ou tom.`,
-              },
-            ],
-          },
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                overallScore: {
-                  type: Type.NUMBER,
-                  description:
-                    'Pontuação geral de pronúncia de 0 a 100, onde 100 é perfeito.',
-                },
-                words: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      word: { type: Type.STRING },
-                      accuracyScore: {
-                        type: Type.NUMBER,
-                        description:
-                          'Pontuação de precisão para a palavra de 0 a 100.',
-                      },
-                      feedback: {
-                        type: Type.STRING,
-                        description:
-                          'Feedback específico para esta palavra se for pronunciada incorretamente (por exemplo, qual fonema estava incorreto). Seja conciso.',
-                      },
-                    },
-                    required: ['word', 'accuracyScore'],
-                  },
-                },
-              },
-              required: ['overallScore', 'words'],
-            },
-          },
-        });
-
-        const feedback = JSON.parse(
-          response.text.trim()
-        ) as PronunciationFeedback;
-        updateTurn(turnIndex, {
-          pronunciationFeedback: feedback,
-          isAnalyzing: false,
-        });
-      } catch (error) {
-        console.error('Error analyzing pronunciation:', error);
-        updateTurn(turnIndex, {
-          pronunciationFeedback: {
-            error: 'Não foi possível analisar a pronúncia.',
-          },
-          isAnalyzing: false,
-        });
-      }
-    },
-    [turns, updateTurn]
-  );
-
   useEffect(() => {
-    const handleInputTranscription = async (text: string, isFinal: boolean) => {
-      const currentTurns = useLogStore.getState().turns;
-      const last = currentTurns[currentTurns.length - 1];
-      const update: Partial<ConversationTurn> = {
-        isFinal,
-      };
+    const { addTurn, updateLastTurn } = useLogStore.getState();
 
+    const handleInputTranscription = (text: string, isFinal: boolean) => {
+      const turns = useLogStore.getState().turns;
+      const last = turns[turns.length - 1];
       if (last && last.role === 'user' && !last.isFinal) {
-        update.text = last.text + text;
+        updateLastTurn({
+          text: last.text + text,
+          isFinal,
+        });
       } else {
-        update.text = text;
-      }
-
-      if (isFinal) {
-        const audioChunks = getAndClearAudioChunks();
-        if (audioChunks.length > 0) {
-          const totalLength = audioChunks.reduce(
-            (acc, val) => acc + val.byteLength,
-            0
-          );
-          const concatenated = new Uint8Array(totalLength);
-          let offset = 0;
-          for (const chunk of audioChunks) {
-            concatenated.set(new Uint8Array(chunk), offset);
-            offset += chunk.byteLength;
-          }
-          const pcm16Data = new Int16Array(concatenated.buffer);
-          const wavBase64 = await encodeWAV(pcm16Data, 16000, 1);
-          update.audioData = wavBase64;
-        }
-      }
-
-      if (last && last.role === 'user' && !last.isFinal) {
-        updateLastTurn(update);
-      } else {
-        addTurn({ role: 'user', ...update, text: update.text || '' });
+        addTurn({ role: 'user', text, isFinal });
       }
     };
 
     const handleOutputTranscription = (text: string, isFinal: boolean) => {
-      const currentTurns = useLogStore.getState().turns;
-      const last = currentTurns[currentTurns.length - 1];
+      const turns = useLogStore.getState().turns;
+      const last = turns[turns.length - 1];
       if (last && last.role === 'agent' && !last.isFinal) {
         updateLastTurn({
           text: last.text + text,
@@ -326,6 +201,8 @@ export default function StreamingConsole() {
       }
     };
 
+    // FIX: The 'content' event provides a single LiveServerContent object.
+    // The function signature is updated to accept one argument, and groundingMetadata is extracted from it.
     const handleContent = (serverContent: LiveServerContent) => {
       const text =
         serverContent.modelTurn?.parts
@@ -335,8 +212,10 @@ export default function StreamingConsole() {
       const groundingChunks = serverContent.groundingMetadata?.groundingChunks;
 
       if (!text && !groundingChunks) return;
-      const currentTurns = useLogStore.getState().turns;
-      const last = currentTurns[currentTurns.length - 1];
+
+      const turns = useLogStore.getState().turns;
+      // FIX: Property 'at' does not exist on type 'ConversationTurn[]'. Replaced with bracket notation.
+      const last = turns[turns.length - 1];
 
       if (last?.role === 'agent' && !last.isFinal) {
         const updatedTurn: Partial<ConversationTurn> = {
@@ -355,8 +234,9 @@ export default function StreamingConsole() {
     };
 
     const handleTurnComplete = () => {
-      const currentTurns = useLogStore.getState().turns;
-      const last = currentTurns[currentTurns.length - 1];
+      const turns = useLogStore.getState().turns;
+      // FIX: Property 'at' does not exist on type 'ConversationTurn[]'. Replaced with bracket notation.
+      const last = turns[turns.length - 1];
       if (last && !last.isFinal) {
         updateLastTurn({ isFinal: true });
       }
@@ -373,7 +253,7 @@ export default function StreamingConsole() {
       client.off('content', handleContent);
       client.off('turncomplete', handleTurnComplete);
     };
-  }, [client, getAndClearAudioChunks, addTurn, updateLastTurn]);
+  }, [client]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -402,28 +282,14 @@ export default function StreamingConsole() {
                   : 'Sistema'}
               </div>
               <div className="message-bubble">
-                {t.isGeneratingImage && (
-                  <div className="image-loader">
-                    <div className="spinner"></div>
-                    <span className="loader-text">{t.text}</span>
-                  </div>
-                )}
-                {t.imageUrl && (
-                  <img
-                    src={t.imageUrl}
-                    alt="Conteúdo gerado por IA"
-                    className="generated-image"
-                  />
-                )}
-                {t.text && (
-                  <div className="transcription-text-content">
-                    {renderContent(t.text)}
-                  </div>
-                )}
+                <div className="transcription-text-content">
+                  {renderContent(t.text)}
+                </div>
                 {t.groundingChunks && t.groundingChunks.length > 0 && (
                   <div className="grounding-chunks">
                     <strong>Fontes:</strong>
                     <ul>
+                      {/* FIX: Filter for chunks that have a web property with a valid URI. */}
                       {t.groundingChunks
                         .filter(chunk => chunk.web && chunk.web.uri)
                         .map((chunk, index) => (
@@ -442,29 +308,9 @@ export default function StreamingConsole() {
                 )}
               </div>
 
-              <div className="transcription-meta">
-                <div className="transcription-timestamp">
-                  {formatTimestamp(t.timestamp)}
-                </div>
-                {t.role === 'user' && t.isFinal && t.audioData && (
-                  <button
-                    className="pronunciation-button"
-                    onClick={() => handleCheckPronunciation(i)}
-                    disabled={t.isAnalyzing || !!t.pronunciationFeedback}
-                    title="Analisar pronúncia"
-                  >
-                    <span className="icon">
-                      {t.isAnalyzing ? 'progress_activity' : 'rule'}
-                    </span>
-                  </button>
-                )}
+              <div className="transcription-timestamp">
+                {formatTimestamp(t.timestamp)}
               </div>
-              {t.pronunciationFeedback && (
-                <PronunciationFeedbackDisplay
-                  feedback={t.pronunciationFeedback}
-                  originalText={t.text}
-                />
-              )}
             </div>
           ))}
         </div>

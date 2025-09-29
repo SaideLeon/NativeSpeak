@@ -30,17 +30,6 @@ export type ControlTrayProps = {
   children?: ReactNode;
 };
 
-// Simple in-memory conversion from ArrayBuffer to base64
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
-}
-
 function ControlTray({ children }: ControlTrayProps) {
   const [audioRecorder] = useState(() => new AudioRecorder());
   const [muted, setMuted] = useState(false);
@@ -48,10 +37,11 @@ function ControlTray({ children }: ControlTrayProps) {
   const micButtonRef = useRef<HTMLButtonElement>(null);
 
   const { client, connected, connect, disconnect } = useLiveAPIContext();
-  const { addAudioChunk } = useLogStore();
 
   useEffect(() => {
+    // FIX: Cannot find name 'connectButton'. Did you mean 'connectButtonRef'?
     if (!connected && connectButtonRef.current) {
+      // FIX: Cannot find name 'connectButton'. Did you mean 'connectButtonRef'?
       connectButtonRef.current.focus();
     }
   }, [connected]);
@@ -63,15 +53,11 @@ function ControlTray({ children }: ControlTrayProps) {
   }, [connected]);
 
   useEffect(() => {
-    const onData = ({ buffer }: { buffer: ArrayBuffer }) => {
-      // Add raw buffer to store for potential analysis
-      addAudioChunk(buffer);
-
-      // Send base64 to live API for streaming
+    const onData = (base64: string) => {
       client.sendRealtimeInput([
         {
           mimeType: 'audio/pcm;rate=16000',
-          data: arrayBufferToBase64(buffer),
+          data: base64,
         },
       ]);
     };
@@ -84,14 +70,13 @@ function ControlTray({ children }: ControlTrayProps) {
     return () => {
       audioRecorder.off('data', onData);
     };
-  }, [connected, client, muted, audioRecorder, addAudioChunk]);
+  }, [connected, client, muted, audioRecorder]);
 
   useEffect(() => {
     const onVolume = (volume: number) => {
       if (micButtonRef.current) {
-        // Scale volume (0-1) for a better visual effect, cap at 25px
-        // Increased sensitivity from 50 to 70 and max from 20 to 25
-        const scaledVolume = Math.min(volume * 70, 25);
+        // Scale volume (0-1) for a better visual effect, cap at 20px
+        const scaledVolume = Math.min(volume * 50, 20);
         micButtonRef.current.style.setProperty('--volume', `${scaledVolume}px`);
       }
     };

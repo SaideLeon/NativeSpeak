@@ -4,13 +4,17 @@
 */
 import { useSettings, useUI } from '@/lib/state';
 import c from 'classnames';
-import { AVAILABLE_VOICES } from '@/lib/constants';
+import { DEFAULT_LIVE_API_MODEL, AVAILABLE_VOICES } from '@/lib/constants';
 import { useLiveAPIContext } from '@/contexts/LiveAPIContext';
 import TodoList from './TodoList';
 
+const AVAILABLE_MODELS = [
+  DEFAULT_LIVE_API_MODEL
+];
+
 export default function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useUI();
-  const { voice, setVoice } =
+  const { model, voice, setModel, setVoice } =
     useSettings();
   const { connected } = useLiveAPIContext();
 
@@ -26,6 +30,17 @@ export default function Sidebar() {
         <div className="sidebar-content">
           <div className="sidebar-section">
             <fieldset disabled={connected}>
+              <label>
+                Modelo
+                <select value={model} onChange={e => setModel(e.target.value)}>
+                  {/* This is an experimental model name that should not be removed from the options. */}
+                  {AVAILABLE_MODELS.map(m => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <label>
                 Voz
                 <select value={voice} onChange={e => setVoice(e.target.value)}>

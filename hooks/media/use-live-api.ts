@@ -20,12 +20,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GenAILiveClient } from '../../lib/genai-live-client';
-import {
-  LiveConnectConfig,
-  Modality,
-  LiveServerToolCall,
-  GoogleGenAI,
-} from '@google/genai';
+import { LiveConnectConfig, Modality, LiveServerToolCall } from '@google/genai';
 import { AudioStreamer } from '../../lib/audio-streamer';
 import { audioContext } from '../../lib/utils';
 import VolMeterWorket from '../../lib/worklets/vol-meter';
@@ -49,11 +44,7 @@ export function useLiveApi({
   apiKey: string;
 }): UseLiveApiResults {
   const { model } = useSettings();
-  const client = useMemo(
-    () => new GenAILiveClient(apiKey, model),
-    [apiKey, model]
-  );
-  const ai = useMemo(() => new GoogleGenAI({ apiKey }), [apiKey]);
+  const client = useMemo(() => new GenAILiveClient(apiKey, model), [apiKey, model]);
 
   const audioStreamerRef = useRef<AudioStreamer | null>(null);
 
@@ -101,110 +92,51 @@ export function useLiveApi({
       }
     };
 
-    const onToolCall = async (toolCall: LiveServerToolCall) => {
+    // Bind event listeners
+    client.on('open', onOpen);
+    client.on('close', onClose);
+    client.on('interrupted', stopAudioStreamer);
+    client.on('audio', onAudio);
+
+    const onToolCall = (toolCall: LiveServerToolCall) => {
       const functionResponses: any[] = [];
 
       for (const fc of toolCall.functionCalls) {
-        if (fc.name === 'generate_image_for_vocabulary') {
-          const prompt = fc.args.prompt;
-          if (typeof prompt !== 'string') {
-            console.error('Invalid prompt for image generation:', fc.args);
-            functionResponses.push({
-              id: fc.id,
-              name: fc.name,
-              response: { result: 'error: prompt must be a string' },
-            });
-            continue;
-          }
+        // Log the function call trigger
+        const triggerMessage = `Disparando chamada de função: **${
+          fc.name
+        }**\n\`\`\`json\n${JSON.stringify(fc.args, null, 2)}\n\`\`\``;
+        useLogStore.getState().addTurn({
+          role: 'system',
+          text: triggerMessage,
+          isFinal: true,
+        });
 
-          useLogStore.getState().addTurn({
-            role: 'system',
-            text: `Gerando imagem para: "${prompt}"...`,
-            isFinal: false,
-            isGeneratingImage: true,
-          });
-
-          try {
-            const response = await ai.models.generateImages({
-              model: 'imagen-4.0-generate-001',
-              prompt: prompt,
-              config: {
-                numberOfImages: 1,
-                outputMimeType: 'image/jpeg',
-                aspectRatio: '1:1',
-              },
-            });
-            const base64ImageBytes =
-              response.generatedImages[0].image.imageBytes;
-            const imageUrl = `data:image/jpeg;base64,${base64ImageBytes}`;
-
-            useLogStore.getState().updateLastTurn({
-              imageUrl: imageUrl,
-              isGeneratingImage: false,
-              isFinal: true,
-              text: ``, // Clear loading text
-            });
-
-            functionResponses.push({
-              id: fc.id,
-              name: fc.name,
-              response: { result: 'ok' },
-            });
-          } catch (error) {
-            console.error('Error generating image:', error);
-            useLogStore.getState().updateLastTurn({
-              text: 'Falha ao gerar a imagem.',
-              isGeneratingImage: false,
-              isFinal: true,
-            });
-            functionResponses.push({
-              id: fc.id,
-              name: fc.name,
-              response: { result: 'error while generating image' },
-            });
-          }
-        } else {
-          // Handle other function calls
-          const triggerMessage = `Disparando chamada de função: **${
-            fc.name
-          }**\n\`\`\`json\n${JSON.stringify(fc.args, null, 2)}\n\`\`\``;
-          useLogStore.getState().addTurn({
-            role: 'system',
-            text: triggerMessage,
-            isFinal: true,
-          });
-
-          // Prepare the response
-          functionResponses.push({
-            id: fc.id,
-            name: fc.name,
-            response: { result: 'ok' }, // simple, hard-coded function response
-          });
-        }
+        // Prepare the response
+        functionResponses.push({
+          id: fc.id,
+          name: fc.name,
+          response: { result: 'ok' }, // simple, hard-coded function response
+        });
       }
 
-      // Log and send back all function responses
+      // Log the function call response
       if (functionResponses.length > 0) {
         const responseMessage = `Resposta da chamada de função:\n\`\`\`json\n${JSON.stringify(
           functionResponses,
           null,
-          2
+          2,
         )}\n\`\`\``;
         useLogStore.getState().addTurn({
           role: 'system',
           text: responseMessage,
           isFinal: true,
         });
-
-        client.sendToolResponse({ functionResponses: functionResponses });
       }
+
+      client.sendToolResponse({ functionResponses: functionResponses });
     };
 
-    // Bind event listeners
-    client.on('open', onOpen);
-    client.on('close', onClose);
-    client.on('interrupted', stopAudioStreamer);
-    client.on('audio', onAudio);
     client.on('toolcall', onToolCall);
 
     return () => {
@@ -215,7 +147,7 @@ export function useLiveApi({
       client.off('audio', onAudio);
       client.off('toolcall', onToolCall);
     };
-  }, [client, ai]);
+  }, [client]);
 
   const connect = useCallback(async () => {
     if (!config) {

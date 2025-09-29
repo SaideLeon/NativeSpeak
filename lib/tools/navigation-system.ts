@@ -8,23 +8,6 @@ import { FunctionResponseScheduling } from '@google/genai';
 
 export const navigationSystemTools: FunctionCall[] = [
   {
-    name: 'get_current_time',
-    description:
-      'Obtém a hora atual exata para um local específico. Se nenhum local for fornecido, retorna a hora local.',
-    parameters: {
-      type: 'OBJECT',
-      properties: {
-        location: {
-          type: 'STRING',
-          description:
-            'A cidade ou país para verificar a hora (ex: "Londres", "Japão").',
-        },
-      },
-    },
-    isEnabled: true,
-    scheduling: FunctionResponseScheduling.INTERRUPT,
-  },
-  {
     name: 'find_route',
     description: 'Encontra uma rota para um destino especificado.',
     parameters: {
@@ -52,8 +35,7 @@ export const navigationSystemTools: FunctionCall[] = [
       properties: {
         placeType: {
           type: 'STRING',
-          description:
-            'O tipo de lugar a ser procurado (ex: restaurante, posto de gasolina, parque).',
+          description: 'O tipo de lugar a ser procurado (ex: restaurante, posto de gasolina, parque).',
         },
         radius: {
           type: 'NUMBER',
@@ -67,8 +49,7 @@ export const navigationSystemTools: FunctionCall[] = [
   },
   {
     name: 'get_traffic_info',
-    description:
-      'Obtém informações de trânsito em tempo real para um local especificado.',
+    description: 'Obtém informações de trânsito em tempo real para um local especificado.',
     parameters: {
       type: 'OBJECT',
       properties: {
