@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { customerSupportTools } from './tools/customer-support';
 import { personalAssistantTools } from './tools/personal-assistant';
 import { navigationSystemTools } from './tools/navigation-system';
+import { useAuthStore } from './authStore';
 
 export type Template = 'customer-support' | 'personal-assistant' | 'navigation-system';
 
@@ -212,17 +213,47 @@ export interface ConversationTurn {
   groundingChunks?: GroundingChunk[];
 }
 
+const saveHistory = (turns: ConversationTurn[]) => {
+  const { user } = useAuthStore.getState();
+  if (user?.email) {
+    const historyKey = `nativespeak_history_${user.email}`;
+    try {
+      localStorage.setItem(historyKey, JSON.stringify(turns));
+    } catch (error) {
+      console.error('Failed to save conversation history:', error);
+    }
+  }
+};
+
+const clearHistory = () => {
+  const { user } = useAuthStore.getState();
+  if (user?.email) {
+    const historyKey = `nativespeak_history_${user.email}`;
+    localStorage.removeItem(historyKey);
+  }
+};
+
 export const useLogStore = create<{
   turns: ConversationTurn[];
+  setTurns: (turns: ConversationTurn[]) => void;
   addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) => void;
   updateLastTurn: (update: Partial<ConversationTurn>) => void;
   clearTurns: () => void;
+  resetTurnsForSession: () => void;
 }>((set, get) => ({
   turns: [],
-  addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) =>
+  setTurns: (loadedTurns: ConversationTurn[]) => {
+    set({ turns: loadedTurns });
+  },
+  resetTurnsForSession: () => {
+    set({ turns: [] });
+  },
+  addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) => {
     set(state => ({
       turns: [...state.turns, { ...turn, timestamp: new Date() }],
-    })),
+    }));
+    saveHistory(get().turns);
+  },
   updateLastTurn: (update: Partial<Omit<ConversationTurn, 'timestamp'>>) => {
     set(state => {
       if (state.turns.length === 0) {
@@ -233,6 +264,10 @@ export const useLogStore = create<{
       newTurns[newTurns.length - 1] = lastTurn;
       return { turns: newTurns };
     });
+    saveHistory(get().turns);
   },
-  clearTurns: () => set({ turns: [] }),
+  clearTurns: () => {
+    set({ turns: [] });
+    clearHistory();
+  },
 }));

@@ -29,6 +29,7 @@ import Sidebar from './components/Sidebar';
 import { LiveAPIProvider } from './contexts/LiveAPIContext';
 import { useAuthStore } from './lib/authStore';
 import LandingPage from './components/LandingPage';
+import LegalModal from './components/LegalModal';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -44,12 +45,14 @@ if (typeof API_KEY !== 'string') {
 function App() {
   const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
+  const [activeLegalDoc, setActiveLegalDoc] = useState<
+    'privacy' | 'terms' | null
+  >(null);
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-  
+
   // To prevent flash of unauthenticated content
   if (isLoading) {
     return null; // or a loading spinner
@@ -65,16 +68,27 @@ function App() {
           <main>
             <div className="main-app-area">
               {isAuthenticated ? (
-                <StreamingConsole /> 
+                <StreamingConsole />
               ) : (
-                <LandingPage onStartClick={() => setIsAuthModalOpen(true)} />
+                <LandingPage
+                  onStartClick={() => setIsAuthModalOpen(true)}
+                  onLegalLinkClick={setActiveLegalDoc}
+                />
               )}
             </div>
 
             {isAuthenticated && <ControlTray></ControlTray>}
           </main>
         </div>
-        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
+        {isAuthModalOpen && (
+          <AuthModal onClose={() => setIsAuthModalOpen(false)} />
+        )}
+        {activeLegalDoc && (
+          <LegalModal
+            docType={activeLegalDoc}
+            onClose={() => setActiveLegalDoc(null)}
+          />
+        )}
       </LiveAPIProvider>
     </div>
   );

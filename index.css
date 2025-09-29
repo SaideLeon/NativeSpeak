@@ -331,7 +331,7 @@ header .header-right {
 }
 
 .transcription-entry.user .transcription-source::before {
-  content: "🇧🇷 ";
+  content: "🇲🇿 ";
 }
 
 .transcription-entry.agent .transcription-source::before {
@@ -1472,4 +1472,52 @@ select {
 html, .modal, .sidebar-content, .transcription-view {
   scrollbar-width: thin;
   scrollbar-color: var(--bg-card) var(--bg-primary);
+}
+
+/* Legal Modal Styles */
+.legal-modal-content {
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.legal-modal-content h2 {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+}
+
+.legal-modal-content h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--text-accent);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--space-xs);
+}
+
+.legal-modal-content p {
+  line-height: 1.7;
+  margin-bottom: var(--space-md);
+}
+
+.legal-modal-content ul {
+  list-style-position: inside;
+  padding-left: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.legal-modal-content li {
+  margin-bottom: var(--space-sm);
+}
+
+.legal-modal-content a {
+  color: var(--primary-light);
+  text-decoration: none;
+}
+
+.legal-modal-content a:hover {
+  text-decoration: underline;
 }

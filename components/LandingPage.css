@@ -162,4 +162,31 @@
   margin-top: var(--space-xl);
   border-top: 1px solid var(--border-color);
   color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: 0.9rem;
+}
+
+.footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition-normal);
+}
+
+.footer-links a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.footer-links span {
+  color: var(--text-muted);
 }

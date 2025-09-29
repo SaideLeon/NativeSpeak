@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { create } from 'zustand';
+import { useLogStore, ConversationTurn } from './state';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
@@ -32,6 +33,27 @@ const SESSION_KEY = 'native_speak_session';
 const SUPER_ADMIN_KEY = 'isSuperAdmin';
 const SYSTEM_UNLOCKED_KEY = 'native_speak_unlocked';
 
+const loadHistory = (email: string): ConversationTurn[] => {
+  const historyKey = `nativespeak_history_${email}`;
+  const savedHistory = localStorage.getItem(historyKey);
+  if (savedHistory) {
+    try {
+      const parsed = JSON.parse(savedHistory) as ConversationTurn[];
+      // Re-hydrate Date objects from ISO strings
+      return parsed.map(turn => ({
+        ...turn,
+        timestamp: new Date(turn.timestamp),
+      }));
+    } catch (e) {
+      console.error('Failed to parse conversation history:', e);
+      // If parsing fails, clear the corrupted data
+      localStorage.removeItem(historyKey);
+      return [];
+    }
+  }
+  return [];
+};
+
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
@@ -59,6 +81,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = { email, firstName, lastName, studyStartDate };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
+      // Clear any potential old history for this email and start fresh
+      useLogStore.getState().clearTurns();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -81,6 +105,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(superAdminUser));
         set({ isAuthenticated: true, user: superAdminUser, isLoading: false, isSystemUnlocked: true });
+        const history = loadHistory(superAdminUser.email);
+        useLogStore.getState().setTurns(history);
         return;
       } catch (e: any) {
          set({ error: 'Falha ao iniciar sessão de super administrador.', isLoading: false });
@@ -112,6 +138,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Ensure super admin key is removed on normal login
       localStorage.removeItem(SUPER_ADMIN_KEY);
       set({ isAuthenticated: true, user, isLoading: false });
+      const history = loadHistory(user.email);
+      useLogStore.getState().setTurns(history);
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -121,6 +149,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SUPER_ADMIN_KEY); // Clear super admin key on logout
+    (useLogStore.getState() as any).resetTurnsForSession();
     set({ isAuthenticated: false, user: null });
   },
 
@@ -145,6 +174,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         }
 
         set({ isAuthenticated: true, user, isLoading: false });
+        const history = loadHistory(user.email);
+        useLogStore.getState().setTurns(history);
       } else {
         set({ isLoading: false });
       }
