@@ -30,6 +30,7 @@ import { LiveAPIProvider } from './contexts/LiveAPIContext';
 import { useAuthStore } from './lib/authStore';
 import LandingPage from './components/LandingPage';
 import LegalModal from './components/LegalModal';
+import TermsAcceptanceModal from './components/TermsAcceptanceModal';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -43,7 +44,7 @@ if (typeof API_KEY !== 'string') {
  * Manages video streaming state and provides controls for webcam/screen capture.
  */
 function App() {
-  const { isAuthenticated, checkAuth, isLoading } = useAuthStore();
+  const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeLegalDoc, setActiveLegalDoc] = useState<
     'privacy' | 'terms' | null
@@ -57,6 +58,8 @@ function App() {
   if (isLoading) {
     return null; // or a loading spinner
   }
+
+  const showTermsModal = isAuthenticated && user?.needsToAcceptTerms;
 
   return (
     <div className="App">
@@ -77,7 +80,7 @@ function App() {
               )}
             </div>
 
-            {isAuthenticated && <ControlTray></ControlTray>}
+            {isAuthenticated && !showTermsModal && <ControlTray></ControlTray>}
           </main>
         </div>
         {isAuthModalOpen && (
@@ -89,6 +92,7 @@ function App() {
             onClose={() => setActiveLegalDoc(null)}
           />
         )}
+        {showTermsModal && <TermsAcceptanceModal />}
       </LiveAPIProvider>
     </div>
   );

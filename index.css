@@ -1235,6 +1235,12 @@ select {
   background: var(--primary-blue);
 }
 
+.auth-modal .submit-button:disabled {
+  background: var(--hover-bg);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .header-user-info {
   display: flex;
   align-items: center;
@@ -1320,6 +1326,34 @@ select {
   margin-bottom: var(--space-lg);
   margin-top: calc(var(--space-lg) * -1);
   line-height: 1.6;
+}
+
+.terms-field {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: var(--space-sm) !important;
+  margin-top: var(--space-xs);
+  margin-bottom: 0 !important;
+}
+
+.terms-field input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.terms-field label {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.terms-field label a {
+  color: var(--primary-light);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 /* Mobile Responsiveness */
