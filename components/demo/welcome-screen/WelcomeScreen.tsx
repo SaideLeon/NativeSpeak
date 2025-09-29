@@ -6,6 +6,7 @@
 import React from 'react';
 import './WelcomeScreen.css';
 import { useTools, Template } from '../../../lib/state';
+import { useLiveAPIContext } from '../../../contexts/LiveAPIContext';
 
 // Conteúdo re-tematizado para cenários de aprendizado de inglês, mas usando as chaves de template existentes.
 const welcomeContent: Record<
@@ -63,6 +64,7 @@ const welcomeContent: Record<
 
 const WelcomeScreen: React.FC = () => {
   const { template, setTemplate } = useTools();
+  const { connected } = useLiveAPIContext();
   const { description, prompts } = welcomeContent[template];
   return (
     <div className="welcome-screen">
@@ -74,6 +76,12 @@ const WelcomeScreen: React.FC = () => {
               value={template}
               onChange={e => setTemplate(e.target.value as Template)}
               aria-label="Selecione um cenário de prática"
+              disabled={connected}
+              title={
+                connected
+                  ? 'Desconecte para alterar o cenário'
+                  : 'Selecione um cenário de prática'
+              }
             >
               {Object.entries(welcomeContent).map(([key, value]) => (
                 <option key={key} value={key}>
