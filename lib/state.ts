@@ -40,6 +40,8 @@ Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
 
 8. Feedback contínuo: acompanhe o progresso, celebre acertos e proponha revisões periódicas para fixar o conteúdo.
 
+9. Análise de Metas: Revise a lista de 'Metas em progresso' do aluno. Se, durante a conversa, você concluir que uma meta foi alcançada, use a função \`mark_goal_as_completed\` para marcá-la como concluída.
+
 Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreensão e conversação em inglês, sempre de forma prática, motivadora e personalizada.`,
   'personal-assistant':
     'Você é um assistente pessoal prestativo e amigável. Seja proativo e eficiente.',
@@ -86,6 +88,8 @@ Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
 
 8. Feedback contínuo: acompanhe o progresso, celebre acertos e proponha revisões periódicas para fixar o conteúdo.
 
+9. Análise de Metas: Revise a lista de 'Metas em progresso' do aluno. Se, durante a conversa, você concluir que uma meta foi alcançada, use a função \`mark_goal_as_completed\` para marcá-la como concluída.
+
 Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreensão e conversação em inglês, sempre de forma prática, motivadora e personalizada.`,
   model: DEFAULT_LIVE_API_MODEL,
   voice: DEFAULT_VOICE,
@@ -104,16 +108,12 @@ export const useUI = create<{
   toggleSidebar: () => void;
   isLeftSidebarOpen: boolean;
   toggleLeftSidebar: () => void;
-  subtitleText: string;
-  setSubtitleText: (text: string) => void;
 }>(set => ({
   isSidebarOpen: false,
   toggleSidebar: () => set(state => ({ isSidebarOpen: !state.isSidebarOpen })),
   isLeftSidebarOpen: false,
   toggleLeftSidebar: () =>
     set(state => ({ isLeftSidebarOpen: !state.isLeftSidebarOpen })),
-  subtitleText: '',
-  setSubtitleText: (text: string) => set({ subtitleText: text }),
 }));
 
 /**

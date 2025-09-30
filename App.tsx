@@ -31,7 +31,6 @@ import { useAuthStore } from './lib/authStore';
 import LandingPage from './components/LandingPage';
 import LegalModal from './components/LegalModal';
 import TermsAcceptanceModal from './components/TermsAcceptanceModal';
-import Subtitles from './components/Subtitles';
 import NotificationToast from './components/NotificationToast';
 import AchievementTracker from './components/AchievementTracker';
 import { useUI } from './lib/state';
@@ -95,7 +94,6 @@ function App() {
         </div>
         {isAuthenticated && !showTermsModal && (
           <>
-            <Subtitles />
             <AchievementTracker />
             <NotificationToast />
           </>

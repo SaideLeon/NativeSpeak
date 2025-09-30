@@ -25,6 +25,7 @@ import { AudioStreamer } from '../../lib/audio-streamer';
 import { audioContext } from '../../lib/utils';
 import VolMeterWorket from '../../lib/worklets/vol-meter';
 import { useLogStore, useSettings } from '@/lib/state';
+import { useTodoStore } from '@/lib/todoStore';
 
 export type UseLiveApiResults = {
   client: GenAILiveClient;
@@ -100,17 +101,32 @@ export function useLiveApi({
 
     const onToolCall = (toolCall: LiveServerToolCall) => {
       const functionResponses: any[] = [];
+      const { addTurn } = useLogStore.getState();
+      const { completeTaskByText } = useTodoStore.getState();
 
       for (const fc of toolCall.functionCalls) {
         // Log the function call trigger
         const triggerMessage = `Disparando chamada de função: **${
           fc.name
         }**\n\`\`\`json\n${JSON.stringify(fc.args, null, 2)}\n\`\`\``;
-        useLogStore.getState().addTurn({
+        addTurn({
           role: 'system',
           text: triggerMessage,
           isFinal: true,
         });
+
+        // Specific logic for marking a goal as completed
+        if (fc.name === 'mark_goal_as_completed') {
+          const goalText = fc.args.goalText;
+          if (typeof goalText === 'string') {
+            completeTaskByText(goalText);
+            addTurn({
+              role: 'system',
+              text: `A meta "${goalText}" foi marcada como concluída com base na conversa.`,
+              isFinal: true,
+            });
+          }
+        }
 
         // Prepare the response
         functionResponses.push({
@@ -127,7 +143,7 @@ export function useLiveApi({
           null,
           2,
         )}\n\`\`\``;
-        useLogStore.getState().addTurn({
+        addTurn({
           role: 'system',
           text: responseMessage,
           isFinal: true,

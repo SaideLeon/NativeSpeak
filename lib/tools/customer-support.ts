@@ -62,4 +62,22 @@ export const customerSupportTools: FunctionCall[] = [
     isEnabled: false, // Desabilitado por padrão para evitar confusão
     scheduling: FunctionResponseScheduling.INTERRUPT,
   },
+  {
+    name: 'mark_goal_as_completed',
+    description:
+      'Use esta função para marcar uma meta de estudo específica como concluída quando determinar, a partir da conversa, que o usuário a alcançou com sucesso.',
+    parameters: {
+      type: 'OBJECT',
+      properties: {
+        goalText: {
+          type: 'STRING',
+          description:
+            'O texto exato da meta a ser marcada como concluída. Por exemplo: "Falar por 2 minutos seguidos."',
+        },
+      },
+      required: ['goalText'],
+    },
+    isEnabled: true,
+    scheduling: FunctionResponseScheduling.INTERRUPT,
+  },
 ];
