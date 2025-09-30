@@ -145,11 +145,16 @@ Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreens�
 export const useUI = create<{
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
+  isLeftSidebarOpen: boolean;
+  toggleLeftSidebar: () => void;
   subtitleText: string;
   setSubtitleText: (text: string) => void;
 }>(set => ({
   isSidebarOpen: false,
   toggleSidebar: () => set(state => ({ isSidebarOpen: !state.isSidebarOpen })),
+  isLeftSidebarOpen: false,
+  toggleLeftSidebar: () =>
+    set(state => ({ isLeftSidebarOpen: !state.isLeftSidebarOpen })),
   subtitleText: '',
   setSubtitleText: (text: string) => set({ subtitleText: text }),
 }));

@@ -34,6 +34,9 @@ import TermsAcceptanceModal from './components/TermsAcceptanceModal';
 import Subtitles from './components/Subtitles';
 import AchievementToast from './components/AchievementToast';
 import AchievementTracker from './components/AchievementTracker';
+import { useUI } from './lib/state';
+import LeftSidebar from './components/LeftSidebar';
+import cn from 'classnames';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -52,6 +55,7 @@ function App() {
   const [activeLegalDoc, setActiveLegalDoc] = useState<
     'privacy' | 'terms' | null
   >(null);
+  const { isLeftSidebarOpen } = useUI();
 
   useEffect(() => {
     checkAuth();
@@ -65,26 +69,29 @@ function App() {
   const showTermsModal = isAuthenticated && user?.needsToAcceptTerms;
 
   return (
-    <div className="App">
+    <div className={cn('App', { 'left-sidebar-open': isLeftSidebarOpen })}>
       <LiveAPIProvider apiKey={API_KEY}>
         <ErrorScreen />
-        <Header onLoginClick={() => setIsAuthModalOpen(true)} />
+        {isAuthenticated && <LeftSidebar />}
         <Sidebar />
-        <div className="streaming-console">
-          <main>
-            <div className="main-app-area">
-              {isAuthenticated ? (
-                <StreamingConsole />
-              ) : (
-                <LandingPage
-                  onStartClick={() => setIsAuthModalOpen(true)}
-                  onLegalLinkClick={setActiveLegalDoc}
-                />
-              )}
-            </div>
+        <div className="content-wrapper">
+          <Header onLoginClick={() => setIsAuthModalOpen(true)} />
+          <div className="streaming-console">
+            <main>
+              <div className="main-app-area">
+                {isAuthenticated ? (
+                  <StreamingConsole />
+                ) : (
+                  <LandingPage
+                    onStartClick={() => setIsAuthModalOpen(true)}
+                    onLegalLinkClick={setActiveLegalDoc}
+                  />
+                )}
+              </div>
 
-            {isAuthenticated && !showTermsModal && <ControlTray></ControlTray>}
-          </main>
+              {isAuthenticated && !showTermsModal && <ControlTray></ControlTray>}
+            </main>
+          </div>
         </div>
         {isAuthenticated && !showTermsModal && (
           <>

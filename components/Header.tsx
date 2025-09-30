@@ -12,13 +12,22 @@ interface HeaderProps {
 
 
 export default function Header({ onLoginClick }: HeaderProps) {
-  const { toggleSidebar } = useUI();
+  const { toggleSidebar, toggleLeftSidebar } = useUI();
   const { isAuthenticated, user, logout } = useAuthStore();
 
   return (
     <>
       <header>
         <div className="header-left">
+          {isAuthenticated && (
+            <button
+              className="menu-button"
+              onClick={toggleLeftSidebar}
+              aria-label="Painel do Aluno"
+            >
+              <span className="icon">menu</span>
+            </button>
+          )}
           <h1>NativeSpeak</h1>
           <SessionTimer />
         </div>
@@ -37,13 +46,15 @@ export default function Header({ onLoginClick }: HeaderProps) {
               <span className="login-text-short">Entrar</span>
             </button>
           )}
-          <button
-            className="settings-button"
-            onClick={toggleSidebar}
-            aria-label="Configurações"
-          >
-            <span className="icon">tune</span>
-          </button>
+          {isAuthenticated && (
+            <button
+              className="settings-button"
+              onClick={toggleSidebar}
+              aria-label="Configurações"
+            >
+              <span className="icon">tune</span>
+            </button>
+          )}
         </div>
       </header>
     </>
