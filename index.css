@@ -85,11 +85,12 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
 }
 
 .App {
   display: flex;
+  position: relative;
+  overflow-x: hidden;
 }
 
 .content-wrapper {
@@ -1913,7 +1914,8 @@ select {
     gap: 0;
   }
   
-  .sidebar {
+  .sidebar,
+  .left-sidebar {
     width: 100vw;
   }
   
@@ -1933,6 +1935,11 @@ select {
 
   .welcome-content > p {
     font-size: 1rem;
+  }
+
+  .name-fields {
+    flex-direction: column;
+    gap: 0;
   }
 }
 

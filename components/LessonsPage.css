@@ -234,3 +234,47 @@
   border: 1px solid var(--error);
   color: var(--error);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .lessons-page {
+    padding: var(--space-lg) var(--space-md);
+    height: calc(100vh - 80px); /* Adjust for smaller header */
+  }
+
+  .lessons-page h1 {
+    font-size: 2rem;
+  }
+
+  .lessons-page > p {
+    font-size: 1rem;
+    margin-bottom: var(--space-xl);
+  }
+
+  .lesson-card {
+    padding: var(--space-lg);
+  }
+
+  .lesson-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .mistake-correction-box {
+    flex-direction: column;
+  }
+
+  .example-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exercise-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  .generate-exercise-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
