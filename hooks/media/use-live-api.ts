@@ -26,6 +26,7 @@ import { audioContext } from '../../lib/utils';
 import VolMeterWorket from '../../lib/worklets/vol-meter';
 import { useLogStore, useSettings } from '@/lib/state';
 import { useTodoStore } from '@/lib/todoStore';
+import { useEvaluationStore } from '@/lib/evaluationStore';
 
 export type UseLiveApiResults = {
   client: GenAILiveClient;
@@ -177,6 +178,10 @@ export function useLiveApi({
   }, [client, config]);
 
   const disconnect = useCallback(async () => {
+    const currentTurns = useLogStore.getState().turns;
+    if (currentTurns.length > 0) {
+      useEvaluationStore.getState().setLastConversationHistory(currentTurns);
+    }
     client.disconnect();
     setConnected(false);
   }, [setConnected, client]);

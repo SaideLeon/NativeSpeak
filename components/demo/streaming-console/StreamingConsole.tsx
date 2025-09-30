@@ -78,6 +78,8 @@ export default function StreamingConsole() {
     lessonTopic,
     progress,
     goToStep,
+    continuationPrompt,
+    clearContinuationPrompt,
   } = useLearningStore();
   const currentStep = progress[lessonTopic]?.currentStep ?? 1;
   const lastProcessedTurnRef = useRef<string | null>(null);
@@ -179,7 +181,14 @@ export default function StreamingConsole() {
     }
 
 
-    const fullSystemPrompt = activeSystemPrompt + context;
+    let fullSystemPrompt = activeSystemPrompt;
+
+    if (continuationPrompt) {
+      fullSystemPrompt = `${continuationPrompt}\n\n---\n\n${activeSystemPrompt}`;
+      clearContinuationPrompt();
+    }
+    
+    fullSystemPrompt += context;
 
 
     // Using `any` for config to accommodate `speechConfig`, which is not in the
@@ -206,7 +215,7 @@ export default function StreamingConsole() {
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic, currentStep, useWebSearch]);
+  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic, currentStep, useWebSearch, continuationPrompt, clearContinuationPrompt]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();

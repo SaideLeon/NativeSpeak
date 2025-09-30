@@ -19,11 +19,14 @@ export const useLearningStore = create<{
   mode: LearningMode;
   lessonTopic: LessonTopic;
   progress: Partial<Record<LessonTopic, LessonProgress>>;
+  continuationPrompt: string | null;
   setMode: (mode: LearningMode) => void;
   setLessonTopic: (topic: LessonTopic) => void;
+  setContinuationPrompt: (prompt: string) => void;
   goToStep: (step: number) => void;
   loadProgress: () => void;
   clearProgress: () => void;
+  clearContinuationPrompt: () => void;
 }>((set, get) => {
   const LESSON_PROGRESS_KEY_PREFIX = 'nativespeak_lesson_progress_';
 
@@ -48,6 +51,7 @@ export const useLearningStore = create<{
     mode: 'conversation',
     lessonTopic: 'ordering-food',
     progress: {},
+    continuationPrompt: null,
     setMode: mode => set({ mode }),
     setLessonTopic: (topic: LessonTopic) => {
       set(state => {
@@ -65,6 +69,7 @@ export const useLearningStore = create<{
         return { lessonTopic: topic, mode: 'guided' };
       });
     },
+    setContinuationPrompt: (prompt: string) => set({ continuationPrompt: prompt }),
     goToStep: (step: number) => {
       const newStep = Math.max(1, Math.min(5, step)); // Lessons have 5 steps.
       set(state => {
@@ -102,5 +107,6 @@ export const useLearningStore = create<{
     clearProgress: () => {
       set({ progress: {} });
     },
+    clearContinuationPrompt: () => set({ continuationPrompt: null }),
   };
 });

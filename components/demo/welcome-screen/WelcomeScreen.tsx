@@ -3,13 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './WelcomeScreen.css';
-import { useTools, Scenario, useLogStore } from '../../../lib/state';
+import { useTools, Scenario, useLogStore, ConversationTurn } from '../../../lib/state';
 import { useLearningStore, LessonTopic } from '../../../lib/learningStore';
 import { lessons } from '../../../lib/lessons';
 import { useEvaluationStore } from '../../../lib/evaluationStore';
 import MarkdownRenderer from '../../MarkdownRenderer';
+import { GoogleGenAI, GenerateContentResponse, Type } from '@google/genai';
+
+const API_KEY = process.env.API_KEY as string;
 
 // Re-themed content for English learning scenarios, but using existing template keys.
 const conversationContent: Record<
@@ -160,7 +163,7 @@ const formatTimestamp = (date: Date) => {
 
 const WelcomeScreen: React.FC = () => {
   const { template, setTemplate } = useTools();
-  const { mode, lessonTopic, setMode, setLessonTopic, progress } =
+  const { mode, lessonTopic, setMode, setLessonTopic, progress, setContinuationPrompt } =
     useLearningStore();
   const { lastEvaluation, lastConversationHistory, clearLastHistory } =
     useEvaluationStore();
@@ -169,13 +172,95 @@ const WelcomeScreen: React.FC = () => {
     lastEvaluation?.rating === 'Péssima',
   );
 
-  const handleLoadHistory = () => {
-    if (lastConversationHistory) {
-      setTurns(lastConversationHistory);
-      clearLastHistory();
+  const [continuationState, setContinuationState] = useState<{
+    view: 'none' | 'loading' | 'continue' | 'start_new';
+    analysis: {
+      hasConclusion: boolean;
+      summary: string;
+      continuationPrompt: string;
+    } | null;
+  }>({
+    view: 'none',
+    analysis: null,
+  });
+
+  const analyzeContinuation = useCallback(async (turns: ConversationTurn[]) => {
+    if (!turns || turns.length < 2) {
+      setContinuationState({ view: 'start_new', analysis: null });
+      return;
     }
+    setContinuationState(prev => ({ ...prev, view: 'loading' }));
+
+    const transcript = turns
+      .map(turn => `${turn.role === 'user' ? 'Aluno' : 'Tutor'}: ${turn.text}`)
+      .join('\n');
+
+    const prompt = `
+      Analise a seguinte transcrição de uma conversa de aprendizado de inglês.
+      Determine se a conversa teve uma conclusão clara ou se foi interrompida abruptamente.
+      Resuma em poucas palavras sobre o que eles estavam conversando e forneça uma instrução curta e direta para a IA (Tutor) sobre como continuar a conversa para dar um desfecho natural.
+
+      Transcrição:
+      ---
+      ${transcript}
+      ---
+
+      Responda estritamente no formato JSON abaixo:
+    `;
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: API_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              hasConclusion: { type: Type.BOOLEAN, description: "A conversa teve um final claro? (true/false)" },
+              summary: { type: Type.STRING, description: "Um resumo muito curto do tópico da conversa (ex: 'futebol' ou 'pedindo direções')." },
+              continuationPrompt: { type: Type.STRING, description: "Uma instrução para a IA continuar a conversa (ex: 'Continue a conversa sobre futebol, perguntando qual o time favorito do aluno para finalizar.')." },
+            },
+            required: ["hasConclusion", "summary", "continuationPrompt"]
+          },
+        },
+      });
+
+      const result = JSON.parse(response.text);
+      setContinuationState({
+        view: result.hasConclusion ? 'start_new' : 'continue',
+        analysis: result,
+      });
+    } catch (error) {
+      console.error('Failed to analyze conversation for continuation:', error);
+      setContinuationState({ view: 'start_new', analysis: null });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showRetryView) {
+      return;
+    }
+    if (lastConversationHistory && continuationState.view === 'none') {
+      analyzeContinuation(lastConversationHistory);
+    } else if (!lastConversationHistory) {
+      setContinuationState({ view: 'start_new', analysis: null });
+    }
+  }, [lastConversationHistory, analyzeContinuation, showRetryView, continuationState.view]);
+  
+  const handleContinueConversation = () => {
+    if (!continuationState.analysis || !lastConversationHistory) return;
+    setContinuationPrompt(continuationState.analysis.continuationPrompt);
+    setTurns(lastConversationHistory);
+    clearLastHistory();
   };
 
+  const handleStartNew = () => {
+    clearLastHistory();
+    setContinuationState({ view: 'start_new', analysis: null });
+  };
+  
   if (showRetryView && lastEvaluation && lastConversationHistory) {
     return (
       <div className="welcome-screen retry-view">
@@ -224,6 +309,43 @@ const WelcomeScreen: React.FC = () => {
     );
   }
 
+  if (continuationState.view === 'loading') {
+    return (
+      <div className="welcome-screen">
+        <div className="continuation-loader">
+          <span className="welcome-icon">manage_history</span>
+          <h2>Analisando sua última conversa...</h2>
+          <p>Verificando se há algo para continuar.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (continuationState.view === 'continue' && continuationState.analysis) {
+    return (
+      <div className="welcome-screen">
+        <div className="continuation-view">
+          <span className="welcome-icon">forum</span>
+          <h2>Continuar a conversa anterior?</h2>
+          <p className="continuation-summary">
+            Parece que sua última conversa sobre <strong>{continuationState.analysis.summary}</strong> não foi concluída.
+          </p>
+          <div className="continuation-actions">
+            <button className="continue-button" onClick={handleContinueConversation}>
+              <span className="icon">play_arrow</span>
+              Continuar Conversa
+            </button>
+            <button className="start-new-alt-button" onClick={handleStartNew}>
+              <span className="icon">add_circle</span>
+              Começar Nova Prática
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   const isConversationMode = mode === 'conversation';
   const { title, description, prompts } = isConversationMode
     ? conversationContent[template]
@@ -236,7 +358,7 @@ const WelcomeScreen: React.FC = () => {
 
         {lastConversationHistory && (
           <div className="load-history-container">
-            <button className="load-history-button" onClick={handleLoadHistory}>
+            <button className="load-history-button" onClick={() => setTurns(lastConversationHistory)}>
               <span className="icon">history</span>
               Carregar última conversa
             </button>

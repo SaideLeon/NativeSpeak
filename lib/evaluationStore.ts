@@ -14,6 +14,11 @@ interface Evaluation {
   feedback: string;
 }
 
+interface SessionData {
+  evaluation: Evaluation | null;
+  history: ConversationTurn[] | null;
+}
+
 interface EvaluationState {
   isLoading: boolean;
   lastEvaluation: Evaluation | null;
@@ -22,24 +27,21 @@ interface EvaluationState {
   loadEvaluation: () => void;
   clearEvaluation: () => void;
   clearLastHistory: () => void;
+  setLastConversationHistory: (turns: ConversationTurn[]) => void;
 }
 
 const EVALUATION_KEY_PREFIX = 'nativespeak_evaluation_';
 
-const saveEvaluation = (
-  evaluation: Evaluation | null,
-  history: ConversationTurn[] | null,
-) => {
+const saveSessionData = (sessionData: SessionData) => {
   const user = useAuthStore.getState().user;
   if (user?.email) {
     try {
-      const dataToSave = { evaluation, history };
       localStorage.setItem(
         `${EVALUATION_KEY_PREFIX}${user.email}`,
-        JSON.stringify(dataToSave),
+        JSON.stringify(sessionData),
       );
     } catch (e) {
-      console.error('Failed to save conversation evaluation', e);
+      console.error('Failed to save session data', e);
     }
   }
 };
@@ -48,10 +50,18 @@ export const useEvaluationStore = create<EvaluationState>((set, get) => ({
   isLoading: false,
   lastEvaluation: null,
   lastConversationHistory: null,
+  setLastConversationHistory: (turns: ConversationTurn[]) => {
+    if (turns.length > 1) {
+      set({ lastConversationHistory: turns });
+      saveSessionData({
+        evaluation: get().lastEvaluation,
+        history: turns,
+      });
+    }
+  },
   clearLastHistory: () => {
     set({ lastConversationHistory: null });
-    // Also update storage
-    saveEvaluation(get().lastEvaluation, null);
+    saveSessionData({ evaluation: get().lastEvaluation, history: null });
   },
   evaluateConversation: async (turns: ConversationTurn[]) => {
     if (!turns.length) return;
@@ -112,7 +122,7 @@ export const useEvaluationStore = create<EvaluationState>((set, get) => ({
         lastConversationHistory: turns, // Save the history that was just evaluated
         isLoading: false,
       });
-      saveEvaluation(result, turns);
+      saveSessionData({ evaluation: result, history: turns });
     } catch (error) {
       console.error('Error evaluating conversation:', error);
       set({ isLoading: false });
