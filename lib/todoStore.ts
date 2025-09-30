@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { useAchievementStore } from './achievementStore';
+import { useAuthStore } from './authStore';
 
 interface Todo {
   id: number;
@@ -88,6 +90,7 @@ export const useTodoStore = create<TodoState>((set) => ({
   },
   cycleTodoStatus: (id: number) => {
     set((state) => {
+      let justCompleted = false;
       const newTodos = state.todos.map((todo) => {
         if (todo.id === id && !todo.isHeader) {
           const newStatus =
@@ -96,11 +99,30 @@ export const useTodoStore = create<TodoState>((set) => ({
               : todo.status === 'inProgress'
               ? 'completed'
               : 'todo';
+          
+          if(newStatus === 'completed' && todo.status !== 'completed') {
+            justCompleted = true;
+          }
+
           return { ...todo, status: newStatus as 'todo' | 'inProgress' | 'completed' };
         }
         return todo;
       });
       saveTodos(newTodos);
+
+      // Check for achievement unlock after state update
+      if (justCompleted) {
+        const completedCount = newTodos.filter(
+          (t) => !t.isHeader && t.status === 'completed'
+        ).length;
+        
+        const user = useAuthStore.getState().user;
+
+        if (completedCount >= 5 && user) {
+            useAchievementStore.getState().unlockAchievement('complete_5_goals', user.email);
+        }
+      }
+
       return { todos: newTodos };
     });
   },

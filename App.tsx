@@ -32,6 +32,8 @@ import LandingPage from './components/LandingPage';
 import LegalModal from './components/LegalModal';
 import TermsAcceptanceModal from './components/TermsAcceptanceModal';
 import Subtitles from './components/Subtitles';
+import AchievementToast from './components/AchievementToast';
+import AchievementTracker from './components/AchievementTracker';
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 if (typeof API_KEY !== 'string') {
@@ -84,7 +86,13 @@ function App() {
             {isAuthenticated && !showTermsModal && <ControlTray></ControlTray>}
           </main>
         </div>
-        {isAuthenticated && !showTermsModal && <Subtitles />}
+        {isAuthenticated && !showTermsModal && (
+          <>
+            <Subtitles />
+            <AchievementTracker />
+            <AchievementToast />
+          </>
+        )}
         {isAuthModalOpen && (
           <AuthModal onClose={() => setIsAuthModalOpen(false)} />
         )}

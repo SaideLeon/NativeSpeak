@@ -8,6 +8,7 @@ import { DEFAULT_LIVE_API_MODEL, AVAILABLE_VOICES } from '@/lib/constants';
 import { useLiveAPIContext } from '@/contexts/LiveAPIContext';
 import TodoList from './TodoList';
 import { useAuthStore } from '../lib/authStore';
+import AchievementsPanel from './AchievementsPanel';
 
 const AVAILABLE_MODELS = [
   DEFAULT_LIVE_API_MODEL
@@ -71,6 +72,9 @@ export default function Sidebar() {
                 </select>
               </label>
             </fieldset>
+          </div>
+          <div className="sidebar-section">
+            <AchievementsPanel />
           </div>
           <div className="sidebar-section">
             <TodoList />

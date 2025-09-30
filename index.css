@@ -1,5 +1,7 @@
 /* Modern English Learning App - Optimized for Portuguese Speakers */
 
+@import './components/AchievementsPanel.css';
+
 :root {
   /* Core Brand Colors - English Learning Theme */
   --primary-blue: #1E3A8A;
@@ -1690,6 +1692,56 @@ html, .modal, .sidebar-content, .transcription-view {
     line-height: 1.5;
     margin: 0;
 }
+
+/* Achievement Toast */
+.achievement-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(150%);
+  background: linear-gradient(135deg, var(--accent-green), var(--primary-light));
+  color: white;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  z-index: 10002;
+  box-shadow: var(--shadow-large);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+}
+
+.achievement-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: all;
+}
+
+.achievement-toast-icon {
+  font-size: 2rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.achievement-toast-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.achievement-toast-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.achievement-toast-name {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
 
 @media (max-width: 768px) {
     .subtitles-container {

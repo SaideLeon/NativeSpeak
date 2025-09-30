@@ -4,6 +4,7 @@
 */
 import { create } from 'zustand';
 import { useLogStore, ConversationTurn } from './state';
+import { useAchievementStore } from './achievementStore';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
@@ -16,6 +17,8 @@ interface User {
   termsAccepted?: boolean;
   needsToAcceptTerms?: boolean; // Transient state property
   credits: number;
+  totalConversationTime: number; // in seconds
+  completedLessons: number;
 }
 
 interface AuthState {
@@ -35,6 +38,8 @@ interface AuthState {
   checkAuth: () => void;
   acceptTerms: () => Promise<void>;
   updateCredits: (amount: number) => void;
+  addConversationTime: (seconds: number) => void;
+  incrementCompletedLessons: () => void;
 }
 
 // NOTE: This is an insecure way to store user data, for demo purposes only.
@@ -95,6 +100,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         studyStartDate,
         termsAccepted: true,
         credits: 3000,
+        totalConversationTime: 0,
+        completedLessons: 0,
       };
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
@@ -105,11 +112,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         studyStartDate,
         termsAccepted: true,
         credits: 3000,
+        totalConversationTime: 0,
+        completedLessons: 0,
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
       // Clear any potential old history for this email and start fresh
       useLogStore.getState().clearTurns();
+      useAchievementStore.getState().loadAchievements(user.email);
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -131,6 +141,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           studyStartDate: new Date().toISOString(),
           termsAccepted: true,
           credits: 999999, // Super admin has unlimited credits
+          totalConversationTime: 0,
+          completedLessons: 0,
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(superAdminUser));
         set({
@@ -141,6 +153,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
         const history = loadHistory(superAdminUser.email);
         useLogStore.getState().setTurns(history);
+        useAchievementStore.getState().loadAchievements(superAdminUser.email);
         return;
       } catch (e: any) {
         set({
@@ -166,12 +179,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (!dbUser || dbUser.pass !== pass) {
         throw new Error('E-mail ou senha inválidos.');
       }
+      
+      // Backwards compatibility
+      if (typeof dbUser.credits === 'undefined') dbUser.credits = 3000;
+      if (typeof dbUser.totalConversationTime === 'undefined') dbUser.totalConversationTime = 0;
+      if (typeof dbUser.completedLessons === 'undefined') dbUser.completedLessons = 0;
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
-      // Backwards compatibility for credits
-      if (typeof dbUser.credits === 'undefined') {
-        dbUser.credits = 3000;
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
-      }
 
       const needsToAcceptTerms = !dbUser.termsAccepted;
 
@@ -182,6 +196,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         studyStartDate: dbUser.studyStartDate,
         termsAccepted: dbUser.termsAccepted,
         credits: dbUser.credits,
+        totalConversationTime: dbUser.totalConversationTime,
+        completedLessons: dbUser.completedLessons,
         ...(needsToAcceptTerms && { needsToAcceptTerms: true }),
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
@@ -190,6 +206,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isAuthenticated: true, user, isLoading: false });
       const history = loadHistory(user.email);
       useLogStore.getState().setTurns(history);
+      useAchievementStore.getState().loadAchievements(user.email);
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -200,6 +217,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SUPER_ADMIN_KEY); // Clear super admin key on logout
     (useLogStore.getState() as any).resetTurnsForSession();
+    useAchievementStore.getState().clearAchievements();
     set({ isAuthenticated: false, user: null });
   },
 
@@ -246,6 +264,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({ isAuthenticated: true, user, isLoading: false });
             const history = loadHistory(user.email);
             useLogStore.getState().setTurns(history);
+            useAchievementStore.getState().loadAchievements(user.email);
             return;
         }
         
@@ -253,15 +272,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           user.needsToAcceptTerms = !dbUser.termsAccepted;
           user.termsAccepted = dbUser.termsAccepted;
           
-          if (!dbUser.studyStartDate) {
-              dbUser.studyStartDate = new Date().toISOString();
-          }
+          if (!dbUser.studyStartDate) dbUser.studyStartDate = new Date().toISOString();
           user.studyStartDate = dbUser.studyStartDate;
           
-          if (typeof dbUser.credits === 'undefined') {
-              dbUser.credits = 3000;
-          }
+          if (typeof dbUser.credits === 'undefined') dbUser.credits = 3000;
           user.credits = dbUser.credits;
+          
+          if (typeof dbUser.totalConversationTime === 'undefined') dbUser.totalConversationTime = 0;
+          user.totalConversationTime = dbUser.totalConversationTime;
+          
+          if (typeof dbUser.completedLessons === 'undefined') dbUser.completedLessons = 0;
+          user.completedLessons = dbUser.completedLessons;
+
           
           localStorage.setItem(USERS_KEY, JSON.stringify(users));
           localStorage.setItem(SESSION_KEY, JSON.stringify(user));
@@ -270,6 +292,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         set({ isAuthenticated: true, user, isLoading: false });
         const history = loadHistory(user.email);
         useLogStore.getState().setTurns(history);
+        useAchievementStore.getState().loadAchievements(user.email);
       } else {
         set({ isLoading: false });
       }
@@ -306,4 +329,47 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { user: updatedUser };
     });
   },
+  
+  addConversationTime: (seconds: number) => {
+    set((state) => {
+      if (!state.user) return state;
+      const newTotalTime = (state.user.totalConversationTime || 0) + seconds;
+      const updatedUser = { ...state.user, totalConversationTime: newTotalTime };
+      
+      try {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+        if (users[updatedUser.email]) {
+          users[updatedUser.email].totalConversationTime = newTotalTime;
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error("Failed to update conversation time in localStorage", error);
+      }
+
+      return { user: updatedUser };
+    });
+  },
+
+  incrementCompletedLessons: () => {
+    set((state) => {
+      if (!state.user) return state;
+      const newCount = (state.user.completedLessons || 0) + 1;
+      const updatedUser = { ...state.user, completedLessons: newCount };
+      
+      try {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+        if (users[updatedUser.email]) {
+          users[updatedUser.email].completedLessons = newCount;
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error("Failed to update completed lessons in localStorage", error);
+      }
+
+      return { user: updatedUser };
+    });
+  },
+
 }));

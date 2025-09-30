@@ -2,9 +2,11 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useAuthStore } from '../lib/authStore';
+import { useAchievementStore } from '../lib/achievementStore';
+import { useLearningStore } from '../lib/learningStore';
 
 const formatTime = (totalSeconds: number) => {
   const hours = Math.floor(totalSeconds / 3600);
@@ -22,7 +24,12 @@ const formatTime = (totalSeconds: number) => {
 export default function SessionTimer() {
   const { connected } = useLiveAPIContext();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const { updateCredits, user } = useAuthStore();
+  const elapsedSecondsRef = useRef(elapsedSeconds);
+  elapsedSecondsRef.current = elapsedSeconds;
+
+  const { updateCredits, user, addConversationTime, incrementCompletedLessons } = useAuthStore();
+  const { unlockAchievement } = useAchievementStore();
+  const { mode } = useLearningStore();
 
   useEffect(() => {
     let interval: number | null = null;
@@ -51,8 +58,23 @@ export default function SessionTimer() {
       if (interval) {
         window.clearInterval(interval);
       }
+      
+      // This part runs when the component unmounts or `connected` changes.
+      // We check if it was previously connected and a session was running.
+      if (elapsedSecondsRef.current > 0 && user) {
+        // Update total conversation time
+        addConversationTime(elapsedSecondsRef.current);
+        
+        // Unlock first session achievement
+        unlockAchievement('first_session', user.email);
+        
+        // If it was a guided lesson, increment lesson count
+        if (mode === 'guided') {
+            incrementCompletedLessons();
+        }
+      }
     };
-  }, [connected, updateCredits, user]);
+  }, [connected, updateCredits, user, addConversationTime, incrementCompletedLessons, unlockAchievement, mode]);
 
   if (!connected) {
     return null;
