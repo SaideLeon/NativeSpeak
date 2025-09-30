@@ -38,6 +38,7 @@ import LeftSidebar from './components/LeftSidebar';
 import cn from 'classnames';
 import { THEMES } from './lib/customization';
 import { usePresenceStore } from './lib/presenceStore';
+import LessonsPage from './components/LessonsPage';
 
 const SYSTEM_API_KEY = process.env.API_KEY as string;
 if (!SYSTEM_API_KEY) {
@@ -56,7 +57,7 @@ function App() {
   const [activeLegalDoc, setActiveLegalDoc] = useState<
     'privacy' | 'terms' | null
   >(null);
-  const { isLeftSidebarOpen } = useUI();
+  const { isLeftSidebarOpen, currentView } = useUI();
   const { geminiApiKey } = useSettings();
   const activeApiKey = geminiApiKey || SYSTEM_API_KEY;
 
@@ -107,7 +108,10 @@ function App() {
             <main>
               <div className="main-app-area">
                 {isAuthenticated ? (
-                  <StreamingConsole />
+                  <>
+                    {currentView === 'console' && <StreamingConsole />}
+                    {currentView === 'lessons' && <LessonsPage />}
+                  </>
                 ) : (
                   <LandingPage
                     onStartClick={() => setIsAuthModalOpen(true)}
@@ -116,7 +120,7 @@ function App() {
                 )}
               </div>
 
-              {isAuthenticated && !showTermsModal && <ControlTray></ControlTray>}
+              {isAuthenticated && !showTermsModal && currentView === 'console' && <ControlTray></ControlTray>}
             </main>
           </div>
         </div>

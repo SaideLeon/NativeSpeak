@@ -31,7 +31,7 @@ const formatTotalTime = (totalSeconds: number) => {
 };
 
 export default function LeftSidebar() {
-  const { isLeftSidebarOpen, toggleLeftSidebar } = useUI();
+  const { isLeftSidebarOpen, toggleLeftSidebar, currentView, setView } = useUI();
   const { user } = useAuthStore();
   const { progress } = useLearningStore();
   const [isCustomizing, setIsCustomizing] = useState(false);
@@ -52,6 +52,22 @@ export default function LeftSidebar() {
           </button>
         </div>
         <div className="sidebar-content">
+          <div className="sidebar-section">
+            <nav className="main-nav">
+              <button
+                className={c({ active: currentView === 'console' })}
+                onClick={() => setView('console')}
+              >
+                <span className="icon">mic</span> Prática de Conversa
+              </button>
+              <button
+                className={c({ active: currentView === 'lessons' })}
+                onClick={() => setView('lessons')}
+              >
+                <span className="icon">school</span> Aulas e Exercícios
+              </button>
+            </nav>
+          </div>
           {user && (
             <div className="sidebar-section user-panel">
               <div className="user-info">

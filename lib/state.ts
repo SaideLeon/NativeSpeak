@@ -173,17 +173,23 @@ Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreens�
 /**
  * UI
  */
+export type AppView = 'console' | 'lessons';
+
 export const useUI = create<{
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   isLeftSidebarOpen: boolean;
   toggleLeftSidebar: () => void;
+  currentView: AppView;
+  setView: (view: AppView) => void;
 }>(set => ({
   isSidebarOpen: false,
   toggleSidebar: () => set(state => ({ isSidebarOpen: !state.isSidebarOpen })),
   isLeftSidebarOpen: false,
   toggleLeftSidebar: () =>
     set(state => ({ isLeftSidebarOpen: !state.isLeftSidebarOpen })),
+  currentView: 'console',
+  setView: view => set({ currentView: view }),
 }));
 
 /**
