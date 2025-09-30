@@ -9,6 +9,7 @@ import { useLearningStore, LessonTopic } from '../lib/learningStore';
 import { lessons } from '../lib/lessons';
 import { useState } from 'react';
 import ProfileCustomizer from './ProfileCustomizer';
+import ConversationEvaluator from './ConversationEvaluator';
 
 const formatTotalTime = (totalSeconds: number) => {
   if (!totalSeconds) return '0m';
@@ -95,6 +96,10 @@ export default function LeftSidebar() {
               </div>
             </div>
           )}
+
+          <div className="sidebar-section">
+            <ConversationEvaluator />
+          </div>
 
           <div className="sidebar-section">
             <h4 className="sidebar-section-title">Progresso da Aula</h4>

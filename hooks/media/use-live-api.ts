@@ -101,10 +101,13 @@ export function useLiveApi({
 
     const onToolCall = (toolCall: LiveServerToolCall) => {
       const functionResponses: any[] = [];
-      const { addTurn } = useLogStore.getState();
+      const { addTurn, addFunctionCall } = useLogStore.getState();
       const { completeTaskByText } = useTodoStore.getState();
 
       for (const fc of toolCall.functionCalls) {
+        // Add to the new separate history
+        addFunctionCall({ name: fc.name, args: fc.args, id: fc.id });
+
         // Log the function call trigger
         const triggerMessage = `Disparando chamada de função: **${
           fc.name

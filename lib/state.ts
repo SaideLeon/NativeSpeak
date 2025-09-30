@@ -286,6 +286,13 @@ export interface ConversationTurn {
   groundingChunks?: GroundingChunk[];
 }
 
+export interface FunctionCallLog {
+  timestamp: Date;
+  name: string;
+  args: any;
+  id?: string;
+}
+
 const saveHistory = (turns: ConversationTurn[]) => {
   const { user } = useAuthStore.getState();
   if (user?.email) {
@@ -308,31 +315,39 @@ const clearHistory = () => {
 
 export const useLogStore = create<{
   turns: ConversationTurn[];
-  // FIX: Property 'inputTokens' does not exist on type '{ turns: ConversationTurn[];...}'.
+  functionCallHistory: FunctionCallLog[];
   inputTokens: number;
   outputTokens: number;
   setTurns: (turns: ConversationTurn[]) => void;
   addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) => void;
+  addFunctionCall: (call: Omit<FunctionCallLog, 'timestamp'>) => void;
   updateLastTurn: (update: Partial<ConversationTurn>) => void;
   clearTurns: () => void;
   resetTurnsForSession: () => void;
 }>((set, get) => ({
   turns: [],
-  // FIX: Property 'inputTokens' does not exist on type '{ turns: ConversationTurn[];...}'.
+  functionCallHistory: [],
   inputTokens: 0,
   outputTokens: 0,
   setTurns: (loadedTurns: ConversationTurn[]) => {
     set({ turns: loadedTurns });
   },
   resetTurnsForSession: () => {
-    // FIX: Reset tokens on session reset.
-    set({ turns: [], inputTokens: 0, outputTokens: 0 });
+    set({ turns: [], functionCallHistory: [], inputTokens: 0, outputTokens: 0 });
   },
   addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) => {
     set(state => ({
       turns: [...state.turns, { ...turn, timestamp: new Date() }],
     }));
     saveHistory(get().turns);
+  },
+  addFunctionCall: (call: Omit<FunctionCallLog, 'timestamp'>) => {
+    set(state => ({
+      functionCallHistory: [
+        ...state.functionCallHistory,
+        { ...call, timestamp: new Date() },
+      ],
+    }));
   },
   updateLastTurn: (update: Partial<Omit<ConversationTurn, 'timestamp'>>) => {
     set(state => {
@@ -347,8 +362,7 @@ export const useLogStore = create<{
     saveHistory(get().turns);
   },
   clearTurns: () => {
-    // FIX: Reset tokens on clear.
-    set({ turns: [], inputTokens: 0, outputTokens: 0 });
+    set({ turns: [], functionCallHistory: [], inputTokens: 0, outputTokens: 0 });
     clearHistory();
   },
 }));

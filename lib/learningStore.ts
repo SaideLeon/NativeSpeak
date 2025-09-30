@@ -14,20 +14,20 @@ type LessonProgress = {
   currentStep: number;
 };
 
+// Refactored to remove redundant currentStep and improve persistence logic.
 export const useLearningStore = create<{
   mode: LearningMode;
   lessonTopic: LessonTopic;
-  currentStep: number; // Current step of the active lesson
-  progress: Partial<Record<LessonTopic, LessonProgress>>; // Progress for all lessons
+  progress: Partial<Record<LessonTopic, LessonProgress>>;
   setMode: (mode: LearningMode) => void;
-  setLessonTopic: (topic: LessonTopic) => void; // This will now handle starting/resuming
-  updateStepFromTranscription: (step: number) => void; // Updates step for the *active* lesson
+  setLessonTopic: (topic: LessonTopic) => void;
   goToStep: (step: number) => void;
-  loadProgress: () => void; // Loads from localStorage based on current user
+  loadProgress: () => void;
   clearProgress: () => void;
 }>((set, get) => {
   const LESSON_PROGRESS_KEY_PREFIX = 'nativespeak_lesson_progress_';
 
+  // Helper to save progress to localStorage, associated with the current user.
   const saveProgress = (
     progress: Partial<Record<LessonTopic, LessonProgress>>,
   ) => {
@@ -47,42 +47,39 @@ export const useLearningStore = create<{
   return {
     mode: 'conversation',
     lessonTopic: 'ordering-food',
-    currentStep: 1,
     progress: {},
     setMode: mode => set({ mode }),
     setLessonTopic: (topic: LessonTopic) => {
-      const { progress } = get();
-      const savedProgress = progress[topic];
-      const stepToStart = savedProgress ? savedProgress.currentStep : 1;
-      set({ lessonTopic: topic, currentStep: stepToStart, mode: 'guided' });
-    },
-    updateStepFromTranscription: (step: number) => {
       set(state => {
-        // Only update if the step has advanced and is part of the current lesson
-        if (step > state.currentStep) {
+        // If there's no progress for this topic, initialize it.
+        // This ensures it appears in the user's "in-progress" list.
+        if (!state.progress[topic]) {
           const newProgress = {
             ...state.progress,
-            [state.lessonTopic]: { currentStep: step },
+            [topic]: { currentStep: 1 },
           };
           saveProgress(newProgress);
-          return { currentStep: step, progress: newProgress };
+          return { lessonTopic: topic, mode: 'guided', progress: newProgress };
         }
-        return state;
+        // If progress already exists, just switch to the lesson.
+        return { lessonTopic: topic, mode: 'guided' };
       });
     },
     goToStep: (step: number) => {
-      const newStep = Math.max(1, Math.min(5, step)); // All lessons have 5 steps
+      const newStep = Math.max(1, Math.min(5, step)); // Lessons have 5 steps.
       set(state => {
-        if (newStep === state.currentStep) return state;
+        const currentStep = state.progress[state.lessonTopic]?.currentStep ?? 1;
+        if (newStep === currentStep) return state;
 
         const newProgress = {
           ...state.progress,
           [state.lessonTopic]: { currentStep: newStep },
         };
         saveProgress(newProgress);
-        return { currentStep: newStep, progress: newProgress };
+        return { progress: newProgress };
       });
     },
+    // Loads progress from localStorage for the currently logged-in user.
     loadProgress: () => {
       const user = useAuthStore.getState().user;
       if (user?.email) {
@@ -91,12 +88,9 @@ export const useLearningStore = create<{
             `${LESSON_PROGRESS_KEY_PREFIX}${user.email}`,
           );
           if (saved) {
-            const parsedProgress = JSON.parse(saved) as Partial<
-              Record<LessonTopic, LessonProgress>
-            >;
-            set({ progress: parsedProgress });
+            set({ progress: JSON.parse(saved) });
           } else {
-            set({ progress: {} }); // No saved progress
+            set({ progress: {} }); // No saved progress for this user.
           }
         } catch (e) {
           console.error('Failed to load lesson progress', e);
@@ -104,8 +98,9 @@ export const useLearningStore = create<{
         }
       }
     },
+    // Clears progress from the state (e.g., on logout).
     clearProgress: () => {
-      set({ progress: {}, currentStep: 1 });
+      set({ progress: {} });
     },
   };
 });

@@ -30,8 +30,11 @@ const formatTimestamp = (date: Date) => {
 };
 
 const renderContent = (text: string) => {
+  // Remove the auto-advance command before rendering
+  const cleanText = text.replace(/\[PROXIMO_PASSO\]/g, '');
+
   // Split by ```json...``` code blocks
-  const parts = text.split(/(`{3}json\n[\s\S]*?\n`{3})/g);
+  const parts = cleanText.split(/(`{3}json\n[\s\S]*?\n`{3})/g);
 
   return parts.map((part, index) => {
     if (part.startsWith('```json')) {
@@ -73,34 +76,39 @@ export default function StreamingConsole() {
   const {
     mode,
     lessonTopic,
-    currentStep,
-    updateStepFromTranscription,
+    progress,
     goToStep,
   } = useLearningStore();
+  const currentStep = progress[lessonTopic]?.currentStep ?? 1;
+  const lastProcessedTurnRef = useRef<string | null>(null);
 
 
-  // Effect to detect step changes in guided lessons
+  // Effect to automatically advance to the next step in guided lessons
   useEffect(() => {
     const lastTurn = turns[turns.length - 1];
 
-     // Detect step changes in guided lessons
-     if (mode === 'guided' && lastTurn && lastTurn.role === 'agent' && lastTurn.text) {
-      const stepRegex = /Passo (\d+):/g;
-      let match;
-      let highestStep = 0;
-      // Find the highest step number mentioned in the text
-      while ((match = stepRegex.exec(lastTurn.text)) !== null) {
-          const stepNumber = parseInt(match[1], 10);
-          if (stepNumber > highestStep) {
-              highestStep = stepNumber;
-          }
-      }
-
-      if (highestStep > 0) {
-          updateStepFromTranscription(highestStep);
+    // Check when the agent's turn is fully complete
+    if (
+      mode === 'guided' &&
+      lastTurn &&
+      lastTurn.role === 'agent' &&
+      lastTurn.isFinal
+    ) {
+      const turnId = lastTurn.timestamp.toISOString();
+      // Ensure we only process each final turn once
+      if (lastProcessedTurnRef.current !== turnId) {
+        if (lastTurn.text.includes('[PROXIMO_PASSO]')) {
+          lastProcessedTurnRef.current = turnId; // Mark as processed immediately
+          // A small delay gives the user time to read the last message
+          const timer = setTimeout(() => {
+            goToStep(currentStep + 1);
+          }, 1200); // 1.2-second delay for better UX
+          return () => clearTimeout(timer);
+        }
       }
     }
-  }, [turns, mode, updateStepFromTranscription]);
+  }, [turns, mode, goToStep, currentStep]);
+
 
   // Set the configuration for the Live API
   useEffect(() => {

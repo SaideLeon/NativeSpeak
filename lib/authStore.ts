@@ -7,6 +7,7 @@ import { useLogStore, ConversationTurn } from './state';
 import { useAchievementStore } from './achievementStore';
 import { useNotificationStore } from './notificationStore';
 import { useLearningStore } from './learningStore';
+import { useEvaluationStore } from './evaluationStore';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
@@ -119,6 +120,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       useLogStore.getState().clearTurns();
       useAchievementStore.getState().loadAchievements(user.email);
       useLearningStore.getState().loadProgress();
+      useEvaluationStore.getState().loadEvaluation();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -156,6 +158,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         useLogStore.getState().setTurns(history);
         useAchievementStore.getState().loadAchievements(superAdminUser.email);
         useLearningStore.getState().loadProgress();
+        useEvaluationStore.getState().loadEvaluation();
         return;
       } catch (e: any) {
         set({
@@ -214,6 +217,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       useLogStore.getState().setTurns(history);
       useAchievementStore.getState().loadAchievements(user.email);
       useLearningStore.getState().loadProgress();
+      useEvaluationStore.getState().loadEvaluation();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -226,6 +230,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     (useLogStore.getState() as any).resetTurnsForSession();
     useAchievementStore.getState().clearAchievements();
     useLearningStore.getState().clearProgress();
+    useEvaluationStore.getState().clearEvaluation();
     set({ isAuthenticated: false, user: null });
   },
 
@@ -274,6 +279,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             useLogStore.getState().setTurns(history);
             useAchievementStore.getState().loadAchievements(user.email);
             useLearningStore.getState().loadProgress();
+            useEvaluationStore.getState().loadEvaluation();
             return;
         }
         
@@ -308,6 +314,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         useLogStore.getState().setTurns(history);
         useAchievementStore.getState().loadAchievements(user.email);
         useLearningStore.getState().loadProgress();
+        useEvaluationStore.getState().loadEvaluation();
       } else {
         set({ isLoading: false });
       }

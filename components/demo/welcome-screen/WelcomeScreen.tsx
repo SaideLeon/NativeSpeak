@@ -3,14 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-import React from 'react';
+import React, { useState } from 'react';
 import './WelcomeScreen.css';
-import { useTools, Scenario } from '../../../lib/state';
-import {
-  useLearningStore,
-  LessonTopic,
-} from '../../../lib/learningStore';
+import { useTools, Scenario, useLogStore } from '../../../lib/state';
+import { useLearningStore, LessonTopic } from '../../../lib/learningStore';
 import { lessons } from '../../../lib/lessons';
+import { useEvaluationStore } from '../../../lib/evaluationStore';
+import MarkdownRenderer from '../../MarkdownRenderer';
 
 // Re-themed content for English learning scenarios, but using existing template keys.
 const conversationContent: Record<
@@ -152,12 +151,80 @@ const conversationContent: Record<
   }
 };
 
+const formatTimestamp = (date: Date) => {
+  const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${hours}:${minutes}`;
+};
+
 const WelcomeScreen: React.FC = () => {
   const { template, setTemplate } = useTools();
-  const { mode, lessonTopic, setMode, setLessonTopic, progress } = useLearningStore();
+  const { mode, lessonTopic, setMode, setLessonTopic, progress } =
+    useLearningStore();
+  const { lastEvaluation, lastConversationHistory, clearLastHistory } =
+    useEvaluationStore();
+  const { setTurns } = useLogStore();
+  const [showRetryView, setShowRetryView] = useState(
+    lastEvaluation?.rating === 'Péssima',
+  );
+
+  const handleLoadHistory = () => {
+    if (lastConversationHistory) {
+      setTurns(lastConversationHistory);
+      clearLastHistory();
+    }
+  };
+
+  if (showRetryView && lastEvaluation && lastConversationHistory) {
+    return (
+      <div className="welcome-screen retry-view">
+        <div className="retry-content">
+          <span className="welcome-icon">history</span>
+          <h2>Revise e Tente Novamente</h2>
+          <p>
+            Sua última conversa foi avaliada como "Péssima". Use o feedback
+            abaixo para melhorar e pratique o mesmo cenário novamente.
+          </p>
+
+          <div className="feedback-section">
+            <h4>Feedback do Tutor</h4>
+            <div className="feedback-text">
+              <MarkdownRenderer text={lastEvaluation.feedback} />
+            </div>
+          </div>
+
+          <div className="history-section">
+            <h4>Histórico da Conversa Anterior</h4>
+            <div className="conversation-history-display">
+              {lastConversationHistory.map((t, i) => (
+                <div key={i} className={`history-entry ${t.role}`}>
+                  <span className="history-role">
+                    {t.role === 'user' ? 'Você' : 'Tutor'}:
+                  </span>
+                  <span className="history-text">{t.text}</span>
+                  <span className="history-timestamp">
+                    {formatTimestamp(t.timestamp)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="retry-actions">
+            <button
+              className="start-new-button"
+              onClick={() => setShowRetryView(false)}
+            >
+              Entendido, Começar Nova Prática
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isConversationMode = mode === 'conversation';
-
   const { title, description, prompts } = isConversationMode
     ? conversationContent[template]
     : lessons[lessonTopic];
@@ -166,6 +233,15 @@ const WelcomeScreen: React.FC = () => {
     <div className="welcome-screen">
       <div className="welcome-content">
         <span className="welcome-icon">mic</span>
+
+        {lastConversationHistory && (
+          <div className="load-history-container">
+            <button className="load-history-button" onClick={handleLoadHistory}>
+              <span className="icon">history</span>
+              Carregar última conversa
+            </button>
+          </div>
+        )}
 
         <div className="mode-selector">
           <button
@@ -190,11 +266,13 @@ const WelcomeScreen: React.FC = () => {
                 onChange={e => setTemplate(e.target.value as Scenario)}
                 aria-label="Selecione um cenário de prática"
               >
-                {Object.entries(conversationContent).map(([scenarioKey, content]) => (
-                  <option key={scenarioKey} value={scenarioKey}>
-                    {content.title}
-                  </option>
-                ))}
+                {Object.entries(conversationContent).map(
+                  ([scenarioKey, content]) => (
+                    <option key={scenarioKey} value={scenarioKey}>
+                      {content.title}
+                    </option>
+                  ),
+                )}
               </select>
             ) : (
               <select
@@ -203,13 +281,16 @@ const WelcomeScreen: React.FC = () => {
                 aria-label="Selecione um tópico de aula"
               >
                 {Object.entries(lessons).map(([topic, details]) => {
-                   const lessonProgress = progress[topic as LessonTopic];
-                   const progressText = lessonProgress ? ` (Passo ${lessonProgress.currentStep})` : '';
+                  const lessonProgress = progress[topic as LessonTopic];
+                  const progressText = lessonProgress
+                    ? ` (Passo ${lessonProgress.currentStep})`
+                    : '';
                   return (
                     <option key={topic} value={topic}>
-                      {details.title}{progressText}
+                      {details.title}
+                      {progressText}
                     </option>
-                  )
+                  );
                 })}
               </select>
             )}
