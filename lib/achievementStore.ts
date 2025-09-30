@@ -8,9 +8,13 @@ import { useNotificationStore } from './notificationStore';
 
 interface AchievementState {
   unlockedIds: Set<string>;
+  // FIX: Property 'lastUnlocked' does not exist on type 'AchievementState'.
+  lastUnlocked: Achievement | null;
   loadAchievements: (email: string) => void;
   unlockAchievement: (id: string, email: string) => void;
   clearAchievements: () => void;
+  // FIX: Property 'clearLastUnlocked' does not exist on type 'AchievementState'.
+  clearLastUnlocked: () => void;
 }
 
 const saveAchievements = (email: string, ids: Set<string>) => {
@@ -24,6 +28,8 @@ const saveAchievements = (email: string, ids: Set<string>) => {
 
 export const useAchievementStore = create<AchievementState>((set, get) => ({
   unlockedIds: new Set<string>(),
+  // FIX: Property 'lastUnlocked' does not exist on type 'AchievementState'.
+  lastUnlocked: null,
 
   loadAchievements: (email: string) => {
     try {
@@ -54,7 +60,8 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
     const newUnlockedIds = new Set<string>(get().unlockedIds);
     newUnlockedIds.add(id);
 
-    set({ unlockedIds: newUnlockedIds });
+    // FIX: Property 'lastUnlocked' does not exist on type 'AchievementState'.
+    set({ unlockedIds: newUnlockedIds, lastUnlocked: achievement });
     saveAchievements(email, newUnlockedIds);
 
     useNotificationStore.getState().addNotification({
@@ -66,6 +73,11 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
   },
 
   clearAchievements: () => {
-    set({ unlockedIds: new Set<string>() });
+    // FIX: Clear last unlocked achievement as well.
+    set({ unlockedIds: new Set<string>(), lastUnlocked: null });
+  },
+  // FIX: Property 'clearLastUnlocked' does not exist on type 'AchievementState'.
+  clearLastUnlocked: () => {
+    set({ lastUnlocked: null });
   },
 }));

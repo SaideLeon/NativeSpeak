@@ -1,60 +1,25 @@
 const CACHE_NAME = 'nativespeak-cache-v1';
 
-// Add files that are part of the "app shell"
+// Adiciona os arquivos que fazem parte do "app shell"
 const appShellFiles = [
-  './',
-  './index.html',
-  './index.css',
-  './index.tsx',
-  './icon.svg',
-  './manifest.json',
+  '/',
+  '/index.html',
+  '/index.css',
+  '/icon.svg',
+  '/manifest.json',
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache and caching app shell');
+        console.log('Cache aberto e app shell em cache');
         return cache.addAll(appShellFiles);
       })
   );
 });
 
-self.addEventListener('fetch', event => {
-  // We only want to handle GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-  
-  event.respondWith(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      const cachedResponse = await cache.match(event.request);
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      
-      try {
-        const networkResponse = await fetch(event.request);
-        // Do not cache chrome extension requests
-        if (!event.request.url.startsWith('chrome-extension://')) {
-          // Check for valid response before caching
-          if (networkResponse && networkResponse.ok) {
-            await cache.put(event.request, networkResponse.clone());
-          }
-        }
-        return networkResponse;
-      } catch (error) {
-        console.error('Fetching failed:', error);
-        // Optionally, you can return a fallback offline page here.
-        // For now, we'll let the request fail.
-        throw error;
-      }
-    })
-  );
-});
-
-
-// Clean up old caches on activation
+// Limpa caches antigos na ativação
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -62,11 +27,40 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('Deleting old cache:', cacheName);
+            console.log('Excluindo cache antigo:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
+  );
+});
+
+// Estratégia Network-first com fallback para o cache
+self.addEventListener('fetch', event => {
+  // Apenas para requisições GET
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  event.respondWith(
+    fetch(event.request)
+      .then(networkResponse => {
+        // Se a busca for bem-sucedida, clona e armazena no cache
+        if (networkResponse && networkResponse.ok) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            // Não armazena em cache requisições de extensões do chrome
+            if (!event.request.url.startsWith('chrome-extension')) {
+                 cache.put(event.request, responseToCache);
+            }
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // Se a requisição de rede falhar, tenta servir do cache
+        return caches.match(event.request);
+      })
   );
 });

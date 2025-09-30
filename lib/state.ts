@@ -292,6 +292,9 @@ const clearHistory = () => {
 
 export const useLogStore = create<{
   turns: ConversationTurn[];
+  // FIX: Property 'inputTokens' does not exist on type '{ turns: ConversationTurn[];...}'.
+  inputTokens: number;
+  outputTokens: number;
   setTurns: (turns: ConversationTurn[]) => void;
   addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) => void;
   updateLastTurn: (update: Partial<ConversationTurn>) => void;
@@ -299,11 +302,15 @@ export const useLogStore = create<{
   resetTurnsForSession: () => void;
 }>((set, get) => ({
   turns: [],
+  // FIX: Property 'inputTokens' does not exist on type '{ turns: ConversationTurn[];...}'.
+  inputTokens: 0,
+  outputTokens: 0,
   setTurns: (loadedTurns: ConversationTurn[]) => {
     set({ turns: loadedTurns });
   },
   resetTurnsForSession: () => {
-    set({ turns: [] });
+    // FIX: Reset tokens on session reset.
+    set({ turns: [], inputTokens: 0, outputTokens: 0 });
   },
   addTurn: (turn: Omit<ConversationTurn, 'timestamp'>) => {
     set(state => ({
@@ -324,7 +331,8 @@ export const useLogStore = create<{
     saveHistory(get().turns);
   },
   clearTurns: () => {
-    set({ turns: [] });
+    // FIX: Reset tokens on clear.
+    set({ turns: [], inputTokens: 0, outputTokens: 0 });
     clearHistory();
   },
 }));
