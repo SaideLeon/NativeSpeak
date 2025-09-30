@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { useLogStore, ConversationTurn } from './state';
 import { useAchievementStore } from './achievementStore';
+import { useNotificationStore } from './notificationStore';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
@@ -311,8 +312,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           return state;
       }
       
-      const newCredits = Math.max(0, state.user.credits + amount);
+      const oldCredits = state.user.credits;
+      const newCredits = Math.max(0, oldCredits + amount);
       const updatedUser = { ...state.user, credits: newCredits };
+
+      const LOW_CREDIT_THRESHOLD = 500;
+      if (newCredits < LOW_CREDIT_THRESHOLD && oldCredits >= LOW_CREDIT_THRESHOLD) {
+        useNotificationStore.getState().addNotification({
+          title: 'Créditos Baixos',
+          message: 'Seus créditos estão acabando. Recarregue em breve!',
+          type: 'info',
+          icon: 'account_balance_wallet',
+        });
+      }
       
       // Update localStorage
       try {
