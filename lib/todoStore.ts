@@ -23,6 +23,7 @@ const getDefaultTodos = (): Todo[] => {
     const now = Date.now();
     return [
       { id: now + 1, text: 'Metas rápidas (diárias)', isHeader: true, status: 'todo' },
+      { id: now + 19, text: 'Falar por 2 minutos seguidos.', status: 'todo' },
       { id: now + 2, text: 'Praticar 10 minutos de conversa com a IA.', status: 'todo' },
       { id: now + 3, text: 'Aprender 5 novas palavras e usá-las em frases.', status: 'todo' },
       { id: now + 4, text: 'Ouvir e repetir 3 frases completas para treinar pronúncia.', status: 'todo' },

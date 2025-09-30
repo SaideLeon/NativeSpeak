@@ -25,63 +25,63 @@ const formatTime = (totalSeconds: number) => {
 export default function SessionTimer() {
   const { connected } = useLiveAPIContext();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const elapsedSecondsRef = useRef(elapsedSeconds);
-  elapsedSecondsRef.current = elapsedSeconds;
+  const wasConnectedRef = useRef(false);
 
   const { updateCredits, user, addConversationTime, incrementCompletedLessons } = useAuthStore();
   const { unlockAchievement } = useAchievementStore();
   const { mode } = useLearningStore();
   const { completeTaskByText } = useTodoStore();
 
+  // Effect for the timer logic.
   useEffect(() => {
-    let interval: number | null = null;
-
-    if (connected) {
-      // Start timer
-      interval = window.setInterval(() => {
-        setElapsedSeconds(prevSeconds => {
-          const newSeconds = prevSeconds + 1;
-          // Deduct credits every 10 seconds of conversation
-          if (newSeconds > 0 && newSeconds % 10 === 0) {
-            if ((user?.credits ?? 0) > 0) {
-              updateCredits(-10);
-            }
-          }
-          // Check for 10-minute goal completion
-          if (newSeconds === 10 * 60) {
-            // 10 minutes in seconds
-            completeTaskByText('10 minutos');
-          }
-          return newSeconds;
-        });
-      }, 1000);
-    } else {
-      // Reset timer if disconnected
+    if (!connected) {
       setElapsedSeconds(0);
+      return;
     }
 
-    // Cleanup function
-    return () => {
-      if (interval) {
-        window.clearInterval(interval);
-      }
-      
-      // This part runs when the component unmounts or `connected` changes.
-      // We check if it was previously connected and a session was running.
-      if (elapsedSecondsRef.current > 0 && user) {
-        // Update total conversation time
-        addConversationTime(elapsedSecondsRef.current);
+    const interval = window.setInterval(() => {
+      // Use functional update to avoid needing elapsedSeconds in dependencies
+      setElapsedSeconds(prevSeconds => {
+        const newSeconds = prevSeconds + 1;
         
-        // Unlock first session achievement
+        // Deduct credits every 10 seconds of conversation
+        if (newSeconds > 0 && newSeconds % 10 === 0) {
+          // This is safe. `updateCredits` uses the `set(state => ...)` form
+          // and can access the latest state, so we don't need to pass user/credits from here.
+          updateCredits(-10);
+        }
+        
+        // Check for 2-minute goal completion
+        if (newSeconds === 2 * 60) { // 2 minutes in seconds
+          completeTaskByText('2 minutos');
+        }
+
+        // Check for 10-minute goal completion
+        if (newSeconds === 10 * 60) { // 10 minutes in seconds
+          completeTaskByText('10 minutos');
+        }
+        return newSeconds;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [connected, updateCredits, completeTaskByText]); // Dependencies are stable, effect runs only when `connected` changes.
+
+  // Effect for session cleanup logic, which runs when a session ends.
+  useEffect(() => {
+    // Check if the connection state changed from connected (true) to disconnected (false).
+    if (wasConnectedRef.current && !connected) {
+      if (elapsedSeconds > 0 && user) {
+        addConversationTime(elapsedSeconds);
         unlockAchievement('first_session', user.email);
-        
-        // If it was a guided lesson, increment lesson count
         if (mode === 'guided') {
-            incrementCompletedLessons();
+          incrementCompletedLessons();
         }
       }
-    };
-  }, [connected, updateCredits, user, addConversationTime, incrementCompletedLessons, unlockAchievement, mode, completeTaskByText]);
+    }
+    // Update the ref at the end of every render to track the previous state for the next render.
+    wasConnectedRef.current = connected;
+  }, [connected, elapsedSeconds, user, addConversationTime, unlockAchievement, mode, incrementCompletedLessons]);
 
   if (!connected) {
     return null;

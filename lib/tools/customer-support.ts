@@ -8,66 +8,58 @@ import { FunctionCall } from '../state';
 
 export const customerSupportTools: FunctionCall[] = [
   {
-    name: 'start_return',
-    description: 'Inicia o processo de devolução de um item, coletando os detalhes necessários do usuário.',
+    name: 'get_word_definition',
+    description:
+      'Busca a definição de uma palavra em inglês e a traduz para o português. Útil para quando o aluno não conhece uma palavra.',
     parameters: {
       type: 'OBJECT',
       properties: {
-        orderId: {
+        word: {
           type: 'STRING',
-          description: 'O ID do pedido que contém o item a ser devolvido.',
-        },
-        itemName: {
-          type: 'STRING',
-          description: 'O nome do item que o usuário deseja devolver.',
-        },
-        reason: {
-          type: 'STRING',
-          description: 'O motivo pelo qual o usuário está devolvendo o item.',
+          description: 'A palavra em inglês para definir.',
         },
       },
-      required: ['orderId', 'itemName', 'reason'],
+      required: ['word'],
     },
     isEnabled: true,
     scheduling: FunctionResponseScheduling.INTERRUPT,
   },
   {
-    name: 'get_order_status',
-    description: 'Fornece o status atual do pedido de um usuário, pesquisando pelo ID do pedido ou detalhes do cliente.',
+    name: 'get_usage_examples',
+    description:
+      'Fornece 2-3 frases de exemplo mostrando como uma palavra em inglês é usada em diferentes contextos.',
     parameters: {
       type: 'OBJECT',
       properties: {
-        orderId: {
+        word: {
           type: 'STRING',
-          description: 'O ID do pedido a ser verificado. Peça por isso primeiro.',
-        },
-        customerName: {
-          type: 'STRING',
-          description: 'O nome do cliente, se o ID do pedido não estiver disponível.',
-        },
-        customerEmail: {
-          type: 'STRING',
-          description: 'O e-mail do cliente, se o ID do pedido não estiver disponível.',
+          description: 'A palavra em inglês para a qual obter exemplos.',
         },
       },
+      required: ['word'],
     },
     isEnabled: true,
     scheduling: FunctionResponseScheduling.INTERRUPT,
   },
   {
-    name: 'speak_to_representative',
-    description: 'Escalona a conversa para um representante de suporte humano.',
+    name: 'translate_phrase',
+    description:
+      'Traduz uma frase curta do português para o inglês, ou do inglês para o português.',
     parameters: {
       type: 'OBJECT',
       properties: {
-        reason: {
+        phrase: {
           type: 'STRING',
-          description: 'Um breve resumo do problema do usuário para o representante.',
+          description: 'A frase a ser traduzida.',
+        },
+        targetLanguage: {
+          type: 'STRING',
+          description: "O idioma para o qual traduzir ('inglês' ou 'português').",
         },
       },
-      required: ['reason'],
+      required: ['phrase', 'targetLanguage'],
     },
-    isEnabled: true,
+    isEnabled: false, // Desabilitado por padrão para evitar confusão
     scheduling: FunctionResponseScheduling.INTERRUPT,
   },
 ];

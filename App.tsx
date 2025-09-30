@@ -38,10 +38,10 @@ import { useUI } from './lib/state';
 import LeftSidebar from './components/LeftSidebar';
 import cn from 'classnames';
 
-const API_KEY = process.env.GEMINI_API_KEY as string;
-if (typeof API_KEY !== 'string') {
+const API_KEY = process.env.API_KEY as string;
+if (!API_KEY) {
   throw new Error(
-    'Missing required environment variable: REACT_APP_GEMINI_API_KEY'
+    'Missing required environment variable: GEMINI_API_KEY. Please set it in your .env file.'
   );
 }
 
