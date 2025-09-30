@@ -10,6 +10,7 @@ import {
   useLearningStore,
   LessonTopic,
 } from '../../../lib/learningStore';
+import { lessons } from '../../../lib/lessons';
 
 // Re-themed content for English learning scenarios, but using existing template keys.
 const conversationContent: Record<
@@ -46,51 +47,15 @@ const conversationContent: Record<
   },
 };
 
-const guidedContent: Record<
-  LessonTopic,
-  { title: string; description: string; prompts: string[] }
-> = {
-  'ordering-food': {
-    title: 'Pedindo Comida',
-    description:
-      'Aprenda vocabulário e frases essenciais para pedir em um restaurante.',
-    prompts: [
-      "I'd like to order...",
-      'Could I have the check?',
-      'Appetizer, Main Course, Dessert',
-    ],
-  },
-  'job-interview-basics': {
-    title: 'Básico de Entrevista',
-    description:
-      'Prepare-se para a pergunta mais comum em entrevistas de emprego.',
-    prompts: [
-      'Tell me about yourself',
-      'Strengths and Weaknesses',
-      'My experience is...',
-    ],
-  },
-  'travel-and-directions': {
-    title: 'Viagens e Direções',
-    description:
-      'Aprenda a pedir e dar informações para não se perder em sua viagem.',
-    prompts: [
-      'How do I get to...?',
-      'Turn left/right',
-      'Go straight ahead',
-    ],
-  },
-};
-
 const WelcomeScreen: React.FC = () => {
   const { template, setTemplate } = useTools();
-  const { mode, lessonTopic, setMode, setLessonTopic } = useLearningStore();
+  const { mode, lessonTopic, setMode, setLessonTopic, progress } = useLearningStore();
 
   const isConversationMode = mode === 'conversation';
 
   const { title, description, prompts } = isConversationMode
     ? conversationContent[template]
-    : guidedContent[lessonTopic];
+    : lessons[lessonTopic];
 
   return (
     <div className="welcome-screen">
@@ -132,13 +97,15 @@ const WelcomeScreen: React.FC = () => {
                 onChange={e => setLessonTopic(e.target.value as LessonTopic)}
                 aria-label="Selecione um tópico de aula"
               >
-                <option value="ordering-food">Pedindo Comida</option>
-                <option value="job-interview-basics">
-                  Básico de Entrevista
-                </option>
-                <option value="travel-and-directions">
-                  Viagens e Direções
-                </option>
+                {Object.entries(lessons).map(([topic, details]) => {
+                   const lessonProgress = progress[topic as LessonTopic];
+                   const progressText = lessonProgress ? ` (Passo ${lessonProgress.currentStep})` : '';
+                  return (
+                    <option key={topic} value={topic}>
+                      {details.title}{progressText}
+                    </option>
+                  )
+                })}
               </select>
             )}
             <span className="icon">arrow_drop_down</span>

@@ -20,6 +20,7 @@ import {
 import { useTodoStore } from '../../../lib/todoStore';
 import { useAuthStore } from '../../../lib/authStore';
 import { useLearningStore } from '../../../lib/learningStore';
+import { lessons } from '../../../lib/lessons';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -73,7 +74,7 @@ export default function StreamingConsole() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { setSubtitleText } = useUI();
   const subtitleTimeoutRef = useRef<number | null>(null);
-  const { mode, lessonTopic } = useLearningStore();
+  const { mode, lessonTopic, currentStep, updateCurrentStep } = useLearningStore();
 
 
   // Effect to manage subtitles based on conversation turns
@@ -100,7 +101,24 @@ export default function StreamingConsole() {
         // If the last turn is not an agent's turn, or there are no turns, clear subtitles immediately.
         setSubtitleText('');
     }
-  }, [turns, setSubtitleText]);
+     // Detect step changes in guided lessons
+     if (mode === 'guided' && lastTurn && lastTurn.role === 'agent' && lastTurn.text) {
+      const stepRegex = /Passo (\d+):/g;
+      let match;
+      let highestStep = 0;
+      // Find the highest step number mentioned in the text
+      while ((match = stepRegex.exec(lastTurn.text)) !== null) {
+          const stepNumber = parseInt(match[1], 10);
+          if (stepNumber > highestStep) {
+              highestStep = stepNumber;
+          }
+      }
+
+      if (highestStep > 0) {
+          updateCurrentStep(highestStep);
+      }
+    }
+  }, [turns, setSubtitleText, mode, updateCurrentStep]);
 
   // Set the configuration for the Live API
   useEffect(() => {
@@ -161,10 +179,20 @@ export default function StreamingConsole() {
         context += '--- FIM DAS INFORMAÇÕES CONTEXTUAIS ---';
     }
     
-    const activeSystemPrompt =
-      mode === 'guided'
-        ? lessonSystemPrompts[lessonTopic]
-        : systemPrompt;
+    let activeSystemPrompt: string;
+
+    if (mode === 'guided') {
+      const basePrompt = lessons[lessonTopic].systemPrompt;
+      if (currentStep > 1) {
+        const resumeInstruction = `Você está retomando uma aula guiada que já está em andamento. O aluno já completou os passos anteriores. Comece diretamente com o Passo ${currentStep}. Não se apresente novamente nem repita os passos anteriores.\n\n---\n\n`;
+        activeSystemPrompt = resumeInstruction + basePrompt;
+      } else {
+        activeSystemPrompt = basePrompt;
+      }
+    } else {
+      activeSystemPrompt = systemPrompt;
+    }
+
 
     const fullSystemPrompt = activeSystemPrompt + context;
 
@@ -193,7 +221,7 @@ export default function StreamingConsole() {
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic, useWebSearch]);
+  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic, currentStep, useWebSearch]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();

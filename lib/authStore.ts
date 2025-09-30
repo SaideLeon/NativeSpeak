@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { useLogStore, ConversationTurn } from './state';
 import { useAchievementStore } from './achievementStore';
 import { useNotificationStore } from './notificationStore';
+import { useLearningStore } from './learningStore';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
@@ -121,6 +122,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Clear any potential old history for this email and start fresh
       useLogStore.getState().clearTurns();
       useAchievementStore.getState().loadAchievements(user.email);
+      useLearningStore.getState().loadProgress();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -155,6 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const history = loadHistory(superAdminUser.email);
         useLogStore.getState().setTurns(history);
         useAchievementStore.getState().loadAchievements(superAdminUser.email);
+        useLearningStore.getState().loadProgress();
         return;
       } catch (e: any) {
         set({
@@ -208,6 +211,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const history = loadHistory(user.email);
       useLogStore.getState().setTurns(history);
       useAchievementStore.getState().loadAchievements(user.email);
+      useLearningStore.getState().loadProgress();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -219,6 +223,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     localStorage.removeItem(SUPER_ADMIN_KEY); // Clear super admin key on logout
     (useLogStore.getState() as any).resetTurnsForSession();
     useAchievementStore.getState().clearAchievements();
+    useLearningStore.getState().clearProgress();
     set({ isAuthenticated: false, user: null });
   },
 
@@ -266,6 +271,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             const history = loadHistory(user.email);
             useLogStore.getState().setTurns(history);
             useAchievementStore.getState().loadAchievements(user.email);
+            useLearningStore.getState().loadProgress();
             return;
         }
         
@@ -294,6 +300,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const history = loadHistory(user.email);
         useLogStore.getState().setTurns(history);
         useAchievementStore.getState().loadAchievements(user.email);
+        useLearningStore.getState().loadProgress();
       } else {
         set({ isLoading: false });
       }
@@ -320,7 +327,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (newCredits < LOW_CREDIT_THRESHOLD && oldCredits >= LOW_CREDIT_THRESHOLD) {
         useNotificationStore.getState().addNotification({
           title: 'Créditos Baixos',
-          message: 'Seus créditos estão acabando. Recarregue em breve!',
+          message: 'Seus créditos de conversação estão acabando. Recarregue em breve!',
           type: 'info',
           icon: 'account_balance_wallet',
         });

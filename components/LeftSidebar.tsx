@@ -5,6 +5,8 @@
 import { useUI } from '@/lib/state';
 import c from 'classnames';
 import { useAuthStore } from '../lib/authStore';
+import { useLearningStore, LessonTopic } from '../lib/learningStore';
+import { lessons } from '../lib/lessons';
 
 const formatTotalTime = (totalSeconds: number) => {
   if (!totalSeconds) return '0m';
@@ -27,6 +29,9 @@ const formatTotalTime = (totalSeconds: number) => {
 export default function LeftSidebar() {
   const { isLeftSidebarOpen, toggleLeftSidebar } = useUI();
   const { user } = useAuthStore();
+  const { progress } = useLearningStore();
+
+  const hasProgress = Object.keys(progress).length > 0;
 
   return (
     <>
@@ -69,7 +74,32 @@ export default function LeftSidebar() {
               </div>
             </div>
           )}
-          {/* Future sections for the left sidebar can be added here */}
+
+          <div className="sidebar-section">
+            <h4 className="sidebar-section-title">Progresso da Aula</h4>
+            {!hasProgress ? (
+              <p className="no-progress-text">
+                Comece uma aula guiada para ver seu progresso aqui.
+              </p>
+            ) : (
+              <div className="lessons-progress-list">
+                {Object.entries(lessons).map(([topic, details]) => {
+                  const lessonProgress = progress[topic as LessonTopic];
+                  if (!lessonProgress) return null; // Only show lessons that have been started
+                  return (
+                    <div key={topic} className="lesson-progress-item">
+                      <span className="lesson-progress-title">
+                        {details.title}
+                      </span>
+                      <span className="lesson-progress-step">
+                        Passo {lessonProgress.currentStep}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </aside>
     </>
