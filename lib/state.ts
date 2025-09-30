@@ -108,9 +108,11 @@ export const useSettings = create<{
   systemPrompt: string;
   model: string;
   voice: string;
+  useWebSearch: boolean;
   setSystemPrompt: (prompt: string) => void;
   setModel: (model: string) => void;
   setVoice: (voice: string) => void;
+  setUseWebSearch: (use: boolean) => void;
 }>(set => ({
   systemPrompt: `Você é um agente de inteligência artificial especializado em ensinar inglês a falantes de português. Seu nome é Tutor, da NativeSpeak.
 Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
@@ -134,9 +136,11 @@ Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
 Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreensão e conversação em inglês, sempre de forma prática, motivadora e personalizada.`,
   model: DEFAULT_LIVE_API_MODEL,
   voice: DEFAULT_VOICE,
+  useWebSearch: true,
   setSystemPrompt: prompt => set({ systemPrompt: prompt }),
   setModel: model => set({ model }),
   setVoice: voice => set({ voice }),
+  setUseWebSearch: use => set({ useWebSearch: use }),
 }));
 
 /**

@@ -16,7 +16,7 @@ const AVAILABLE_MODELS = [
 
 export default function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useUI();
-  const { model, voice, setModel, setVoice } =
+  const { model, voice, useWebSearch, setModel, setVoice, setUseWebSearch } =
     useSettings();
   const { connected } = useLiveAPIContext();
   const { user } = useAuthStore();
@@ -54,6 +54,24 @@ export default function Sidebar() {
                   ))}
                 </select>
               </label>
+              <div className="tool-item">
+                <label className="tool-checkbox-wrapper">
+                  <input
+                    id="web-search-toggle"
+                    type="checkbox"
+                    checked={useWebSearch}
+                    onChange={e => setUseWebSearch(e.target.checked)}
+                  />
+                  <span className="checkbox-visual"></span>
+                </label>
+                <label
+                  htmlFor="web-search-toggle"
+                  className="tool-name-text"
+                  style={{ cursor: 'pointer' }}
+                >
+                  Ativar Pesquisa na Web
+                </label>
+              </div>
             </fieldset>
           </div>
           <div className="sidebar-section">

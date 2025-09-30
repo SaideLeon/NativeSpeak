@@ -65,7 +65,7 @@ const renderContent = (text: string) => {
 
 export default function StreamingConsole() {
   const { client, setConfig } = useLiveAPIContext();
-  const { systemPrompt, voice } = useSettings();
+  const { systemPrompt, voice, useWebSearch } = useSettings();
   const { tools } = useTools();
   const { todos } = useTodoStore();
   const { user } = useAuthStore();
@@ -104,17 +104,23 @@ export default function StreamingConsole() {
 
   // Set the configuration for the Live API
   useEffect(() => {
-    const enabledTools = tools
-      .filter(tool => tool.isEnabled)
-      .map(tool => ({
-        functionDeclarations: [
-          {
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.parameters,
-          },
-        ],
-      }));
+    let finalTools: any; // Use `any` to accommodate both tool types
+
+    if (useWebSearch) {
+      finalTools = [{ googleSearch: {} }];
+    } else {
+      finalTools = tools
+        .filter(tool => tool.isEnabled)
+        .map(tool => ({
+          functionDeclarations: [
+            {
+              name: tool.name,
+              description: tool.description,
+              parameters: tool.parameters,
+            },
+          ],
+        }));
+    }
 
     let context = '';
     const inProgressTasks = todos
@@ -183,11 +189,11 @@ export default function StreamingConsole() {
           },
         ],
       },
-      tools: enabledTools,
+      tools: finalTools,
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic]);
+  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic, useWebSearch]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();
