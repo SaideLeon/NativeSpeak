@@ -15,6 +15,7 @@ interface User {
   studyStartDate: string;
   termsAccepted?: boolean;
   needsToAcceptTerms?: boolean; // Transient state property
+  credits: number;
 }
 
 interface AuthState {
@@ -33,6 +34,7 @@ interface AuthState {
   logout: () => void;
   checkAuth: () => void;
   acceptTerms: () => Promise<void>;
+  updateCredits: (amount: number) => void;
 }
 
 // NOTE: This is an insecure way to store user data, for demo purposes only.
@@ -92,15 +94,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         lastName,
         studyStartDate,
         termsAccepted: true,
+        credits: 3000,
       };
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
-      const user = {
+      const user: User = {
         email,
         firstName,
         lastName,
         studyStartDate,
         termsAccepted: true,
+        credits: 3000,
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
@@ -126,6 +130,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           lastName: 'Supremo',
           studyStartDate: new Date().toISOString(),
           termsAccepted: true,
+          credits: 999999, // Super admin has unlimited credits
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(superAdminUser));
         set({
@@ -157,18 +162,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // Normal user login
     try {
       const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-      if (!users[email] || users[email].pass !== pass) {
+      const dbUser = users[email];
+      if (!dbUser || dbUser.pass !== pass) {
         throw new Error('E-mail ou senha inválidos.');
       }
 
-      const needsToAcceptTerms = !users[email].termsAccepted;
+      // Backwards compatibility for credits
+      if (typeof dbUser.credits === 'undefined') {
+        dbUser.credits = 3000;
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      }
+
+      const needsToAcceptTerms = !dbUser.termsAccepted;
 
       const user: User = {
         email,
-        firstName: users[email].firstName,
-        lastName: users[email].lastName,
-        studyStartDate: users[email].studyStartDate,
-        termsAccepted: users[email].termsAccepted,
+        firstName: dbUser.firstName,
+        lastName: dbUser.lastName,
+        studyStartDate: dbUser.studyStartDate,
+        termsAccepted: dbUser.termsAccepted,
+        credits: dbUser.credits,
         ...(needsToAcceptTerms && { needsToAcceptTerms: true }),
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
@@ -224,25 +237,34 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const session = localStorage.getItem(SESSION_KEY);
       if (session) {
-        const user = JSON.parse(session);
+        const user: User = JSON.parse(session);
         const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
         const dbUser = users[user.email];
 
-        // Check against the source of truth (USERS_KEY)
-        if (dbUser && !dbUser.termsAccepted) {
-          user.needsToAcceptTerms = true;
-        } else if (dbUser) {
-          user.termsAccepted = dbUser.termsAccepted; // Sync just in case
+        // Check against the source of truth (USERS_KEY) for super admin
+        if (user.email === 'admin@nativespeak.app') {
+            set({ isAuthenticated: true, user, isLoading: false });
+            const history = loadHistory(user.email);
+            useLogStore.getState().setTurns(history);
+            return;
         }
-
-        // Backwards compatibility for users without a start date
-        if (!user.studyStartDate) {
-          if (dbUser?.studyStartDate) {
-            user.studyStartDate = dbUser.studyStartDate;
-          } else {
-            user.studyStartDate = new Date().toISOString();
+        
+        if (dbUser) {
+          user.needsToAcceptTerms = !dbUser.termsAccepted;
+          user.termsAccepted = dbUser.termsAccepted;
+          
+          if (!dbUser.studyStartDate) {
+              dbUser.studyStartDate = new Date().toISOString();
           }
-          localStorage.setItem(SESSION_KEY, JSON.stringify(user)); // Resave session
+          user.studyStartDate = dbUser.studyStartDate;
+          
+          if (typeof dbUser.credits === 'undefined') {
+              dbUser.credits = 3000;
+          }
+          user.credits = dbUser.credits;
+          
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+          localStorage.setItem(SESSION_KEY, JSON.stringify(user));
         }
 
         set({ isAuthenticated: true, user, isLoading: false });
@@ -254,5 +276,34 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (e) {
       set({ isLoading: false });
     }
+  },
+
+  updateCredits: (amount: number) => {
+    set((state) => {
+      if (!state.isAuthenticated || !state.user) {
+        return state;
+      }
+      // Super admin is not affected by credit changes
+      if (state.user.email === 'admin@nativespeak.app') {
+          return state;
+      }
+      
+      const newCredits = Math.max(0, state.user.credits + amount);
+      const updatedUser = { ...state.user, credits: newCredits };
+      
+      // Update localStorage
+      try {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+        if (users[updatedUser.email]) {
+          users[updatedUser.email].credits = newCredits;
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error("Failed to update credits in localStorage", error);
+      }
+
+      return { user: updatedUser };
+    });
   },
 }));

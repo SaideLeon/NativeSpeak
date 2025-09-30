@@ -4,6 +4,7 @@
 */
 import { useState, useEffect } from 'react';
 import { useLiveAPIContext } from '../contexts/LiveAPIContext';
+import { useAuthStore } from '../lib/authStore';
 
 const formatTime = (totalSeconds: number) => {
   const hours = Math.floor(totalSeconds / 3600);
@@ -21,6 +22,7 @@ const formatTime = (totalSeconds: number) => {
 export default function SessionTimer() {
   const { connected } = useLiveAPIContext();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const { updateCredits, user } = useAuthStore();
 
   useEffect(() => {
     let interval: number | null = null;
@@ -28,7 +30,16 @@ export default function SessionTimer() {
     if (connected) {
       // Start timer
       interval = window.setInterval(() => {
-        setElapsedSeconds(prevSeconds => prevSeconds + 1);
+        setElapsedSeconds(prevSeconds => {
+          const newSeconds = prevSeconds + 1;
+          // Deduct credits every 10 seconds of conversation
+          if (newSeconds > 0 && newSeconds % 10 === 0) {
+            if ((user?.credits ?? 0) > 0) {
+              updateCredits(-10);
+            }
+          }
+          return newSeconds;
+        });
       }, 1000);
     } else {
       // Reset timer if disconnected
@@ -41,7 +52,7 @@ export default function SessionTimer() {
         window.clearInterval(interval);
       }
     };
-  }, [connected]);
+  }, [connected, updateCredits, user]);
 
   if (!connected) {
     return null;

@@ -644,6 +644,63 @@ button:focus-visible {
   border-radius: 2px;
 }
 
+/* User Panel in Sidebar */
+.user-panel {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--space-2xl);
+}
+
+.user-panel .sidebar-section-title {
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.user-panel .sidebar-section-title::before {
+  background: var(--primary-light);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.user-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.credits-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--bg-secondary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.credits-display .icon {
+  color: var(--accent-orange);
+  font-size: 1.25rem;
+}
+
+.credits-value {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.credits-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+
 /* Form Elements */
 label {
   display: flex;

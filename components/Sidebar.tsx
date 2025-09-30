@@ -7,6 +7,7 @@ import c from 'classnames';
 import { DEFAULT_LIVE_API_MODEL, AVAILABLE_VOICES } from '@/lib/constants';
 import { useLiveAPIContext } from '@/contexts/LiveAPIContext';
 import TodoList from './TodoList';
+import { useAuthStore } from '../lib/authStore';
 
 const AVAILABLE_MODELS = [
   DEFAULT_LIVE_API_MODEL
@@ -17,6 +18,7 @@ export default function Sidebar() {
   const { model, voice, setModel, setVoice } =
     useSettings();
   const { connected } = useLiveAPIContext();
+  const { user } = useAuthStore();
 
   return (
     <>
@@ -28,6 +30,23 @@ export default function Sidebar() {
           </button>
         </div>
         <div className="sidebar-content">
+          {user && (
+            <div className="sidebar-section user-panel">
+              <h4 className="sidebar-section-title">Painel do Aluno</h4>
+              <div className="user-info">
+                <span className="user-name">
+                  {user.firstName} {user.lastName}
+                </span>
+                <div className="credits-display">
+                  <span className="icon">toll</span>
+                  <span className="credits-value">
+                    {user.credits.toLocaleString('pt-BR')}
+                  </span>
+                  <span className="credits-label">Créditos</span>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="sidebar-section">
             <fieldset disabled={connected}>
               <label>
