@@ -7,6 +7,8 @@ import c from 'classnames';
 import { useAuthStore } from '../lib/authStore';
 import { useLearningStore, LessonTopic } from '../lib/learningStore';
 import { lessons } from '../lib/lessons';
+import { useState } from 'react';
+import ProfileCustomizer from './ProfileCustomizer';
 
 const formatTotalTime = (totalSeconds: number) => {
   if (!totalSeconds) return '0m';
@@ -30,6 +32,7 @@ export default function LeftSidebar() {
   const { isLeftSidebarOpen, toggleLeftSidebar } = useUI();
   const { user } = useAuthStore();
   const { progress } = useLearningStore();
+  const [isCustomizing, setIsCustomizing] = useState(false);
 
   const hasProgress = Object.keys(progress).length > 0;
 
@@ -49,11 +52,25 @@ export default function LeftSidebar() {
         <div className="sidebar-content">
           {user && (
             <div className="sidebar-section user-panel">
-              <h4 className="sidebar-section-title">Painel do Aluno</h4>
               <div className="user-info">
-                <span className="user-name">
-                  {user.firstName} {user.lastName}
-                </span>
+                <div className="user-header">
+                  <button
+                    className="avatar-button"
+                    onClick={() => setIsCustomizing(!isCustomizing)}
+                    title="Personalizar Perfil"
+                  >
+                    <span className="icon user-avatar">
+                      {user.avatar || 'person'}
+                    </span>
+                    <span className="icon edit-icon">edit</span>
+                  </button>
+                  <span className="user-name">
+                    {user.firstName} {user.lastName}
+                  </span>
+                </div>
+
+                {isCustomizing && <ProfileCustomizer />}
+
                 <div className="credits-display">
                   <span className="icon">toll</span>
                   <span className="credits-value">

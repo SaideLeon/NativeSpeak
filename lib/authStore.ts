@@ -21,6 +21,8 @@ interface User {
   credits: number;
   totalConversationTime: number; // in seconds
   completedLessons: number;
+  avatar?: string;
+  theme?: string;
 }
 
 interface AuthState {
@@ -42,6 +44,7 @@ interface AuthState {
   updateCredits: (amount: number) => void;
   addConversationTime: (seconds: number) => void;
   incrementCompletedLessons: () => void;
+  updateProfile: (updates: Partial<Pick<User, 'avatar' | 'theme'>>) => void;
 }
 
 // NOTE: This is an insecure way to store user data, for demo purposes only.
@@ -95,8 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
       const studyStartDate = new Date().toISOString();
       // In a real app, you would hash the password
-      users[email] = {
-        pass,
+      const newUser = {
         firstName,
         lastName,
         studyStartDate,
@@ -104,19 +106,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         credits: 3000,
         totalConversationTime: 0,
         completedLessons: 0,
+        avatar: 'person',
+        theme: 'default',
       };
+      users[email] = { pass, ...newUser };
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
-      const user: User = {
-        email,
-        firstName,
-        lastName,
-        studyStartDate,
-        termsAccepted: true,
-        credits: 3000,
-        totalConversationTime: 0,
-        completedLessons: 0,
-      };
+      const user: User = { email, ...newUser };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
       set({ isAuthenticated: true, user, isLoading: false });
       // Clear any potential old history for this email and start fresh
@@ -146,6 +142,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           credits: 999999, // Super admin has unlimited credits
           totalConversationTime: 0,
           completedLessons: 0,
+          avatar: 'admin_panel_settings',
+          theme: 'default',
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(superAdminUser));
         set({
@@ -188,6 +186,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (typeof dbUser.credits === 'undefined') dbUser.credits = 3000;
       if (typeof dbUser.totalConversationTime === 'undefined') dbUser.totalConversationTime = 0;
       if (typeof dbUser.completedLessons === 'undefined') dbUser.completedLessons = 0;
+      if (!dbUser.avatar) dbUser.avatar = 'person';
+      if (!dbUser.theme) dbUser.theme = 'default';
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
 
@@ -202,6 +202,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         credits: dbUser.credits,
         totalConversationTime: dbUser.totalConversationTime,
         completedLessons: dbUser.completedLessons,
+        avatar: dbUser.avatar,
+        theme: dbUser.theme,
         ...(needsToAcceptTerms && { needsToAcceptTerms: true }),
       };
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
@@ -291,6 +293,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           if (typeof dbUser.completedLessons === 'undefined') dbUser.completedLessons = 0;
           user.completedLessons = dbUser.completedLessons;
 
+          if (!dbUser.avatar) dbUser.avatar = 'person';
+          user.avatar = dbUser.avatar;
+
+          if (!dbUser.theme) dbUser.theme = 'default';
+          user.theme = dbUser.theme;
           
           localStorage.setItem(USERS_KEY, JSON.stringify(users));
           localStorage.setItem(SESSION_KEY, JSON.stringify(user));
@@ -391,4 +398,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
+  updateProfile: (updates) => {
+    set((state) => {
+      if (!state.user) return state;
+      const updatedUser = { ...state.user, ...updates };
+
+      try {
+        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+        if (users[updatedUser.email]) {
+          users[updatedUser.email] = { ...users[updatedUser.email], ...updates };
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+        }
+        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error("Failed to update profile in localStorage", error);
+      }
+      return { user: updatedUser };
+    });
+  },
 }));

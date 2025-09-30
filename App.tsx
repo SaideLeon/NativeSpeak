@@ -36,6 +36,7 @@ import AchievementTracker from './components/AchievementTracker';
 import { useUI } from './lib/state';
 import LeftSidebar from './components/LeftSidebar';
 import cn from 'classnames';
+import { THEMES } from './lib/customization';
 
 const API_KEY = process.env.API_KEY as string;
 if (!API_KEY) {
@@ -59,6 +60,17 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    const themeKey = user?.theme || 'default';
+    const activeTheme = THEMES[themeKey] || THEMES['default'];
+
+    const root = document.documentElement;
+    Object.entries(activeTheme.colors).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+  }, [user?.theme]);
+
 
   // To prevent flash of unauthenticated content
   if (isLoading) {

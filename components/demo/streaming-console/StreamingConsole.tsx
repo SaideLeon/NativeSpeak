@@ -18,7 +18,7 @@ import {
 import { useTodoStore } from '../../../lib/todoStore';
 import { useAuthStore } from '../../../lib/authStore';
 import { useLearningStore } from '../../../lib/learningStore';
-import { lessons } from '../../../lib/lessons';
+import { getCurrentLessonState } from '../../../lib/lessons';
 
 const formatTimestamp = (date: Date) => {
   const pad = (num: number, size = 2) => num.toString().padStart(size, '0');
@@ -70,7 +70,13 @@ export default function StreamingConsole() {
   const { user } = useAuthStore();
   const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { mode, lessonTopic, currentStep, updateCurrentStep } = useLearningStore();
+  const {
+    mode,
+    lessonTopic,
+    currentStep,
+    updateStepFromTranscription,
+    goToStep,
+  } = useLearningStore();
 
 
   // Effect to detect step changes in guided lessons
@@ -91,10 +97,10 @@ export default function StreamingConsole() {
       }
 
       if (highestStep > 0) {
-          updateCurrentStep(highestStep);
+          updateStepFromTranscription(highestStep);
       }
     }
-  }, [turns, mode, updateCurrentStep]);
+  }, [turns, mode, updateStepFromTranscription]);
 
   // Set the configuration for the Live API
   useEffect(() => {
@@ -158,13 +164,8 @@ export default function StreamingConsole() {
     let activeSystemPrompt: string;
 
     if (mode === 'guided') {
-      const basePrompt = lessons[lessonTopic].systemPrompt;
-      if (currentStep > 1) {
-        const resumeInstruction = `Você está retomando uma aula guiada que já está em andamento. O aluno já completou os passos anteriores. Comece diretamente com o Passo ${currentStep}. Não se apresente novamente nem repita os passos anteriores.\n\n---\n\n`;
-        activeSystemPrompt = resumeInstruction + basePrompt;
-      } else {
-        activeSystemPrompt = basePrompt;
-      }
+      const lessonState = getCurrentLessonState(lessonTopic, currentStep);
+      activeSystemPrompt = lessonState.systemPrompt;
     } else {
       activeSystemPrompt = systemPrompt;
     }
@@ -289,63 +290,88 @@ export default function StreamingConsole() {
   }, [turns]);
 
   return (
-    <div
-      className={cn('transcription-container', {
-        'is-welcome': turns.length === 0,
-      })}
-    >
-      {turns.length === 0 ? (
-        <WelcomeScreen />
-      ) : (
-        <div className="transcription-view" ref={scrollRef}>
-          {turns.map((t, i) => (
-            <div
-              key={i}
-              className={`transcription-entry ${t.role} ${
-                !t.isFinal ? 'interim' : ''
-              }`}
-            >
-              <div className="transcription-source">
-                {t.role === 'user'
-                  ? 'Você'
-                  : t.role === 'agent'
-                  ? 'Tutor'
-                  : 'Sistema'}
-              </div>
-              <div className="message-bubble">
-                <div className="transcription-text-content">
-                  {renderContent(t.text)}
+    <>
+      <div
+        className={cn('transcription-container', {
+          'is-welcome': turns.length === 0,
+        })}
+      >
+        {turns.length === 0 ? (
+          <WelcomeScreen />
+        ) : (
+          <div className="transcription-view" ref={scrollRef}>
+            {turns.map((t, i) => (
+              <div
+                key={i}
+                className={`transcription-entry ${t.role} ${
+                  !t.isFinal ? 'interim' : ''
+                }`}
+              >
+                <div className="transcription-source">
+                  {t.role === 'user'
+                    ? 'Você'
+                    : t.role === 'agent'
+                    ? 'Tutor'
+                    : 'Sistema'}
                 </div>
-                {t.groundingChunks && t.groundingChunks.length > 0 && (
-                  <div className="grounding-chunks">
-                    <strong>Fontes:</strong>
-                    <ul>
-                      {/* FIX: Filter for chunks that have a web property with a valid URI. */}
-                      {t.groundingChunks
-                        .filter(chunk => chunk.web && chunk.web.uri)
-                        .map((chunk, index) => (
-                          <li key={index}>
-                            <a
-                              href={chunk.web!.uri!}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {chunk.web!.title || chunk.web!.uri}
-                            </a>
-                          </li>
-                        ))}
-                    </ul>
+                <div className="message-bubble">
+                  <div className="transcription-text-content">
+                    {renderContent(t.text)}
                   </div>
-                )}
-              </div>
+                  {t.groundingChunks && t.groundingChunks.length > 0 && (
+                    <div className="grounding-chunks">
+                      <strong>Fontes:</strong>
+                      <ul>
+                        {/* FIX: Filter for chunks that have a web property with a valid URI. */}
+                        {t.groundingChunks
+                          .filter(chunk => chunk.web && chunk.web.uri)
+                          .map((chunk, index) => (
+                            <li key={index}>
+                              <a
+                                href={chunk.web!.uri!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {chunk.web!.title || chunk.web!.uri}
+                              </a>
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
 
-              <div className="transcription-timestamp">
-                {formatTimestamp(t.timestamp)}
+                <div className="transcription-timestamp">
+                  {formatTimestamp(t.timestamp)}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
+      </div>
+      {mode === 'guided' && (
+        <div className="guided-nav">
+          <button
+            className="nav-button"
+            onClick={() => goToStep(currentStep - 1)}
+            disabled={currentStep <= 1}
+            title="Passo Anterior"
+          >
+            <span className="icon">arrow_back</span>
+            <span className="nav-button-text">Anterior</span>
+          </button>
+          <span className="step-indicator">Passo {currentStep} / 5</span>
+          <button
+            className="nav-button"
+            onClick={() => goToStep(currentStep + 1)}
+            disabled={currentStep >= 5}
+            title="Próximo Passo"
+          >
+            <span className="nav-button-text">Próximo</span>
+            <span className="icon">arrow_forward</span>
+          </button>
         </div>
       )}
-    </div>
+    </>
   );
 }

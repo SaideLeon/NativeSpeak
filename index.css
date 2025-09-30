@@ -1,6 +1,7 @@
 /* Modern English Learning App - Optimized for Portuguese Speakers */
 
 @import './components/AchievementsPanel.css';
+@import './components/ProfileCustomizer.css';
 
 :root {
   /* Core Brand Colors - English Learning Theme */
@@ -610,6 +611,65 @@ button:focus-visible {
   opacity: 1;
 }
 
+/* Guided Lesson Navigation */
+.guided-nav {
+  position: fixed;
+  bottom: 120px; /* Position it above the control tray */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-lg);
+  box-shadow: var(--shadow-medium);
+  z-index: 100;
+  transition: all var(--transition-slow);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.App.left-sidebar-open .guided-nav {
+  left: calc(50% + 420px / 2); /* Adjust for sidebar width */
+}
+
+.guided-nav .nav-button {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 500;
+  transition: all var(--transition-normal);
+}
+
+.guided-nav .nav-button:not(:disabled):hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.guided-nav .nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.guided-nav .step-indicator {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+}
+
+
 /* Right Sidebar - Language Learning Settings */
 .sidebar {
   position: fixed;
@@ -723,14 +783,55 @@ button:focus-visible {
   margin-bottom: var(--space-2xl);
 }
 
-.user-panel .sidebar-section-title {
-  margin-bottom: var(--space-md);
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.avatar-button {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.avatar-button:hover {
+  border-color: var(--primary-light);
+  transform: scale(1.05);
+}
+
+.avatar-button .user-avatar {
+  font-size: 2.5rem;
   color: var(--text-primary);
 }
 
-.user-panel .sidebar-section-title::before {
+.avatar-button .edit-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 1rem;
   background: var(--primary-light);
+  color: white;
+  border-radius: var(--radius-full);
+  padding: 4px;
+  border: 2px solid var(--bg-secondary);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all var(--transition-normal);
 }
+
+.avatar-button:hover .edit-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
 
 .user-info {
   display: flex;
@@ -742,6 +843,7 @@ button:focus-visible {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-primary);
+  word-break: break-word;
 }
 
 .credits-display {
@@ -1689,6 +1791,19 @@ select {
     width: 64px !important;
     height: 64px !important;
     font-size: 1.75rem !important;
+  }
+
+  .guided-nav {
+    bottom: 90px;
+    gap: var(--space-md);
+  }
+
+  .guided-nav .nav-button-text {
+    display: none;
+  }
+
+  .guided-nav .nav-button {
+    gap: 0;
   }
   
   .sidebar {

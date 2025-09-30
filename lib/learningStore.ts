@@ -21,7 +21,8 @@ export const useLearningStore = create<{
   progress: Partial<Record<LessonTopic, LessonProgress>>; // Progress for all lessons
   setMode: (mode: LearningMode) => void;
   setLessonTopic: (topic: LessonTopic) => void; // This will now handle starting/resuming
-  updateCurrentStep: (step: number) => void; // Updates step for the *active* lesson
+  updateStepFromTranscription: (step: number) => void; // Updates step for the *active* lesson
+  goToStep: (step: number) => void;
   loadProgress: () => void; // Loads from localStorage based on current user
   clearProgress: () => void;
 }>((set, get) => {
@@ -55,7 +56,7 @@ export const useLearningStore = create<{
       const stepToStart = savedProgress ? savedProgress.currentStep : 1;
       set({ lessonTopic: topic, currentStep: stepToStart, mode: 'guided' });
     },
-    updateCurrentStep: (step: number) => {
+    updateStepFromTranscription: (step: number) => {
       set(state => {
         // Only update if the step has advanced and is part of the current lesson
         if (step > state.currentStep) {
@@ -67,6 +68,19 @@ export const useLearningStore = create<{
           return { currentStep: step, progress: newProgress };
         }
         return state;
+      });
+    },
+    goToStep: (step: number) => {
+      const newStep = Math.max(1, Math.min(5, step)); // All lessons have 5 steps
+      set(state => {
+        if (newStep === state.currentStep) return state;
+
+        const newProgress = {
+          ...state.progress,
+          [state.lessonTopic]: { currentStep: newStep },
+        };
+        saveProgress(newProgress);
+        return { currentStep: newStep, progress: newProgress };
       });
     },
     loadProgress: () => {
