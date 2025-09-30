@@ -5,14 +5,14 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import './WelcomeScreen.css';
-import { useTools, Scenario, useLogStore, ConversationTurn } from '../../../lib/state';
+import { useSettings, useTools, Scenario, useLogStore, ConversationTurn } from '../../../lib/state';
 import { useLearningStore, LessonTopic } from '../../../lib/learningStore';
 import { lessons } from '../../../lib/lessons';
 import { useEvaluationStore } from '../../../lib/evaluationStore';
 import MarkdownRenderer from '../../MarkdownRenderer';
 import { GoogleGenAI, GenerateContentResponse, Type } from '@google/genai';
 
-const API_KEY = process.env.API_KEY as string;
+const SYSTEM_API_KEY = process.env.API_KEY as string;
 
 // Re-themed content for English learning scenarios, but using existing template keys.
 const conversationContent: Record<
@@ -163,6 +163,7 @@ const formatTimestamp = (date: Date) => {
 
 const WelcomeScreen: React.FC = () => {
   const { template, setTemplate } = useTools();
+  const { geminiApiKey } = useSettings();
   const { mode, lessonTopic, setMode, setLessonTopic, progress, setContinuationPrompt } =
     useLearningStore();
   const { lastEvaluation, lastConversationHistory, clearLastHistory } =
@@ -209,7 +210,8 @@ const WelcomeScreen: React.FC = () => {
     `;
 
     try {
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
+      const activeApiKey = geminiApiKey || SYSTEM_API_KEY;
+      const ai = new GoogleGenAI({ apiKey: activeApiKey });
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,
@@ -236,7 +238,7 @@ const WelcomeScreen: React.FC = () => {
       console.error('Failed to analyze conversation for continuation:', error);
       setContinuationState({ view: 'start_new', analysis: null });
     }
-  }, []);
+  }, [geminiApiKey]);
 
   useEffect(() => {
     if (showRetryView) {

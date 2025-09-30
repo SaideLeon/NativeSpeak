@@ -127,10 +127,12 @@ export const useSettings = create<{
   model: string;
   voice: string;
   useWebSearch: boolean;
+  geminiApiKey: string;
   setSystemPrompt: (prompt: string) => void;
   setModel: (model: string) => void;
   setVoice: (voice: string) => void;
   setUseWebSearch: (use: boolean) => void;
+  setGeminiApiKey: (key: string) => void;
 }>(set => ({
   systemPrompt: `Você é um agente de inteligência artificial especializado em ensinar inglês a falantes de português. Seu nome é Tutor, da NativeSpeak.
 Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
@@ -157,10 +159,15 @@ Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreens�
   model: DEFAULT_LIVE_API_MODEL,
   voice: DEFAULT_VOICE,
   useWebSearch: true,
+  geminiApiKey: localStorage.getItem('gemini_api_key') || '',
   setSystemPrompt: prompt => set({ systemPrompt: prompt }),
   setModel: model => set({ model }),
   setVoice: voice => set({ voice }),
   setUseWebSearch: use => set({ useWebSearch: use }),
+  setGeminiApiKey: key => {
+    localStorage.setItem('gemini_api_key', key);
+    set({ geminiApiKey: key });
+  },
 }));
 
 /**

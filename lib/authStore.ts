@@ -8,6 +8,7 @@ import { useAchievementStore } from './achievementStore';
 import { useNotificationStore } from './notificationStore';
 import { useLearningStore } from './learningStore';
 import { useEvaluationStore } from './evaluationStore';
+import { usePresenceStore } from './presenceStore';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
@@ -121,6 +122,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       useAchievementStore.getState().loadAchievements(user.email);
       useLearningStore.getState().loadProgress();
       useEvaluationStore.getState().loadEvaluation();
+      usePresenceStore.getState().setSelfOnline();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -159,6 +161,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         useAchievementStore.getState().loadAchievements(superAdminUser.email);
         useLearningStore.getState().loadProgress();
         useEvaluationStore.getState().loadEvaluation();
+        usePresenceStore.getState().setSelfOnline();
         return;
       } catch (e: any) {
         set({
@@ -218,6 +221,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       useAchievementStore.getState().loadAchievements(user.email);
       useLearningStore.getState().loadProgress();
       useEvaluationStore.getState().loadEvaluation();
+      usePresenceStore.getState().setSelfOnline();
     } catch (e: any) {
       set({ error: e.message, isLoading: false });
       throw e;
@@ -225,6 +229,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   logout: () => {
+    usePresenceStore.getState().setSelfOffline();
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SUPER_ADMIN_KEY); // Clear super admin key on logout
     (useLogStore.getState() as any).resetTurnsForSession();

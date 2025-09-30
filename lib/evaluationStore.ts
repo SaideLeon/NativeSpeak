@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { create } from 'zustand';
-import { ConversationTurn, useLogStore } from './state';
+import { ConversationTurn, useSettings } from './state';
 import { useAuthStore } from './authStore';
 import { GoogleGenAI, GenerateContentResponse, Type } from '@google/genai';
 
-const API_KEY = process.env.API_KEY as string;
+const SYSTEM_API_KEY = process.env.API_KEY as string;
 
 interface Evaluation {
   rating: 'Péssima' | 'Média' | 'Alta';
@@ -93,7 +93,10 @@ export const useEvaluationStore = create<EvaluationState>((set, get) => ({
     `;
 
     try {
-      const ai = new GoogleGenAI({ apiKey: API_KEY });
+      const userApiKey = useSettings.getState().geminiApiKey;
+      const activeApiKey = userApiKey || SYSTEM_API_KEY;
+      const ai = new GoogleGenAI({ apiKey: activeApiKey });
+
       const response: GenerateContentResponse = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,

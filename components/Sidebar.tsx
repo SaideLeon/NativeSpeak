@@ -16,8 +16,16 @@ const AVAILABLE_MODELS = [
 
 export default function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useUI();
-  const { model, voice, useWebSearch, setModel, setVoice, setUseWebSearch } =
-    useSettings();
+  const {
+    model,
+    voice,
+    useWebSearch,
+    geminiApiKey,
+    setModel,
+    setVoice,
+    setUseWebSearch,
+    setGeminiApiKey,
+  } = useSettings();
   const { connected } = useLiveAPIContext();
   const { user } = useAuthStore();
 
@@ -57,6 +65,18 @@ export default function Sidebar() {
                     </option>
                   ))}
                 </select>
+              </label>
+              <label>
+                Sua Chave de API Gemini
+                <input
+                  type="password"
+                  value={geminiApiKey}
+                  onChange={e => setGeminiApiKey(e.target.value)}
+                  placeholder="Deixe em branco para usar o padrão"
+                />
+                <p className="setting-description">
+                  Sua chave é salva localmente e usada para todas as chamadas da API Gemini.
+                </p>
               </label>
               <div className="tool-item">
                 <label className="tool-checkbox-wrapper">

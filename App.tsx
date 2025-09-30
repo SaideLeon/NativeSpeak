@@ -33,13 +33,14 @@ import LegalModal from './components/LegalModal';
 import TermsAcceptanceModal from './components/TermsAcceptanceModal';
 import NotificationToast from './components/NotificationToast';
 import AchievementTracker from './components/AchievementTracker';
-import { useUI } from './lib/state';
+import { useSettings, useUI } from './lib/state';
 import LeftSidebar from './components/LeftSidebar';
 import cn from 'classnames';
 import { THEMES } from './lib/customization';
+import { usePresenceStore } from './lib/presenceStore';
 
-const API_KEY = process.env.API_KEY as string;
-if (!API_KEY) {
+const SYSTEM_API_KEY = process.env.API_KEY as string;
+if (!SYSTEM_API_KEY) {
   throw new Error(
     'Missing required environment variable: GEMINI_API_KEY. Please set it in your .env file.'
   );
@@ -56,6 +57,8 @@ function App() {
     'privacy' | 'terms' | null
   >(null);
   const { isLeftSidebarOpen } = useUI();
+  const { geminiApiKey } = useSettings();
+  const activeApiKey = geminiApiKey || SYSTEM_API_KEY;
 
   useEffect(() => {
     checkAuth();
@@ -71,6 +74,19 @@ function App() {
     });
   }, [user?.theme]);
 
+  // Handle user leaving the page to set them as offline
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (useAuthStore.getState().isAuthenticated) {
+        usePresenceStore.getState().setSelfOffline();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
 
   // To prevent flash of unauthenticated content
   if (isLoading) {
@@ -81,7 +97,7 @@ function App() {
 
   return (
     <div className={cn('App', { 'left-sidebar-open': isLeftSidebarOpen })}>
-      <LiveAPIProvider apiKey={API_KEY}>
+      <LiveAPIProvider apiKey={activeApiKey}>
         <ErrorScreen />
         {isAuthenticated && <LeftSidebar />}
         <Sidebar />
