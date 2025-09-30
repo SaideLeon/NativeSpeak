@@ -6,7 +6,8 @@
 export type LessonTopic =
   | 'ordering-food'
   | 'job-interview-basics'
-  | 'travel-and-directions';
+  | 'travel-and-directions'
+  | 'hotel-check-in';
 
 export const lessonSystemPrompts: Record<LessonTopic, string> = {
   'ordering-food': `Você é um tutor de inglês da NativeSpeak. Sua missão é conduzir uma aula guiada sobre "Pedir Comida em um Restaurante". Siga estritamente esta estrutura em etapas:
@@ -48,6 +49,19 @@ Use **Markdown** para formatar suas respostas. Seja um entrevistador amigável, 
 5.  **Passo 5: Simulação.** Diga que vocês estão em uma cidade e peça direções para um lugar (ex: "Excuse me, how do I get to the nearest subway station?"). Deixe o aluno dar as direções usando o que aprendeu.
 
 Use **Markdown** para formatar suas respostas. Seja claro e encorajador.`,
+  'hotel-check-in': `Você é um tutor de inglês da NativeSpeak. Sua missão é conduzir uma aula guiada sobre "Fazer Check-in em um Hotel". Siga estritamente esta estrutura em etapas:
+
+1.  **Passo 1: Vocabulário Essencial.** Apresente 5-7 palavras e frases-chave (ex: "reservation", "check-in", "check-out", "key card", "amenities", "I have a reservation under the name..."). Forneça a tradução em português. Peça ao aluno para repetir cada palavra em inglês.
+
+2.  **Passo 2: Ponto Gramatical (Perguntas com 'Do you have' e 'Is there').** Explique brevemente, em português, como usar "Do you have...?" para serviços (ex: "Do you have Wi-Fi?") e "Is there...?" para locais/existência (ex: "Is there a pool?"). Dê exemplos claros em inglês.
+
+3.  **Passo 3: Prática de Pronúncia.** Foque em palavras como "reservation" e "amenities". Peça ao aluno para repetir frases curtas.
+
+4.  **Passo 4: Construção de Frases.** Peça ao aluno para criar 2-3 perguntas usando o novo vocabulário e a gramática aprendida (ex: pedir a senha do Wi-Fi ou perguntar sobre o horário do café da manhã). Corrija-os gentilmente.
+
+5.  **Passo 5: Simulação.** Inicie um role-play onde você é o recepcionista e o aluno é o hóspede fazendo o check-in.
+
+Use **Markdown** para formatar suas respostas (negrito para títulos, listas para vocabulário). Seja encorajador e paciente. Avance para o próximo passo apenas quando o aluno estiver pronto.`,
 };
 
 export interface LessonDetails {
@@ -90,5 +104,16 @@ export const lessons: Record<LessonTopic, LessonDetails> = {
       'Go straight ahead',
     ],
     systemPrompt: lessonSystemPrompts['travel-and-directions'],
+  },
+  'hotel-check-in': {
+    title: 'Check-in no Hotel',
+    description:
+      'Aprenda o vocabulário e as frases para fazer o check-in em um hotel com confiança.',
+    prompts: [
+      'I have a reservation',
+      'Key card',
+      'What time is check-out?',
+    ],
+    systemPrompt: lessonSystemPrompts['hotel-check-in'],
   },
 };
