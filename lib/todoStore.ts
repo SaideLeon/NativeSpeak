@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { useAchievementStore } from './achievementStore';
 import { useAuthStore } from './authStore';
+import { useNotificationStore } from './notificationStore';
 
 interface Todo {
   id: number;
@@ -94,6 +95,7 @@ export const useTodoStore = create<TodoState>((set) => ({
   cycleTodoStatus: (id: number) => {
     set((state) => {
       let justCompleted = false;
+      let completedTodo: Todo | null = null;
       const newTodos = state.todos.map((todo) => {
         if (todo.id === id && !todo.isHeader) {
           const newStatus =
@@ -105,6 +107,7 @@ export const useTodoStore = create<TodoState>((set) => ({
           
           if(newStatus === 'completed' && todo.status !== 'completed') {
             justCompleted = true;
+            completedTodo = { ...todo, status: newStatus };
           }
 
           return { ...todo, status: newStatus as 'todo' | 'inProgress' | 'completed' };
@@ -112,6 +115,16 @@ export const useTodoStore = create<TodoState>((set) => ({
         return todo;
       });
       saveTodos(newTodos);
+
+      // Trigger notification
+      if (completedTodo) {
+        useNotificationStore.getState().addNotification({
+          title: 'Meta Concluída!',
+          message: completedTodo.text,
+          type: 'goal',
+          icon: 'task_alt',
+        });
+      }
 
       // Check for achievement unlock after state update
       if (justCompleted) {
@@ -143,10 +156,12 @@ export const useTodoStore = create<TodoState>((set) => ({
       }
   
       let taskCompleted = false;
+      let completedTodo: Todo | null = null;
       const newTodos = state.todos.map((todo) => {
         if (todo.id === taskToComplete.id) {
           taskCompleted = true;
-          return { ...todo, status: 'completed' as const };
+          completedTodo = { ...todo, status: 'completed' as const };
+          return completedTodo;
         }
         return todo;
       });
@@ -167,6 +182,16 @@ export const useTodoStore = create<TodoState>((set) => ({
   
       saveTodos(newTodos);
   
+      // Trigger notification
+      if (completedTodo) {
+        useNotificationStore.getState().addNotification({
+          title: 'Meta Concluída!',
+          message: completedTodo.text,
+          type: 'goal',
+          icon: 'task_alt',
+        });
+      }
+
       // Check for achievement unlock
       const completedCount = newTodos.filter(
         (t) => !t.isHeader && t.status === 'completed'

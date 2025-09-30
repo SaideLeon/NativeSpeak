@@ -32,7 +32,7 @@ import LandingPage from './components/LandingPage';
 import LegalModal from './components/LegalModal';
 import TermsAcceptanceModal from './components/TermsAcceptanceModal';
 import Subtitles from './components/Subtitles';
-import AchievementToast from './components/AchievementToast';
+import NotificationToast from './components/NotificationToast';
 import AchievementTracker from './components/AchievementTracker';
 import { useUI } from './lib/state';
 import LeftSidebar from './components/LeftSidebar';
@@ -97,7 +97,7 @@ function App() {
           <>
             <Subtitles />
             <AchievementTracker />
-            <AchievementToast />
+            <NotificationToast />
           </>
         )}
         {isAuthModalOpen && (

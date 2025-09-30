@@ -4,13 +4,12 @@
 */
 import { create } from 'zustand';
 import { Achievement, ALL_ACHIEVEMENTS } from './achievements';
+import { useNotificationStore } from './notificationStore';
 
 interface AchievementState {
   unlockedIds: Set<string>;
-  lastUnlocked: Achievement | null;
   loadAchievements: (email: string) => void;
   unlockAchievement: (id: string, email: string) => void;
-  clearLastUnlocked: () => void;
   clearAchievements: () => void;
 }
 
@@ -24,9 +23,7 @@ const saveAchievements = (email: string, ids: Set<string>) => {
 };
 
 export const useAchievementStore = create<AchievementState>((set, get) => ({
-  // FIX: Explicitly set the type for the new Set to avoid it being inferred as Set<unknown>.
   unlockedIds: new Set<string>(),
-  lastUnlocked: null,
 
   loadAchievements: (email: string) => {
     try {
@@ -36,12 +33,10 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
         const parsed = JSON.parse(saved) as string[];
         set({ unlockedIds: new Set(parsed) });
       } else {
-        // FIX: Explicitly set the type for the new Set to avoid it being inferred as Set<unknown>.
         set({ unlockedIds: new Set<string>() });
       }
     } catch (error) {
       console.error('Failed to load achievements:', error);
-      // FIX: Explicitly set the type for the new Set to avoid it being inferred as Set<unknown>.
       set({ unlockedIds: new Set<string>() });
     }
   },
@@ -56,20 +51,21 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
       return; // Achievement not found
     }
 
-    // FIX: Explicitly set the generic type to string to prevent `newUnlockedIds` from being inferred as `Set<unknown>`.
     const newUnlockedIds = new Set<string>(get().unlockedIds);
     newUnlockedIds.add(id);
 
-    set({ unlockedIds: newUnlockedIds, lastUnlocked: achievement });
+    set({ unlockedIds: newUnlockedIds });
     saveAchievements(email, newUnlockedIds);
-  },
 
-  clearLastUnlocked: () => {
-    set({ lastUnlocked: null });
+    useNotificationStore.getState().addNotification({
+      title: 'Conquista Desbloqueada!',
+      message: achievement.name,
+      type: 'achievement',
+      icon: achievement.icon,
+    });
   },
 
   clearAchievements: () => {
-    // FIX: Explicitly set the type for the new Set to avoid it being inferred as Set<unknown>.
-    set({ unlockedIds: new Set<string>(), lastUnlocked: null });
+    set({ unlockedIds: new Set<string>() });
   },
 }));
