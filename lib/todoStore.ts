@@ -24,27 +24,36 @@ const TODO_STORAGE_KEY = 'native_speak_todos';
 const getDefaultTodos = (): Todo[] => {
     const now = Date.now();
     return [
+      // Daily Goals
       { id: now + 1, text: 'Metas rápidas (diárias)', isHeader: true, status: 'todo' },
-      { id: now + 19, text: 'Falar por 2 minutos seguidos.', status: 'todo', duration: 120 },
-      { id: now + 2, text: 'Praticar 10 minutos de conversa com a IA.', status: 'todo', duration: 600 },
-      { id: now + 3, text: 'Aprender 5 novas palavras e usá-las em frases.', status: 'todo', duration: 0 },
-      { id: now + 4, text: 'Ouvir e repetir 3 frases completas para treinar pronúncia.', status: 'todo', duration: 0 },
-      { id: now + 5, text: 'Fazer uma simulação de “small talk” (conversa casual).', status: 'todo', duration: 0 },
-      { id: now + 6, text: 'Revisar o que aprendi ontem com um mini-teste próprio.', status: 'todo', duration: 0 },
+      { id: now + 2, text: 'Falar por 2 minutos seguidos.', status: 'todo', duration: 120 },
+      { id: now + 3, text: 'Praticar 10 minutos de conversa com a IA.', status: 'todo', duration: 600 },
+      { id: now + 4, text: 'Aprender 5 novas palavras e usá-las em frases.', status: 'todo', duration: 0 },
+      { id: now + 5, text: 'Ouvir e repetir 3 frases completas para treinar pronúncia.', status: 'todo', duration: 0 },
+      { id: now + 6, text: 'Fazer uma simulação de “small talk” (conversa casual).', status: 'todo', duration: 0 },
+      { id: now + 7, text: 'Revisar o que aprendi ontem com um mini-teste próprio.', status: 'todo', duration: 0 },
+      { id: now + 8, text: 'Pedir para a IA corrigir uma frase que você formulou.', status: 'todo', duration: 0 },
+      { id: now + 9, text: 'Descrever uma imagem ou o seu dia para a IA.', status: 'todo', duration: 0 },
+
+      // Weekly Goals
+      { id: now + 10, text: 'Metas intermediárias (semanais)', isHeader: true, status: 'todo' },
+      { id: now + 11, text: 'Acumular 1 hora de prática falada no total.', status: 'todo', duration: 3600 },
+      { id: now + 12, text: 'Dominar 20 novas palavras/expressões.', status: 'todo', duration: 0 },
+      { id: now + 13, text: 'Completar 2 cenários de prática (ex: viagem, entrevista).', status: 'todo', duration: 0 },
+      { id: now + 14, text: 'Gravar minha voz e comparar evolução com semanas anteriores.', status: 'todo', duration: 0 },
+      { id: now + 15, text: 'Assistir um vídeo curto em inglês e explicar para a IA o que entendi.', status: 'todo', duration: 0 },
+      { id: now + 16, text: 'Explicar um tópico complexo do seu interesse para a IA.', status: 'todo', duration: 0 },
+      { id: now + 17, text: 'Manter uma conversa de 5 minutos sobre um único tema.', status: 'todo', duration: 300 },
     
-      { id: now + 7, text: 'Metas intermediárias (semanais)', isHeader: true, status: 'todo' },
-      { id: now + 8, text: 'Acumular 1 hora de prática falada no total.', status: 'todo', duration: 3600 },
-      { id: now + 9, text: 'Dominar 20 novas palavras/expressões.', status: 'todo', duration: 0 },
-      { id: now + 10, text: 'Completar 2 cenários de prática (ex: viagem, entrevista).', status: 'todo', duration: 0 },
-      { id: now + 11, text: 'Gravar minha voz e comparar evolução com semanas anteriores.', status: 'todo', duration: 0 },
-      { id: now + 12, text: 'Assistir um vídeo curto em inglês e explicar para a IA o que entendi.', status: 'todo', duration: 0 },
-    
-      { id: now + 13, text: 'Metas de longo prazo (mensais)', isHeader: true, status: 'todo' },
-      { id: now + 14, text: 'Completar 5 horas de conversação com a IA.', status: 'todo', duration: 18000 },
-      { id: now + 15, text: 'Conseguir conversar 10 minutos seguidos sem trocar para o português.', status: 'todo', duration: 600 },
-      { id: now + 16, text: 'Escrever um pequeno texto (100–200 palavras) e revisar com a IA.', status: 'todo', duration: 0 },
-      { id: now + 17, text: 'Revisar todas as metas concluídas e criar novas para o próximo mês.', status: 'todo', duration: 0 },
-      { id: now + 18, text: 'Treinar um cenário avançado (ex: reunião de trabalho ou debate).', status: 'todo', duration: 0 },
+      // Monthly Goals
+      { id: now + 18, text: 'Metas de longo prazo (mensais)', isHeader: true, status: 'todo' },
+      { id: now + 19, text: 'Completar 5 horas de conversação com a IA.', status: 'todo', duration: 18000 },
+      { id: now + 20, text: 'Conseguir conversar 10 minutos seguidos sem trocar para o português.', status: 'todo', duration: 600 },
+      { id: now + 21, text: 'Escrever um pequeno texto (100–200 palavras) e revisar com a IA.', status: 'todo', duration: 0 },
+      { id: now + 22, text: 'Revisar todas as metas concluídas e criar novas para o próximo mês.', status: 'todo', duration: 0 },
+      { id: now + 23, text: 'Treinar um cenário avançado (ex: reunião de trabalho ou debate).', status: 'todo', duration: 0 },
+      { id: now + 24, text: 'Sentir-se confiante para iniciar uma conversa básica em inglês.', status: 'todo', duration: 0 },
+      { id: now + 25, text: 'Entender 80% das respostas da IA sem precisar de tradução.', status: 'todo', duration: 0 },
     ];
 };
 
