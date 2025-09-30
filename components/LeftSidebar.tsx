@@ -38,7 +38,11 @@ export default function LeftSidebar() {
       <aside className={c('left-sidebar', { open: isLeftSidebarOpen })}>
         <div className="sidebar-header">
           <h3>Painel</h3>
-          <button onClick={toggleLeftSidebar} className="close-button">
+          <button
+            onClick={toggleLeftSidebar}
+            className="close-button"
+            title="Fechar Painel"
+          >
             <span className="icon">close</span>
           </button>
         </div>

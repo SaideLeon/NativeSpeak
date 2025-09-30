@@ -26,7 +26,11 @@ export default function Sidebar() {
       <aside className={c('sidebar', { open: isSidebarOpen })}>
         <div className="sidebar-header">
           <h3>Configurações</h3>
-          <button onClick={toggleSidebar} className="close-button">
+          <button
+            onClick={toggleSidebar}
+            className="close-button"
+            title="Fechar Configurações"
+          >
             <span className="icon">close</span>
           </button>
         </div>

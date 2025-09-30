@@ -24,6 +24,7 @@ export default function Header({ onLoginClick }: HeaderProps) {
               className="menu-button"
               onClick={toggleLeftSidebar}
               aria-label="Painel do Aluno"
+              title="Painel do Aluno"
             >
               <span className="icon">menu</span>
             </button>
@@ -51,6 +52,7 @@ export default function Header({ onLoginClick }: HeaderProps) {
               className="settings-button"
               onClick={toggleSidebar}
               aria-label="Configurações"
+              title="Configurações"
             >
               <span className="icon">tune</span>
             </button>

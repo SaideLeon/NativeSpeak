@@ -26,7 +26,12 @@ const TodoList: React.FC = () => {
           placeholder="Adicionar nova meta..."
           className="todo-input"
         />
-        <button type="submit" className="todo-add-button" aria-label="Add goal">
+        <button
+          type="submit"
+          className="todo-add-button"
+          aria-label="Add goal"
+          title="Adicionar meta"
+        >
           <span className="icon">add</span>
         </button>
       </form>
@@ -39,6 +44,7 @@ const TodoList: React.FC = () => {
                 onClick={() => removeTodo(todo.id)}
                 className="todo-delete-button"
                 aria-label={`Delete category ${todo.text}`}
+                title="Excluir categoria"
               >
                 <span className="icon">delete</span>
               </button>
@@ -55,6 +61,7 @@ const TodoList: React.FC = () => {
                 onClick={() => cycleTodoStatus(todo.id)}
                 className="todo-status-button"
                 aria-label={`Change status for ${todo.text}`}
+                title="Alterar status"
               >
                 <span className="icon">
                   {todo.status === 'todo' && 'radio_button_unchecked'}
@@ -67,6 +74,7 @@ const TodoList: React.FC = () => {
                 onClick={() => removeTodo(todo.id)}
                 className="todo-delete-button"
                 aria-label={`Delete ${todo.text}`}
+                title="Excluir meta"
               >
                 <span className="icon">delete</span>
               </button>
