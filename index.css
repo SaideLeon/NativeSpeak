@@ -523,11 +523,20 @@ button:focus-visible {
   box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
 }
 
+.mic-button.recording {
+  background: linear-gradient(135deg, var(--primary-light), var(--accent-purple));
+}
+
+.mic-button.recording:hover {
+  background: linear-gradient(135deg, var(--primary-blue), #7C3AED);
+}
+
+
 .mic-button.recording::after {
   content: '';
   position: absolute;
   inset: -2px;
-  background: conic-gradient(from 0deg, transparent, var(--error), transparent);
+  background: conic-gradient(from 0deg, transparent, var(--primary-light), transparent);
   border-radius: inherit;
   z-index: -1;
   animation: micRotate 2s linear infinite;
@@ -547,11 +556,11 @@ button:focus-visible {
   initial-value: 0px;
 }
 
-.mic-button::before {
+.mic-button.recording::before {
   content: '';
   position: absolute;
   inset: calc(var(--volume) * -1);
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.3) 0%, transparent 70%);
   border-radius: inherit;
   z-index: -1;
   transition: all 0.1s ease-out;

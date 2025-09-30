@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { create } from 'zustand';
-import { LessonTopic } from './state';
+import { LessonTopic } from './lessons';
 import { useAuthStore } from './authStore';
 
 export type { LessonTopic };

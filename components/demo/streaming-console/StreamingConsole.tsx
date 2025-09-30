@@ -15,7 +15,6 @@ import {
   useTools,
   ConversationTurn,
   useUI,
-  lessonSystemPrompts,
 } from '@/lib/state';
 import { useTodoStore } from '../../../lib/todoStore';
 import { useAuthStore } from '../../../lib/authStore';
