@@ -14,6 +14,7 @@ interface TodoState {
   addTodo: (text: string) => void;
   removeTodo: (id: number) => void;
   cycleTodoStatus: (id: number) => void;
+  completeTaskByText: (searchText: string) => void;
 }
 
 const TODO_STORAGE_KEY = 'native_speak_todos';
@@ -121,6 +122,39 @@ export const useTodoStore = create<TodoState>((set) => ({
         if (completedCount >= 5 && user) {
             useAchievementStore.getState().unlockAchievement('complete_5_goals', user.email);
         }
+      }
+
+      return { todos: newTodos };
+    });
+  },
+  completeTaskByText: (searchText: string) => {
+    set((state) => {
+      const taskToComplete = state.todos.find(
+        (t) =>
+          !t.isHeader &&
+          t.status !== 'completed' &&
+          t.text.toLowerCase().includes(searchText.toLowerCase())
+      );
+
+      if (!taskToComplete) {
+        return state; // No task found or already completed
+      }
+
+      const newTodos = state.todos.map((todo) =>
+        todo.id === taskToComplete.id
+          ? { ...todo, status: 'completed' as const }
+          : todo
+      );
+      saveTodos(newTodos);
+
+      // Check for achievement unlock
+      const completedCount = newTodos.filter(
+        (t) => !t.isHeader && t.status === 'completed'
+      ).length;
+      
+      const user = useAuthStore.getState().user;
+      if (completedCount >= 5 && user) {
+        useAchievementStore.getState().unlockAchievement('complete_5_goals', user.email);
       }
 
       return { todos: newTodos };

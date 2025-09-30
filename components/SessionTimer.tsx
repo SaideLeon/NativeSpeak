@@ -7,6 +7,7 @@ import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useAuthStore } from '../lib/authStore';
 import { useAchievementStore } from '../lib/achievementStore';
 import { useLearningStore } from '../lib/learningStore';
+import { useTodoStore } from '../lib/todoStore';
 
 const formatTime = (totalSeconds: number) => {
   const hours = Math.floor(totalSeconds / 3600);
@@ -30,6 +31,7 @@ export default function SessionTimer() {
   const { updateCredits, user, addConversationTime, incrementCompletedLessons } = useAuthStore();
   const { unlockAchievement } = useAchievementStore();
   const { mode } = useLearningStore();
+  const { completeTaskByText } = useTodoStore();
 
   useEffect(() => {
     let interval: number | null = null;
@@ -44,6 +46,11 @@ export default function SessionTimer() {
             if ((user?.credits ?? 0) > 0) {
               updateCredits(-10);
             }
+          }
+          // Check for 10-minute goal completion
+          if (newSeconds === 10 * 60) {
+            // 10 minutes in seconds
+            completeTaskByText('10 minutos');
           }
           return newSeconds;
         });
@@ -74,7 +81,7 @@ export default function SessionTimer() {
         }
       }
     };
-  }, [connected, updateCredits, user, addConversationTime, incrementCompletedLessons, unlockAchievement, mode]);
+  }, [connected, updateCredits, user, addConversationTime, incrementCompletedLessons, unlockAchievement, mode, completeTaskByText]);
 
   if (!connected) {
     return null;

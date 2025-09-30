@@ -56,7 +56,8 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
       return; // Achievement not found
     }
 
-    const newUnlockedIds = new Set(get().unlockedIds);
+    // FIX: Explicitly set the generic type to string to prevent `newUnlockedIds` from being inferred as `Set<unknown>`.
+    const newUnlockedIds = new Set<string>(get().unlockedIds);
     newUnlockedIds.add(id);
 
     set({ unlockedIds: newUnlockedIds, lastUnlocked: achievement });

@@ -5,12 +5,14 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '../lib/authStore';
 import { useAchievementStore } from '../lib/achievementStore';
+import { useTodoStore } from '../lib/todoStore';
 
 // This is a "logic-only" component that doesn't render any UI.
 // It's responsible for tracking user progress and unlocking achievements.
 const AchievementTracker = () => {
   const { user } = useAuthStore();
   const { unlockAchievement } = useAchievementStore();
+  const { completeTaskByText } = useTodoStore();
 
   useEffect(() => {
     if (!user) {
@@ -35,8 +37,13 @@ const AchievementTracker = () => {
     if (lessons >= 5) {
       unlockAchievement('complete_5_lessons', user.email);
     }
+
+    // --- Todo-based Progress Tracking ---
+    if (totalMinutes >= 60) {
+      completeTaskByText('1 hora');
+    }
     
-  }, [user, unlockAchievement]);
+  }, [user, unlockAchievement, completeTaskByText]);
 
   return null; // This component does not render anything.
 };

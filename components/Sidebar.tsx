@@ -14,6 +14,25 @@ const AVAILABLE_MODELS = [
   DEFAULT_LIVE_API_MODEL
 ];
 
+const formatTotalTime = (totalSeconds: number) => {
+  if (!totalSeconds) return '0m';
+  if (totalSeconds < 60) {
+    return `${totalSeconds}s`;
+  }
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  let result = '';
+  if (hours > 0) {
+    result += `${hours}h `;
+  }
+  if (minutes > 0) {
+    result += `${minutes}m`;
+  }
+  return result.trim();
+};
+
+
 export default function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useUI();
   const { model, voice, setModel, setVoice } =
@@ -44,6 +63,20 @@ export default function Sidebar() {
                     {user.credits.toLocaleString('pt-BR')}
                   </span>
                   <span className="credits-label">Créditos</span>
+                </div>
+                <div className="user-stats">
+                  <div className="stat-item">
+                    <span className="icon">history</span>
+                    <span className="stat-value">
+                      {formatTotalTime(user.totalConversationTime)}
+                    </span>
+                    <span className="stat-label">Tempo Total</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="icon">school</span>
+                    <span className="stat-value">{user.completedLessons}</span>
+                    <span className="stat-label">Aulas</span>
+                  </div>
                 </div>
               </div>
             </div>

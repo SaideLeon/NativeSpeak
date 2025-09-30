@@ -667,7 +667,7 @@ button:focus-visible {
 .user-info {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .user-name {
@@ -700,6 +700,42 @@ button:focus-visible {
 .credits-label {
   font-size: 0.8rem;
   color: var(--text-muted);
+}
+
+.user-stats {
+  display: flex;
+  gap: var(--space-lg);
+  background: var(--bg-secondary);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  text-align: center;
+}
+
+.stat-item .icon {
+  font-size: 1.5rem;
+  color: var(--text-accent);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 
