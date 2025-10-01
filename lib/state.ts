@@ -189,7 +189,7 @@ export const useUI = create<{
   toggleLeftSidebar: () =>
     set(state => ({ isLeftSidebarOpen: !state.isLeftSidebarOpen })),
   currentView: 'console',
-  setView: (view) => set({ currentView: view }),
+  setView: (view) => set({ currentView: view, isLeftSidebarOpen: false }),
 }));
 
 /**
