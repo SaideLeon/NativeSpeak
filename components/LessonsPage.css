@@ -278,3 +278,25 @@
     justify-content: center;
   }
 }
+
+.lessons-attribution {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.lessons-attribution p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.lessons-attribution a {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+
+.lessons-attribution a:hover {
+  text-decoration: underline;
+}

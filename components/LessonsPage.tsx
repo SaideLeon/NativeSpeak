@@ -178,6 +178,20 @@ const LessonsPage: React.FC = () => {
           </div>
         ))}
       </div>
+      <div className="lessons-attribution">
+        <p>
+          Parte do material e dos exemplos apresentados neste exercício foram
+          adaptados a partir das aulas disponibilizadas no canal{' '}
+          <a
+            href="https://youtu.be/mOxeT2_0t2s?si=xQ035y93rUK1-cO5"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            English with Lucy
+          </a>
+          , que oferece recursos valiosos para o aprendizado de inglês.
+        </p>
+      </div>
     </div>
   );
 };
