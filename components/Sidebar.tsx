@@ -67,7 +67,14 @@ export default function Sidebar() {
                 </select>
               </label>
               <label>
-                Sua Chave de API Gemini
+                <span className="label-line">
+                  Sua Chave de API Gemini
+                  {geminiApiKey ? (
+                    <span className="api-key-badge active" title="Usando sua chave de API pessoal">Ativa</span>
+                  ) : (
+                    <span className="api-key-badge" title="Usando a chave de API do sistema">Padrão</span>
+                  )}
+                </span>
                 <input
                   type="password"
                   value={geminiApiKey}

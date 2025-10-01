@@ -1062,6 +1062,30 @@ label {
   margin-bottom: var(--space-md);
 }
 
+.label-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.api-key-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.api-key-badge.active {
+  background-color: var(--accent-green);
+  color: white;
+  border-color: var(--accent-green);
+}
+
 input, textarea, select {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
