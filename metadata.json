@@ -1,0 +1,7 @@
+{
+  "name": "NativeSpeak",
+  "description": "Um sandbox interativo para experimentar streaming de áudio nativo e chamada de função usando a API Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

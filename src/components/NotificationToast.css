@@ -1,0 +1,74 @@
+.notification-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column-reverse; /* New notifications appear at the bottom, pushing old ones up */
+  gap: var(--space-sm);
+  z-index: 10002;
+  align-items: center;
+  transition: left var(--transition-slow);
+}
+
+.App.left-sidebar-open .notification-container {
+    left: calc(50% + 420px / 2);
+}
+
+
+.notification-toast {
+  color: white;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-large);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.notification-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.notification-toast.notification-type-achievement {
+  background: linear-gradient(135deg, var(--accent-green), var(--primary-light));
+}
+
+.notification-toast.notification-type-goal {
+  background: linear-gradient(135deg, var(--accent-orange), #F97316); /* Orange gradient */
+}
+
+.notification-toast.notification-type-info {
+  background: linear-gradient(135deg, var(--accent-purple), var(--primary-light));
+}
+
+.notification-toast-icon {
+  font-size: 2rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.notification-toast-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-toast-title {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.notification-toast-message {
+  font-weight: 500;
+  font-size: 1rem;
+}

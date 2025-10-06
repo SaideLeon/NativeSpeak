@@ -1,0 +1,16 @@
+{
+  "short_name": "NativeSpeak",
+  "name": "NativeSpeak",
+  "description": "Seu parceiro de IA para dominar a conversação em inglês. Pratique a fala, receba feedback instantâneo e melhore a fluência.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1E3A8A",
+  "background_color": "#0F172A"
+}

@@ -1,0 +1,163 @@
+/* Study Goals - Todo List */
+.todo-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.todo-form {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.todo-input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all var(--transition-normal);
+}
+
+.todo-input::placeholder {
+  color: var(--text-muted);
+}
+
+.todo-input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: var(--bg-secondary);
+}
+
+.todo-add-button {
+  background: var(--accent-green);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-normal);
+}
+
+.todo-add-button:hover {
+  background: #059669; /* Darker green */
+}
+
+.todo-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.todo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xs);
+  padding: 0 var(--space-xs);
+}
+
+.todo-header .todo-delete-button {
+  opacity: 0;
+}
+
+.todo-header:hover .todo-delete-button {
+  opacity: 1;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md); /* slightly less padding */
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+}
+
+.todo-item.inProgress {
+  border-left-color: var(--accent-orange);
+}
+
+.todo-item.completed {
+  background: var(--bg-secondary);
+  border-left-color: var(--accent-green);
+  opacity: 0.7;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.todo-text {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: color var(--transition-normal);
+  word-break: break-word;
+}
+
+.todo-delete-button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition-fast);
+}
+
+.todo-item:hover .todo-delete-button {
+  opacity: 1;
+}
+
+.todo-delete-button:hover {
+  color: var(--error);
+}
+
+/* Status button styles */
+.todo-status-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.todo-status-button:hover {
+  color: var(--text-primary);
+}
+
+.todo-status-button .icon {
+  font-size: 22px;
+}
+
+.todo-item.inProgress .todo-status-button {
+  color: var(--accent-orange);
+}
+
+.todo-item.completed .todo-status-button {
+  color: var(--accent-green);
+}

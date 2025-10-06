@@ -1,0 +1,79 @@
+/* Achievements Panel */
+.achievements-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: var(--space-md);
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: var(--space-xs); /* For scrollbar */
+}
+
+.achievement-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  opacity: 0.4;
+  filter: grayscale(1);
+  transition: all var(--transition-normal);
+  cursor: help;
+  position: relative;
+}
+
+.achievement-item.unlocked {
+  opacity: 1;
+  filter: grayscale(0);
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.achievement-icon {
+  font-size: 2.5rem;
+  color: var(--text-muted);
+}
+
+.achievement-item.unlocked .achievement-icon {
+  color: var(--accent-orange);
+  text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+}
+
+.achievement-tooltip {
+  visibility: hidden;
+  width: 200px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  text-align: center;
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  position: absolute;
+  z-index: 1;
+  bottom: 110%;
+  left: 50%;
+  margin-left: -100px; /* Use half of the width to center */
+  opacity: 0;
+  transition: opacity 0.3s;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-medium);
+  pointer-events: none;
+}
+
+.achievement-item:hover .achievement-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-name {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: var(--space-xs);
+}
+
+.tooltip-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
