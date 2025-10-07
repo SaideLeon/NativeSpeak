@@ -4,7 +4,7 @@
   "description": "Seu parceiro de IA para dominar a conversação em inglês. Pratique a fala, receba feedback instantâneo e melhore a fluência.",
   "icons": [
     {
-      "src": "icon.svg",
+      "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
