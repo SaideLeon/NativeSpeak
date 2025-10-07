@@ -9,11 +9,18 @@ import { useNotificationStore } from './notificationStore';
 import { useLearningStore } from './learningStore';
 import { useEvaluationStore } from './evaluationStore';
 import { usePresenceStore } from './presenceStore';
+import axios from 'axios';
 
 // In a real app, this would be a more secure session management system.
 // For this demo, we use localStorage.
 
+const api = axios.create({
+  baseURL: '/api',
+});
+
 interface User {
+  id?: number;
+  token?: { access: string; refresh: string };
   email: string;
   firstName: string;
   lastName: string;
@@ -86,136 +93,72 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (email, pass, firstName, lastName) => {
     set({ error: null, isLoading: true });
     try {
-      const isSystemUnlocked =
-        localStorage.getItem(SYSTEM_UNLOCKED_KEY) === 'true';
-      if (!isSystemUnlocked) {
-        throw new Error(
-          'O sistema precisa ser ativado por um administrador para permitir novos registros.'
-        );
-      }
-
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-      if (users[email]) {
-        throw new Error('Já existe um usuário com este e-mail.');
-      }
-      const studyStartDate = new Date().toISOString();
-      // In a real app, you would hash the password
-      const newUser = {
-        firstName,
-        lastName,
-        studyStartDate,
-        termsAccepted: true,
-        credits: 3000,
-        totalConversationTime: 0,
-        completedLessons: 0,
-        avatar: 'person',
-        theme: 'default',
-      };
-      users[email] = { pass, ...newUser };
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-      const user: User = { email, ...newUser };
-      localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      set({ isAuthenticated: true, user, isLoading: false });
-      // Clear any potential old history for this email and start fresh
-      useLogStore.getState().clearTurns();
-      useAchievementStore.getState().loadAchievements(user.email);
-      useLearningStore.getState().loadProgress();
-      useEvaluationStore.getState().loadEvaluation();
-      usePresenceStore.getState().setSelfOnline();
+      await api.post('/register/', {
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password: pass,
+        password2: pass,
+        terms: true,
+      });
+      // After successful registration, log the user in
+      await get().login(email, pass);
     } catch (e: any) {
-      set({ error: e.message, isLoading: false });
-      throw e;
+      const errorMsg =
+        e.response?.data?.email?.[0] ||
+        'Ocorreu um erro durante o registro.';
+      set({ error: errorMsg, isLoading: false });
+      throw new Error(errorMsg);
     }
   },
 
   login: async (email, pass) => {
     set({ error: null, isLoading: true });
+    try {
+      const response = await api.post('/login/', { email, password: pass });
+      const token = response.data;
 
-    // Master Key check for activation
-    if (pass === 'Claustriania') {
-      try {
-        localStorage.setItem(SUPER_ADMIN_KEY, 'true');
-        localStorage.setItem(SYSTEM_UNLOCKED_KEY, 'true'); // Unlock the system
-        const superAdminUser: User = {
-          email: 'admin@nativespeak.app',
-          firstName: 'Administrador',
-          lastName: 'Supremo',
+      api.defaults.headers.common['Authorization'] = `Bearer ${token.access}`;
+
+      const meResponse = await api.get('/me/');
+      const serverUser = meResponse.data;
+
+      // Check for local data and merge
+      const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
+      let localUser = users[email];
+      if (!localUser) {
+        // First time login for this user on this device, create local data
+        localUser = {
           studyStartDate: new Date().toISOString(),
-          termsAccepted: true,
-          credits: 999999, // Super admin has unlimited credits
+          credits: 3000,
           totalConversationTime: 0,
           completedLessons: 0,
-          avatar: 'admin_panel_settings',
+          avatar: 'person',
           theme: 'default',
         };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(superAdminUser));
-        set({
-          isAuthenticated: true,
-          user: superAdminUser,
-          isLoading: false,
-          isSystemUnlocked: true,
-        });
-        const history = loadHistory(superAdminUser.email);
-        useLogStore.getState().setTurns(history);
-        useAchievementStore.getState().loadAchievements(superAdminUser.email);
-        useLearningStore.getState().loadProgress();
-        useEvaluationStore.getState().loadEvaluation();
-        usePresenceStore.getState().setSelfOnline();
-        return;
-      } catch (e: any) {
-        set({
-          error: 'Falha ao iniciar sessão de super administrador.',
-          isLoading: false,
-        });
-        throw e;
+        users[email] = localUser;
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
       }
-    }
-
-    const isSystemUnlocked =
-      localStorage.getItem(SYSTEM_UNLOCKED_KEY) === 'true';
-    if (!isSystemUnlocked) {
-      const e = new Error('Chave Suprema inválida.');
-      set({ error: e.message, isLoading: false });
-      throw e;
-    }
-
-    // Normal user login
-    try {
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-      const dbUser = users[email];
-      if (!dbUser || dbUser.pass !== pass) {
-        throw new Error('E-mail ou senha inválidos.');
-      }
-      
-      // Backwards compatibility
-      if (typeof dbUser.credits === 'undefined') dbUser.credits = 3000;
-      if (typeof dbUser.totalConversationTime === 'undefined') dbUser.totalConversationTime = 0;
-      if (typeof dbUser.completedLessons === 'undefined') dbUser.completedLessons = 0;
-      if (!dbUser.avatar) dbUser.avatar = 'person';
-      if (!dbUser.theme) dbUser.theme = 'default';
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-
-      const needsToAcceptTerms = !dbUser.termsAccepted;
 
       const user: User = {
-        email,
-        firstName: dbUser.firstName,
-        lastName: dbUser.lastName,
-        studyStartDate: dbUser.studyStartDate,
-        termsAccepted: dbUser.termsAccepted,
-        credits: dbUser.credits,
-        totalConversationTime: dbUser.totalConversationTime,
-        completedLessons: dbUser.completedLessons,
-        avatar: dbUser.avatar,
-        theme: dbUser.theme,
-        ...(needsToAcceptTerms && { needsToAcceptTerms: true }),
+        id: serverUser.id,
+        email: serverUser.email,
+        firstName: serverUser.first_name,
+        lastName: serverUser.last_name,
+        token,
+        studyStartDate: localUser.studyStartDate,
+        termsAccepted: true, // Assuming terms are accepted on register
+        credits: localUser.credits,
+        totalConversationTime: localUser.totalConversationTime,
+        completedLessons: localUser.completedLessons,
+        avatar: localUser.avatar,
+        theme: localUser.theme,
       };
+
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-      // Ensure super admin key is removed on normal login
-      localStorage.removeItem(SUPER_ADMIN_KEY);
-      set({ isAuthenticated: true, user, isLoading: false });
+      set({ isAuthenticated: true, user, isLoading: false, error: null });
+
+      // Load other stores
       const history = loadHistory(user.email);
       useLogStore.getState().setTurns(history);
       useAchievementStore.getState().loadAchievements(user.email);
@@ -223,8 +166,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       useEvaluationStore.getState().loadEvaluation();
       usePresenceStore.getState().setSelfOnline();
     } catch (e: any) {
-      set({ error: e.message, isLoading: false });
-      throw e;
+      const errorMsg =
+        e.response?.data?.detail || 'E-mail ou senha inválidos.';
+      set({ error: errorMsg, isLoading: false });
+      throw new Error(errorMsg);
     }
   },
 
@@ -232,6 +177,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     usePresenceStore.getState().setSelfOffline();
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SUPER_ADMIN_KEY); // Clear super admin key on logout
+    delete api.defaults.headers.common['Authorization'];
     (useLogStore.getState() as any).resetTurnsForSession();
     useAchievementStore.getState().clearAchievements();
     useLearningStore.getState().clearProgress();
@@ -245,21 +191,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ error: null });
 
     try {
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-      if (users[user.email]) {
-        users[user.email].termsAccepted = true;
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-        const updatedUser = {
-          ...user,
-          needsToAcceptTerms: false,
-          termsAccepted: true,
-        };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
-        set({ user: updatedUser });
-      } else {
-        throw new Error('Usuário não encontrado para atualizar os termos.');
-      }
+      // This is now handled on the backend, but we reflect it in the frontend state
+      const updatedUser = {
+        ...user,
+        needsToAcceptTerms: false,
+        termsAccepted: true,
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(updatedUser));
+      set({ user: updatedUser });
     } catch (e: any) {
       set({ error: e.message });
       throw e;
@@ -268,58 +207,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   checkAuth: () => {
     try {
-      const isUnlocked = localStorage.getItem(SYSTEM_UNLOCKED_KEY) === 'true';
-      set({ isSystemUnlocked: isUnlocked });
-
       const session = localStorage.getItem(SESSION_KEY);
       if (session) {
         const user: User = JSON.parse(session);
-        const users = JSON.parse(localStorage.getItem(USERS_KEY) || '{}');
-        const dbUser = users[user.email];
+        if (user.token?.access) {
+          api.defaults.headers.common[
+            'Authorization'
+          ] = `Bearer ${user.token.access}`;
+          set({ isAuthenticated: true, user, isLoading: false });
 
-        // Check against the source of truth (USERS_KEY) for super admin
-        if (user.email === 'admin@nativespeak.app') {
-            set({ isAuthenticated: true, user, isLoading: false });
-            const history = loadHistory(user.email);
-            useLogStore.getState().setTurns(history);
-            useAchievementStore.getState().loadAchievements(user.email);
-            useLearningStore.getState().loadProgress();
-            useEvaluationStore.getState().loadEvaluation();
-            return;
+          // Load other stores
+          const history = loadHistory(user.email);
+          useLogStore.getState().setTurns(history);
+          useAchievementStore.getState().loadAchievements(user.email);
+          useLearningStore.getState().loadProgress();
+          useEvaluationStore.getState().loadEvaluation();
+        } else {
+          set({ isLoading: false });
         }
-        
-        if (dbUser) {
-          user.needsToAcceptTerms = !dbUser.termsAccepted;
-          user.termsAccepted = dbUser.termsAccepted;
-          
-          if (!dbUser.studyStartDate) dbUser.studyStartDate = new Date().toISOString();
-          user.studyStartDate = dbUser.studyStartDate;
-          
-          if (typeof dbUser.credits === 'undefined') dbUser.credits = 3000;
-          user.credits = dbUser.credits;
-          
-          if (typeof dbUser.totalConversationTime === 'undefined') dbUser.totalConversationTime = 0;
-          user.totalConversationTime = dbUser.totalConversationTime;
-          
-          if (typeof dbUser.completedLessons === 'undefined') dbUser.completedLessons = 0;
-          user.completedLessons = dbUser.completedLessons;
-
-          if (!dbUser.avatar) dbUser.avatar = 'person';
-          user.avatar = dbUser.avatar;
-
-          if (!dbUser.theme) dbUser.theme = 'default';
-          user.theme = dbUser.theme;
-          
-          localStorage.setItem(USERS_KEY, JSON.stringify(users));
-          localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-        }
-
-        set({ isAuthenticated: true, user, isLoading: false });
-        const history = loadHistory(user.email);
-        useLogStore.getState().setTurns(history);
-        useAchievementStore.getState().loadAchievements(user.email);
-        useLearningStore.getState().loadProgress();
-        useEvaluationStore.getState().loadEvaluation();
       } else {
         set({ isLoading: false });
       }
@@ -332,10 +237,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set((state) => {
       if (!state.isAuthenticated || !state.user) {
         return state;
-      }
-      // Super admin is not affected by credit changes
-      if (state.user.email === 'admin@nativespeak.app') {
-          return state;
       }
       
       const oldCredits = state.user.credits;

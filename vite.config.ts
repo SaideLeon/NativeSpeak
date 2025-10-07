@@ -9,9 +9,16 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/api': {
+            target: 'https://nativespeak.cognick.qzz.io',
+            changeOrigin: true,
+          },
+        },
       },
       plugins: [react()],
       define: {
+        'process.env.API_URL': JSON.stringify(env.VITE_API_URL),
         'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY)
       },
       resolve: {

@@ -22,11 +22,11 @@ const PrivacyPolicy = () => (
     <ul>
       <li>
         <strong>Informações da Conta:</strong> Quando você se registra,
-        coletamos seu nome, sobrenome e endereço de e-mail.
+        coletamos e armazenamos seu nome, sobrenome e endereço de e-mail em nossos servidores seguros para criar e gerenciar sua conta.
       </li>
       <li>
-        <strong>Histórico de Conversa:</strong> Para permitir que você continue
-        de onde parou, salvamos o histórico de suas conversas. Esta informação
+        <strong>Dados da Aplicação:</strong> Para personalizar sua experiência e permitir que você continue
+        de onde parou, salvamos dados como seu histórico de conversas, progresso de lições e conquistas. Esta informação
         é armazenada localmente no seu navegador usando a tecnologia{' '}
         <code>localStorage</code>.
       </li>
@@ -35,26 +35,21 @@ const PrivacyPolicy = () => (
     <h3>3. Como Usamos Suas Informações</h3>
     <p>Utilizamos as informações coletadas para:</p>
     <ul>
-      <li>Fornecer e manter nosso serviço.</li>
+      <li>Fornecer, manter e proteger nosso serviço.</li>
       <li>Personalizar sua experiência de aprendizado.</li>
-      <li>Permitir que você acesse seu histórico de conversas entre sessões.</li>
+      <li>Sincronizar seu progresso e preferências no dispositivo que você usa.</li>
     </ul>
 
     <h3>4. Armazenamento de Dados</h3>
     <p>
-      Todas as suas informações de conta e histórico de conversas são
-      armazenadas de forma segura no <code>localStorage</code> do seu navegador.
-      Não transmitimos esses dados para servidores externos, exceto pela
-      comunicação necessária com a API Gemini para processar suas conversas de
-      áudio em tempo real.
+      Suas informações de conta (nome, e-mail) são armazenadas em nossos servidores. Outros dados, como histórico de conversas e progresso, são armazenados de forma segura no <code>localStorage</code> do seu navegador.
+      A comunicação com a API Gemini para processar suas conversas de áudio em tempo real é feita de forma segura.
     </p>
 
     <h3>5. Seus Direitos</h3>
     <p>
-      Como seus dados são armazenados localmente, você tem controle total sobre
-      eles. Você pode limpar o cache e os dados do seu navegador a qualquer
-      momento para remover permanentemente seu histórico e informações de
-      sessão.
+      Você tem controle sobre os dados armazenados localmente. Você pode limpar o cache e os dados do seu navegador a qualquer
+      momento para remover permanentemente seu histórico e informações de sessão. Para solicitar a exclusão dos dados da sua conta de nossos servidores, por favor, entre em contato conosco.
     </p>
 
     <h3>6. Contato</h3>
