@@ -72,5 +72,4 @@ Contém a lógica principal, utilitários e classes que não são componentes Re
     ```bash
     npm run dev
     ```
-
 5.  Abra o navegador no endereço fornecido (geralmente `http://nativespeak.vercel.app`).
