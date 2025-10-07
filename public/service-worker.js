@@ -4,7 +4,6 @@ const CACHE_NAME = 'nativespeak-cache-v1';
 const appShellFiles = [
   '/',
   '/index.html',
-  '/index.css',
   '/icon.svg',
   '/manifest.json',
 ];
