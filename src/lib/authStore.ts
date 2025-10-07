@@ -15,7 +15,7 @@ import axios from 'axios';
 // For this demo, we use localStorage.
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.API_URL || '/api',
 });
 
 interface User {
