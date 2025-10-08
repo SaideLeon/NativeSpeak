@@ -15,6 +15,9 @@
 .error {
   color: var(--error);
 }
+.topicDescription{
+  padding: 20px;
+}
 
 .backButton {
   background: var(--bg-card);
