@@ -17,6 +17,40 @@ export interface Theme {
   topics: Topic[];
 }
 
+export interface GrammarExample {
+  id: number;
+  subject: string;
+  verb_form: string;
+  example_sentence: string;
+  translation: string;
+  order: number;
+}
+
+export interface GrammarContent {
+  id: number;
+  title: string;
+  explanation: string;
+  examples: GrammarExample[];
+  order: number;
+}
+
+export interface DialogueLine {
+  id: number;
+  speaker: string;
+  text: string;
+  translation: string;
+  audio: string | null;
+  order: number;
+}
+
+export interface DialogueContent {
+  id: number;
+  title: string;
+  context: string;
+  lines: DialogueLine[];
+  order: number;
+}
+
 export interface Topic {
   id: number;
   title: string;
@@ -26,8 +60,8 @@ export interface Topic {
   description: string;
   order: number;
   vocabulary_items: VocabularyItem[];
-  grammar_contents: any[]; // Define this later if needed
-  dialogues: any[]; // Define this later if needed
+  grammar_contents: GrammarContent[];
+  dialogues: DialogueContent[];
   example_boxes: any[]; // Define this later if needed
   exercises: Exercise[];
 }

@@ -1,0 +1,53 @@
+/* src/components/Course/sections/DialogueSection.module.css */
+.dialogueSection h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+.dialogueContent {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.dialogueContent h5 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.context {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 1.5rem;
+}
+
+.dialogueLine {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-light);
+}
+
+.speaker {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.lineText {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0;
+}
+
+.translation {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
