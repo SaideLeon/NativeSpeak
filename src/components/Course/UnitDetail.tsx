@@ -66,29 +66,51 @@ interface TopicItemProps {
 }
 
 function TopicItem({ topic, onExerciseClick }: TopicItemProps) {
+
   return (
+
     <div className={styles.topicItem}>
-      <div>
-        <span className={styles.topicIcon}>{topic.icon}</span>
-        <span className={styles.topicTitle}>{topic.title}</span>
-      </div>
+
+      <span className={styles.topicIcon}>{topic.icon}</span>
+
+      <span className={styles.topicTitle}>{topic.title}</span>
+
       {topic.description && <p className={styles.topicDescription}>{topic.description}</p>}
 
+
+
       {topic.vocabulary_items && topic.vocabulary_items.length > 0 && (
+
         <VocabularySection items={topic.vocabulary_items} />
+
       )}
+
+
 
       {topic.grammar_contents && topic.grammar_contents.length > 0 && (
+
         <GrammarSection contents={topic.grammar_contents} />
+
       )}
+
+
 
       {topic.dialogues && topic.dialogues.length > 0 && (
+
         <DialogueSection dialogues={topic.dialogues} />
+
       )}
 
+
+
       {topic.exercises && topic.exercises.length > 0 && (
+
         <ExerciseList exercises={topic.exercises} onExerciseClick={onExerciseClick} />
+
       )}
+
     </div>
+
   );
+
 }
