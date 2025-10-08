@@ -16,7 +16,11 @@
   color: var(--error);
 }
 .topicDescription{
-  padding: 20px;
+  padding-right: 30px !important;
+}
+._topicItem_1h9tf_80 p {
+  display: block;
+  padding-right: 30px;
 }
 
 .backButton {
