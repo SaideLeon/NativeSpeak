@@ -22,14 +22,14 @@
 }
 
 .popup-content {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: #1E293B; /* Dark blue */
+  color: #F8FAFC; /* Light gray */
   padding: 40px;
   border-radius: 24px;
   max-width: 600px;
   width: 90%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-color);
+  border: 1px solid #475569;
   animation: slideIn 0.4s ease-out;
 }
 
