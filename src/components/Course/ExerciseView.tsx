@@ -1,17 +1,126 @@
 // src/components/Course/ExerciseView.tsx
+import { useState } from 'react';
+import { useExercise } from '../../hooks/useCourseData';
+import { useAuthStore } from '../../lib/authStore';
+import type { SubmissionResult } from '../../types/course.types';
+import styles from './ExerciseView.module.css';
 
 interface ExerciseViewProps {
   exerciseId: number;
   onBack: () => void;
 }
 
-export const ExerciseView = ({ exerciseId, onBack }: ExerciseViewProps) => {
+export function ExerciseView({ exerciseId, onBack }: ExerciseViewProps) {
+  const { exercise, loading, error } = useExercise(exerciseId);
+  const { token } = useAuthStore();
+  const [answers, setAnswers] = useState<{ [key: number]: string }>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<SubmissionResult | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleAnswerChange = (questionId: number, answer: string) => {
+    setAnswers({ ...answers, [questionId]: answer });
+  };
+
+  const handleSubmit = async () => {
+    if (!exercise) return;
+
+    try {
+      const response = await fetch(`https://nativespeak.cognick.qzz.io/api/exercises/${exerciseId}/submit/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          exercise_id: exerciseId,
+          answers: answers,
+          time_spent: 0, // TODO: track time spent
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit answers');
+      }
+
+      const data = await response.json();
+      setResult(data);
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'An unknown error occurred');
+    }
+  };
+
+  if (loading) {
+    return <div className={styles.loading}>Carregando exercício...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  if (!exercise) {
+    return <div className={styles.error}>Exercício não encontrado.</div>;
+  }
+
+  if (submitted && result) {
     return (
-        <div style={{padding: '2rem'}}>
-            <button onClick={onBack} style={{marginBottom: '1rem'}}>Voltar para a Unidade</button>
-            <h2>Exercise View</h2>
-            <p>Exercicio ID: {exerciseId}</p>
-            <p>Componente de exercício ainda não implementado.</p>
+      <div className={styles.exerciseView}>
+        <h1 className={styles.title}>Resultado</h1>
+        <div className={styles.resultSummary}>
+          <p>Pontuação: {result.score} / {result.max_score}</p>
+          <p>Percentual: {result.percentage}%</p>
         </div>
+        <div className={styles.questionsList}>
+          {exercise.questions.map((question) => {
+            const response = result.responses.find(r => r.question_id === question.id);
+            return (
+              <div key={question.id} className={styles.questionItem}>
+                <p className={styles.questionText}>{question.question_text}</p>
+                <p>Sua resposta: {answers[question.id]}</p>
+                {response && (
+                  <div>
+                    <p>Resposta correta: {response.correct_answer}</p>
+                    <p>{response.is_correct ? 'Correto!' : 'Incorreto.'}</p>
+                    <p>{response.explanation}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <button onClick={onBack} className={styles.backButton}>&larr; Voltar para a unidade</button>
+      </div>
     );
-};
+  }
+
+  return (
+    <div className={styles.exerciseView}>
+      <button onClick={onBack} className={styles.backButton}>&larr; Voltar para a unidade</button>
+      <h1 className={styles.title}>{exercise.title}</h1>
+      <p className={styles.instructions}>{exercise.instructions}</p>
+      
+      <div className={styles.questionsList}>
+        {exercise.questions.map((question) => (
+          <div key={question.id} className={styles.questionItem}>
+            <p className={styles.questionText}>{question.question_text}</p>
+            {question.fill_blank_answer && (
+              <input
+                type="text"
+                className={styles.answerInput}
+                onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+              />
+            )}
+            {/* Add other question types here */}
+          </div>
+        ))}
+      </div>
+
+      {submitError && <div className={styles.error}>{submitError}</div>}
+
+      <button onClick={handleSubmit} className={styles.submitButton}>
+        Enviar Respostas
+      </button>
+    </div>
+  );
+}

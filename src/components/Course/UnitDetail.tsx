@@ -1,11 +1,6 @@
 // src/components/Course/UnitDetail.tsx
-import { useUnit } from '../../hooks/useCourseData';
-import { VocabularySection } from './sections/VocabularySection';
-import { GrammarSection } from './sections/GrammarSection';
-import { DialogueSection } from './sections/DialogueSection';
-import { ExerciseList } from './sections/ExerciseList';
-import type { Topic } from '../../types/course.types';
-
+import { useUnitDetail } from '../../hooks/useCourseData';
+import type { Theme } from '../../types/course.types';
 import styles from './UnitDetail.module.css';
 
 interface UnitDetailProps {
@@ -15,84 +10,64 @@ interface UnitDetailProps {
 }
 
 export function UnitDetail({ unitId, onExerciseClick, onBack }: UnitDetailProps) {
-  const { unit, loading, error } = useUnit(unitId);
+  const { unit, loading, error } = useUnitDetail(unitId);
 
-  if (loading) return <div className={styles.unitDetail}>Carregando...</div>;
-  if (error || !unit) return <div className={styles.unitDetail}>Erro ao carregar unidade</div>;
+  if (loading) {
+    return <div className={styles.loading}>Carregando detalhes da unidade...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  if (!unit) {
+    return <div className={styles.error}>Unidade não encontrada.</div>;
+  }
 
   return (
     <div className={styles.unitDetail}>
-        <button onClick={onBack} className={styles.backButton}>
-            <span className="icon">arrow_back</span>
-            Voltar para Unidades
-        </button>
-      <header className={styles.header}>
-        <h1>{unit.icon} {unit.title}</h1>
-        <p>{unit.description}</p>
-      </header>
-
-      <div className={styles.content}>
+      <button onClick={onBack} className={styles.backButton}>&larr; Voltar para as unidades</button>
+      <h1 className={styles.title}>{unit.icon} {unit.title}</h1>
+      <p className={styles.description}>{unit.description}</p>
+      <div className={styles.themesGrid}>
         {unit.themes.map((theme) => (
-          <section key={theme.id} className={styles.themeSection}>
-            <h2>
-              <span>{theme.icon}</span> {theme.title}
-            </h2>
-
-            {theme.topics.map((topic) => (
-              <TopicContent 
-                key={topic.id} 
-                topic={topic}
-                onExerciseClick={onExerciseClick}
-              />
-            ))}
-          </section>
+          <ThemeCard key={theme.id} theme={theme} onExerciseClick={onExerciseClick} />
         ))}
       </div>
     </div>
   );
 }
 
-interface TopicContentProps {
-  topic: Topic;
+interface ThemeCardProps {
+  theme: Theme;
   onExerciseClick: (exerciseId: number) => void;
 }
 
-function TopicContent({ topic, onExerciseClick }: TopicContentProps) {
+function ThemeCard({ theme, onExerciseClick }: ThemeCardProps) {
   return (
-    <div className={styles.topic}>
-      <h3>{topic.icon} {topic.title}</h3>
-      {topic.description && <p>{topic.description}</p>}
-
-      {/* Vocabulary */}
-      {topic.topic_type === 'vocabulary' && topic.vocabulary_items.length > 0 && (
-        <VocabularySection items={topic.vocabulary_items} />
-      )}
-
-      {/* Grammar */}
-      {topic.topic_type === 'grammar' && topic.grammar_contents.length > 0 && (
-        <GrammarSection contents={topic.grammar_contents} />
-      )}
-
-      {/* Dialogues */}
-      {topic.topic_type === 'speaking' && topic.dialogues.length > 0 && (
-        <DialogueSection dialogues={topic.dialogues} />
-      )}
-
-      {/* Example Boxes */}
-      {topic.example_boxes.map((box) => (
-        <div key={box.id} className={`${styles.exampleBox} ${styles[box.box_type]}`}>
-          <strong>{box.title}:</strong>
-          <div dangerouslySetInnerHTML={{ __html: box.content.replace(/\n/g, '<br>') }} />
-        </div>
-      ))}
-
-      {/* Exercises */}
-      {topic.exercises.length > 0 && (
-        <ExerciseList 
-          exercises={topic.exercises}
-          onExerciseClick={onExerciseClick}
-        />
-      )}
+    <div className={styles.themeCard}>
+      <h3>{theme.icon} {theme.title}</h3>
+      <div className={styles.topicsList}>
+        {theme.topics.map((topic) => (
+          <div key={topic.id} className={styles.topicItem}>
+            <div>
+              <span className={styles.topicIcon}>{topic.icon}</span>
+              <span className={styles.topicTitle}>{topic.title}</span>
+            </div>
+            <div className={styles.exercisesList}>
+              {topic.exercises.map((exercise) => (
+                <button
+                  key={exercise.id}
+                  className={styles.exerciseButton}
+                  onClick={() => onExerciseClick(exercise.id)}
+                >
+                  {exercise.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
