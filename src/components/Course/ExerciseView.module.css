@@ -1,82 +1,147 @@
 /* src/components/Course/ExerciseView.module.css */
 .exerciseView {
-  padding: 2rem;
+  padding: 3rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .loading, .error {
   text-align: center;
-  padding: 2rem;
-  font-size: 1.2rem;
+  padding: 5rem;
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  color: var(--error);
 }
 
 .backButton {
-  background: none;
-  border: none;
-  color: var(--text-color);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+}
+
+.backButton:hover {
+  background: var(--primary-light);
+  color: white;
+  border-color: var(--primary-light);
 }
 
 .title {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-heading);
+  text-align: center;
 }
 
 .instructions {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: var(--text-secondary);
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  text-align: center;
 }
 
 .questionsList {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  gap: 2rem;
+  margin-bottom: 3rem;
 }
 
 .questionItem {
-  background-color: var(--background-light);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border: 1px solid var(--border-color);
 }
 
 .questionText {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
 }
 
 .answerInput {
   width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
+  padding: 1rem;
+  font-size: 1.1rem;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-normal);
+}
+
+.answerInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
 }
 
 .submitButton {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 3rem;
+  font-size: 1.3rem;
+  font-weight: 600;
   cursor: pointer;
   display: block;
   margin: 0 auto;
+  transition: background-color var(--transition-normal);
+}
+
+.submitButton:hover {
+  background-color: var(--primary-dark);
 }
 
 .resultSummary {
-  background-color: var(--background-light);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  margin-bottom: 3rem;
   text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.resultSummary h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
 }
 
 .resultSummary p {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   margin: 0.5rem 0;
+}
+
+.resultQuestion {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.resultQuestion:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.resultAnswer {
+  font-weight: 600;
+}
+
+.correct {
+  color: var(--accent-green);
+}
+
+.incorrect {
+  color: var(--error);
 }

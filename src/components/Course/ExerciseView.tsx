@@ -1,9 +1,9 @@
-// src/components/Course/ExerciseView.tsx
 import { useState } from 'react';
 import { useExercise } from '../../hooks/useCourseData';
 import { useAuthStore } from '../../lib/authStore';
 import type { SubmissionResult } from '../../types/course.types';
 import styles from './ExerciseView.module.css';
+import cn from 'classnames';
 
 interface ExerciseViewProps {
   exerciseId: number;
@@ -66,30 +66,33 @@ export function ExerciseView({ exerciseId, onBack }: ExerciseViewProps) {
   if (submitted && result) {
     return (
       <div className={styles.exerciseView}>
-        <h1 className={styles.title}>Resultado</h1>
         <div className={styles.resultSummary}>
-          <p>Pontuação: {result.score} / {result.max_score}</p>
-          <p>Percentual: {result.percentage}%</p>
+          <h2>Resultado do Exercício</h2>
+          <p>Pontuação Final: {result.score} de {result.max_score} ({result.percentage}%)</p>
         </div>
         <div className={styles.questionsList}>
           {exercise.questions.map((question) => {
             const response = result.responses.find(r => r.question_id === question.id);
+            const isCorrect = response?.is_correct || false;
             return (
-              <div key={question.id} className={styles.questionItem}>
+              <div key={question.id} className={cn(styles.questionItem, styles.resultQuestion)}>
                 <p className={styles.questionText}>{question.question_text}</p>
-                <p>Sua resposta: {answers[question.id]}</p>
-                {response && (
-                  <div>
-                    <p>Resposta correta: {response.correct_answer}</p>
-                    <p>{response.is_correct ? 'Correto!' : 'Incorreto.'}</p>
-                    <p>{response.explanation}</p>
-                  </div>
+                <p className={styles.resultAnswer}>
+                  Sua resposta: <span className={isCorrect ? styles.correct : styles.incorrect}>{answers[question.id] || 'Não respondido'}</span>
+                </p>
+                {!isCorrect && response && (
+                  <p className={styles.resultAnswer}>
+                    Resposta correta: <span className={styles.correct}>{response.correct_answer}</span>
+                  </p>
                 )}
+                {response && <p>{response.explanation}</p>}
               </div>
             );
           })}
         </div>
-        <button onClick={onBack} className={styles.backButton}>&larr; Voltar para a unidade</button>
+        <button onClick={onBack} className={styles.backButton}>
+          &larr; Voltar para a unidade
+        </button>
       </div>
     );
   }
@@ -109,6 +112,7 @@ export function ExerciseView({ exerciseId, onBack }: ExerciseViewProps) {
                 type="text"
                 className={styles.answerInput}
                 onChange={(e) => handleAnswerChange(question.id, e.target.value)}
+                placeholder="Digite sua resposta aqui..."
               />
             )}
             {/* Add other question types here */}
@@ -119,7 +123,7 @@ export function ExerciseView({ exerciseId, onBack }: ExerciseViewProps) {
       {submitError && <div className={styles.error}>{submitError}</div>}
 
       <button onClick={handleSubmit} className={styles.submitButton}>
-        Enviar Respostas
+        Verificar Respostas
       </button>
     </div>
   );

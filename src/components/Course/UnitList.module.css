@@ -1,78 +1,82 @@
 /* src/components/Course/UnitList.module.css */
 .unitList {
-  padding: 2rem;
+  padding: 3rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .title {
   text-align: center;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  font-size: 3rem;
   font-family: var(--font-heading);
   color: var(--text-primary);
   background: linear-gradient(135deg, var(--primary-light), var(--accent-green));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: 1px;
 }
 
 .unitsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
 }
 
 .unitCard {
   background: var(--bg-card);
-  padding: 2rem;
-  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
   cursor: pointer;
   transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
 .unitCard:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
   border-color: var(--primary-light);
-  box-shadow: var(--shadow-medium);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
 .unitIcon {
-    font-size: 2.5rem;
+    font-size: 3rem;
     line-height: 1;
 }
 
 .unitCard h3 {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     color: var(--text-primary);
-    margin-bottom: var(--space-xs);
+    margin-bottom: var(--space-sm);
 }
 
 .unitCard p {
     color: var(--text-secondary);
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 1.1rem;
+    line-height: 1.7;
     flex-grow: 1;
 }
 
 .unitMeta {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
-    font-weight: 500;
+    font-weight: 600;
     border-top: 1px solid var(--border-color);
-    padding-top: var(--space-md);
-    margin-top: var(--space-md);
+    padding-top: var(--space-lg);
+    margin-top: var(--space-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .loading, .error {
     text-align: center;
-    padding: 4rem;
-    font-size: 1.2rem;
+    padding: 5rem;
+    font-size: 1.4rem;
     color: var(--text-secondary);
 }
 
