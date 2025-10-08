@@ -122,3 +122,29 @@
 .exerciseButton:hover {
   background-color: var(--primary-dark);
 }
+
+@media (max-width: 768px) {
+  .unitDetail {
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+
+  .description {
+    font-size: 1.1rem;
+  }
+
+  .themeCard {
+    padding: 1.5rem;
+  }
+
+  .themeCard h3 {
+    font-size: 1.5rem;
+  }
+
+  .topicTitle {
+    font-size: 1.1rem;
+  }
+}
