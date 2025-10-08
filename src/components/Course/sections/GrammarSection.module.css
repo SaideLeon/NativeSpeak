@@ -37,6 +37,8 @@
 .examplesTable {
     width: 100%;
     border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
 }
 
 .examplesTable th, .examplesTable td {
