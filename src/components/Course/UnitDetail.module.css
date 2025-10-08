@@ -1,0 +1,120 @@
+/* src/components/Course/UnitDetail.module.css */
+.unitDetail {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header h1 {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.header p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 60ch;
+  margin: 0 auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.themeSection {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.themeSection h2 {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topic {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border-left: 4px solid var(--primary-light);
+}
+
+.topic:last-child {
+  margin-bottom: 0;
+}
+
+.topic h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.topic > p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.exampleBox {
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.exampleBox.tip {
+  border-left: 3px solid var(--accent-green);
+}
+.exampleBox.warning {
+  border-left: 3px solid var(--warning);
+}
+.exampleBox.info {
+  border-left: 3px solid var(--accent-purple);
+}
+
+.exampleBox strong {
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.backButton {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    margin-bottom: 2rem;
+}
+
+.backButton:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+    border-color: var(--primary-light);
+}

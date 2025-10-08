@@ -1,0 +1,81 @@
+/* src/components/Course/UnitList.module.css */
+.unitList {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--primary-light), var(--accent-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.unitsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.unitCard {
+  background: var(--bg-card);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.unitCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-medium);
+}
+
+.unitIcon {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.unitCard h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.unitCard p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.unitMeta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 4rem;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.error {
+    color: var(--error);
+}

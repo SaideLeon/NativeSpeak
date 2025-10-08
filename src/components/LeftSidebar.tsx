@@ -66,6 +66,12 @@ export default function LeftSidebar() {
               >
                 <span className="icon">school</span> Aulas e Exercícios
               </button>
+              <button
+                className={c({ active: currentView === 'courses' })}
+                onClick={() => setView('courses')}
+              >
+                <span className="icon">video_library</span> Cursos
+              </button>
             </nav>
           </div>
           {user && (
