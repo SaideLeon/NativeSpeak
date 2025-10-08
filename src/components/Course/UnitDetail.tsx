@@ -47,6 +47,11 @@ function ThemeCard({ theme, onExerciseClick }: ThemeCardProps) {
   return (
     <div className={styles.themeCard}>
       <h3>{theme.icon} {theme.title}</h3>
+      <div style={{ fontSize: '12px', background: '#eee', padding: '5px', borderRadius: '5px', color: '#333' }}>
+        <p><strong>ID:</strong> {theme.id}</p>
+        <p><strong>Order:</strong> {theme.order}</p>
+        <p><strong>Topics count:</strong> {theme.topics.length}</p>
+      </div>
       <div className={styles.topicsList}>
         {theme.topics.map((topic) => (
           <div key={topic.id} className={styles.topicItem}>
