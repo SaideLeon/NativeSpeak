@@ -37,7 +37,7 @@ import LeftSidebar from './components/LeftSidebar';
 import cn from 'classnames';
 import { THEMES } from './lib/customization';
 import { usePresenceStore } from './lib/presenceStore';
-import LessonsPage from './components/LessonsPage';
+import { CoursesPage } from './components/Course/CoursesPage';
 
 const SYSTEM_API_KEY = process.env.API_KEY as string;
 if (!SYSTEM_API_KEY) {
@@ -109,7 +109,7 @@ function App() {
                 {isAuthenticated ? (
                   <>
                     {currentView === 'console' && <StreamingConsole />}
-                    {currentView === 'lessons' && <LessonsPage />}
+                    {currentView === 'courses' && <CoursesPage />}
                   </>
                 ) : (
                   <LandingPage

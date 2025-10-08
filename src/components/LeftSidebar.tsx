@@ -5,8 +5,7 @@
 import { useUI } from '../lib/state';
 import c from 'classnames';
 import { useAuthStore } from '../lib/authStore';
-import { useLearningStore, LessonTopic } from '../lib/learningStore';
-import { lessons } from '../lib/lessons';
+import { useLearningStore } from '../lib/learningStore';
 import { useState } from 'react';
 import ProfileCustomizer from './ProfileCustomizer';
 import ConversationEvaluator from './ConversationEvaluator';
@@ -36,7 +35,7 @@ export default function LeftSidebar() {
   const { progress } = useLearningStore();
   const [isCustomizing, setIsCustomizing] = useState(false);
 
-  const hasProgress = Object.keys(progress).length > 0;
+
 
   return (
     <>
@@ -60,12 +59,7 @@ export default function LeftSidebar() {
               >
                 <span className="icon">mic</span> Prática de Conversa
               </button>
-              <button
-                className={c({ active: currentView === 'lessons' })}
-                onClick={() => setView('lessons')}
-              >
-                <span className="icon">school</span> Aulas e Exercícios
-              </button>
+
               <button
                 className={c({ active: currentView === 'courses' })}
                 onClick={() => setView('courses')}
@@ -128,31 +122,7 @@ export default function LeftSidebar() {
             <ConversationEvaluator />
           </div>
 
-          <div className="sidebar-section">
-            <h4 className="sidebar-section-title">Progresso da Aula</h4>
-            {!hasProgress ? (
-              <p className="no-progress-text">
-                Comece uma aula guiada para ver seu progresso aqui.
-              </p>
-            ) : (
-              <div className="lessons-progress-list">
-                {Object.entries(lessons).map(([topic, details]) => {
-                  const lessonProgress = progress[topic as LessonTopic];
-                  if (!lessonProgress) return null; // Only show lessons that have been started
-                  return (
-                    <div key={topic} className="lesson-progress-item">
-                      <span className="lesson-progress-title">
-                        {details.title}
-                      </span>
-                      <span className="lesson-progress-step">
-                        Passo {lessonProgress.currentStep}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+
         </div>
       </aside>
     </>

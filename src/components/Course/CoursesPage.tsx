@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { UnitList } from './UnitList';
 import { UnitDetail } from './UnitDetail';
+import './CoursesPage.css';
 import { ExerciseView } from './ExerciseView';
 
 export function CoursesPage() {

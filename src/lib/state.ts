@@ -173,7 +173,7 @@ Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreens�
 /**
  * UI
  */
-export type AppView = 'console' | 'lessons';
+export type AppView = 'console' | 'lessons' | 'courses';
 
 export const useUI = create<{
   isSidebarOpen: boolean;
