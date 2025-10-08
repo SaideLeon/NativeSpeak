@@ -83,3 +83,30 @@
 .error {
     color: var(--error);
 }
+
+@media (max-width: 768px) {
+  .unitList {
+    padding: 2rem 1rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .unitsGrid {
+    gap: 1.5rem;
+  }
+
+  .unitCard {
+    padding: 1.5rem;
+  }
+
+  .unitCard h3 {
+    font-size: 1.3rem;
+  }
+
+  .unitCard p {
+    font-size: 1rem;
+  }
+}
