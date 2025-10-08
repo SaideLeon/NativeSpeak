@@ -72,7 +72,7 @@ function TopicItem({ topic, onExerciseClick }: TopicItemProps) {
         <span className={styles.topicIcon}>{topic.icon}</span>
         <span className={styles.topicTitle}>{topic.title}</span>
       </div>
-      {topic.description && <p className='topicDescription'>{topic.description}</p>}
+      {topic.description && <p className={styles.topicDescription}>{topic.description}</p>}
 
       {topic.vocabulary_items && topic.vocabulary_items.length > 0 && (
         <VocabularySection items={topic.vocabulary_items} />

@@ -86,6 +86,12 @@
   display: block;
 }
 
+.topicDescription {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
 .topicIcon {
   font-size: 1.5rem;
 }
