@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { authStore } from '../lib/authStore';
+import { useAuthStore } from '../lib/authStore';
 
 const API_URL = 'https://nativespeak.cognick.qzz.io/api';
 
@@ -15,7 +15,7 @@ export function useGoalsData() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const token = authStore.getState().token;
+  const token = useAuthStore.getState().user?.token?.access;
 
   const getHeaders = useCallback(() => {
     return {

@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { Achievement, ALL_ACHIEVEMENTS } from './achievements';
 import { useNotificationStore } from './notificationStore';
-import { authStore } from './authStore';
+import { useAuthStore } from './authStore';
 
 const API_URL = 'https://nativespeak.cognick.qzz.io/api';
 
@@ -23,7 +23,7 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
   lastUnlocked: null,
 
   fetchAchievements: async () => {
-    const token = authStore.getState().token;
+    const token = useAuthStore.getState().user?.token?.access;
     if (!token) return;
 
     try {
@@ -50,10 +50,10 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
       return; // Not found or already unlocked
     }
 
-    const token = authStore.getState().token;
-    if (!token) return;
-
     try {
+      const token = useAuthStore.getState().user?.token?.access;
+      if (!token) return;
+
       const response = await fetch(`${API_URL}/achievements/`, {
         method: 'POST',
         headers: {
