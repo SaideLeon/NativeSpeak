@@ -6,6 +6,7 @@ import { create } from 'zustand';
 import { customerSupportTools } from './tools/customer-support';
 import { personalAssistantTools } from './tools/personal-assistant';
 import { navigationSystemTools } from './tools/navigation-system';
+import { getAllUnits, searchUnit } from './tools/course-tools';
 import { useAuthStore } from './authStore';
 import { useLearningStore } from './learningStore';
 
@@ -13,6 +14,7 @@ export type Scenario =
   | 'customer-support'
   | 'personal-assistant'
   | 'navigation-system'
+  | 'course-management'
   | 'soccer'
   | 'technology'
   | 'artificial-intelligence'
@@ -39,6 +41,7 @@ const toolsets: Record<Scenario, FunctionCall[]> = {
   'customer-support': customerSupportTools,
   'personal-assistant': personalAssistantTools,
   'navigation-system': navigationSystemTools,
+  'course-management': [getAllUnits, searchUnit],
   'soccer': customerSupportTools,
   'technology': customerSupportTools,
   'artificial-intelligence': customerSupportTools,
@@ -85,6 +88,7 @@ Seu papel é ser um tutor paciente, interativo e adaptativo. Siga estas regras:
 9. Análise de Metas: Revise a lista de 'Metas em progresso' do aluno. Se, durante a conversa, você concluir que uma meta foi alcançada, use a função \`mark_goal_as_completed\` para marcá-la como concluída.
 
 Sua missão é ajudar o aluno a desenvolver vocabulário, gramática, compreensão e conversação em inglês, sempre de forma prática, motivadora e personalizada.`,
+  'course-management': `Você é um assistente de gerenciamento de cursos. Você pode listar todas as unidades e pesquisar por conteúdo dentro de uma unidade específica.`,
   'personal-assistant':
     'Você é um assistente pessoal prestativo e amigável. Seja proativo e eficiente.',
   'navigation-system':
