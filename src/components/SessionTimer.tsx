@@ -30,7 +30,7 @@ export default function SessionTimer() {
   const { updateCredits, user, addConversationTime, incrementCompletedLessons } = useAuthStore();
   const { unlockAchievement } = useAchievementStore();
   const { mode } = useLearningStore();
-  const { completeTaskByText } = useTodoStore();
+  const { goals, updateGoal } = useGoalsData();
 
   // Effect for the timer logic.
   useEffect(() => {
@@ -53,19 +53,25 @@ export default function SessionTimer() {
         
         // Check for 2-minute goal completion
         if (newSeconds === 2 * 60) { // 2 minutes in seconds
-          completeTaskByText('2 minutos');
+          const goalToComplete = goals.find(g => g.text === '2 minutos');
+          if (goalToComplete) {
+            updateGoal(goalToComplete.id, { status: 'completed' });
+          }
         }
 
         // Check for 10-minute goal completion
         if (newSeconds === 10 * 60) { // 10 minutes in seconds
-          completeTaskByText('10 minutos');
+          const goalToComplete = goals.find(g => g.text === '10 minutos');
+          if (goalToComplete) {
+            updateGoal(goalToComplete.id, { status: 'completed' });
+          }
         }
         return newSeconds;
       });
     }, 1000);
 
     return () => window.clearInterval(interval);
-  }, [connected, updateCredits, completeTaskByText]); // Dependencies are stable, effect runs only when `connected` changes.
+  }, [connected, updateCredits, goals, updateGoal]); // Dependencies are stable, effect runs only when `connected` changes.
 
   // Effect for session cleanup logic, which runs when a session ends.
   useEffect(() => {
