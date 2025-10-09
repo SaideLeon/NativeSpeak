@@ -15,7 +15,7 @@ import {
   useTools,
   ConversationTurn,
 } from '@/lib/state';
-import { useTodoStore } from '../../../lib/todoStore';
+import { useGoalsData } from '../../../hooks/useGoalsData';
 import { useAuthStore } from '../../../lib/authStore';
 import { useLearningStore } from '../../../lib/learningStore';
 import { getCurrentLessonState } from '../../../lib/lessons';
@@ -69,7 +69,7 @@ export default function StreamingConsole() {
   const { client, setConfig } = useLiveAPIContext();
   const { systemPrompt, voice, useWebSearch } = useSettings();
   const { tools } = useTools();
-  const { todos } = useTodoStore();
+  const { goals } = useGoalsData();
   const { user } = useAuthStore();
   const turns = useLogStore(state => state.turns);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -133,10 +133,10 @@ export default function StreamingConsole() {
     }
 
     let context = '';
-    const inProgressTasks = todos
+    const inProgressTasks = goals
       .filter(t => t.status === 'inProgress' && !t.isHeader)
       .map(t => `- ${t.text}`);
-    const completedTasks = todos
+    const completedTasks = goals
       .filter(t => t.status === 'completed' && !t.isHeader)
       .map(t => `- ${t.text}`);
 
@@ -215,7 +215,7 @@ export default function StreamingConsole() {
     };
 
     setConfig(config);
-  }, [setConfig, systemPrompt, tools, voice, todos, user, mode, lessonTopic, currentStep, useWebSearch, continuationPrompt, clearContinuationPrompt]);
+  }, [setConfig, systemPrompt, tools, voice, goals, user, mode, lessonTopic, currentStep, useWebSearch, continuationPrompt, clearContinuationPrompt]);
 
   useEffect(() => {
     const { addTurn, updateLastTurn } = useLogStore.getState();
