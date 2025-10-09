@@ -15,16 +15,17 @@ export function useGoalsData() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const token = useAuthStore.getState().user?.token?.access;
 
   const getHeaders = useCallback(() => {
+    const token = useAuthStore.getState().user?.token?.access;
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`,
     };
-  }, [token]);
+  }, []);
 
   const fetchGoals = useCallback(async () => {
+    const token = useAuthStore.getState().user?.token?.access;
     if (!token) {
       setLoading(false);
       return;
@@ -44,13 +45,14 @@ export function useGoalsData() {
     } finally {
       setLoading(false);
     }
-  }, [getHeaders, token]);
+  }, [getHeaders]);
 
   useEffect(() => {
     fetchGoals();
   }, [fetchGoals]);
 
   const addGoal = async (newGoal: Omit<Goal, 'id' | 'created_at'>) => {
+    const token = useAuthStore.getState().user?.token?.access;
     if (!token) return null;
     try {
       const response = await fetch(`${API_URL}/goals/`, {
@@ -71,6 +73,7 @@ export function useGoalsData() {
   };
 
   const updateGoal = async (id: number, updatedData: Partial<Omit<Goal, 'id' | 'created_at'>>) => {
+    const token = useAuthStore.getState().user?.token?.access;
     if (!token) return null;
     try {
       const response = await fetch(`${API_URL}/goals/${id}/`, {
@@ -91,6 +94,7 @@ export function useGoalsData() {
   };
 
   const deleteGoal = async (id: number) => {
+    const token = useAuthStore.getState().user?.token?.access;
     if (!token) return;
     try {
       const response = await fetch(`${API_URL}/goals/${id}/`, {
