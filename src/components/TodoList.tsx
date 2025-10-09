@@ -22,7 +22,7 @@ const TodoList: React.FC = () => {
         : goal.status === 'completed'
         ? 'onHold'
         : 'inProgress';
-    updateGoal(goal.id, { status: newStatus });
+    updateGoal(goal.id, { ...goal, status: newStatus });
   };
 
   if (loading) {

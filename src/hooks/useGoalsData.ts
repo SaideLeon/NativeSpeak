@@ -72,15 +72,14 @@ export function useGoalsData() {
     }
   };
 
-  const updateGoal = async (id: number, updatedData: Partial<Omit<Goal, 'id' | 'created_at'>>) => {
+  const updateGoal = async (id: number, updatedData: Partial<Goal>) => {
     const token = useAuthStore.getState().user?.token?.access;
     if (!token) return null;
-    console.log('Updating goal:', id, updatedData);
     try {
       const response = await fetch(`${API_URL}/goals/${id}/`, {
         method: 'PUT',
         headers: getHeaders(),
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify({ text: updatedData.text, status: updatedData.status }),
       });
       if (!response.ok) {
         throw new Error('Failed to update goal');
