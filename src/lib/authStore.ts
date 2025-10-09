@@ -166,6 +166,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       useEvaluationStore.getState().loadEvaluation();
       usePresenceStore.getState().setSelfOnline();
     } catch (e: any) {
+      console.error('Login failed:', e);
       const errorMsg =
         e.response?.data?.detail || 'E-mail ou senha inválidos.';
       set({ error: errorMsg, isLoading: false });
