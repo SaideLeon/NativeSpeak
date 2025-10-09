@@ -20,7 +20,7 @@ const TodoList: React.FC = () => {
       goal.status === 'inProgress'
         ? 'completed'
         : goal.status === 'completed'
-        ? 'onHold'
+        ? 'inProgress'
         : 'inProgress';
     updateGoal(goal.id, { ...goal, status: newStatus });
   };
