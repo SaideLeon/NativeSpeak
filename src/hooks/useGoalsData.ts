@@ -75,6 +75,7 @@ export function useGoalsData() {
   const updateGoal = async (id: number, updatedData: Partial<Omit<Goal, 'id' | 'created_at'>>) => {
     const token = useAuthStore.getState().user?.token?.access;
     if (!token) return null;
+    console.log('Updating goal:', id, updatedData);
     try {
       const response = await fetch(`${API_URL}/goals/${id}/`, {
         method: 'PUT',
