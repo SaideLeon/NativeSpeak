@@ -5,78 +5,90 @@
 import { create } from 'zustand';
 import { Achievement, ALL_ACHIEVEMENTS } from './achievements';
 import { useNotificationStore } from './notificationStore';
+import { authStore } from './authStore';
+
+const API_URL = 'https://nativespeak.cognick.qzz.io/api';
 
 interface AchievementState {
   unlockedIds: Set<string>;
-  // FIX: Property 'lastUnlocked' does not exist on type 'AchievementState'.
   lastUnlocked: Achievement | null;
-  loadAchievements: (email: string) => void;
-  unlockAchievement: (id: string, email: string) => void;
+  fetchAchievements: () => Promise<void>;
+  unlockAchievement: (id: string) => Promise<void>;
   clearAchievements: () => void;
-  // FIX: Property 'clearLastUnlocked' does not exist on type 'AchievementState'.
   clearLastUnlocked: () => void;
 }
 
-const saveAchievements = (email: string, ids: Set<string>) => {
-  try {
-    const key = `nativespeak_achievements_${email}`;
-    localStorage.setItem(key, JSON.stringify(Array.from(ids)));
-  } catch (error) {
-    console.error('Failed to save achievements:', error);
-  }
-};
-
 export const useAchievementStore = create<AchievementState>((set, get) => ({
   unlockedIds: new Set<string>(),
-  // FIX: Property 'lastUnlocked' does not exist on type 'AchievementState'.
   lastUnlocked: null,
 
-  loadAchievements: (email: string) => {
+  fetchAchievements: async () => {
+    const token = authStore.getState().token;
+    if (!token) return;
+
     try {
-      const key = `nativespeak_achievements_${email}`;
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        const parsed = JSON.parse(saved) as string[];
-        set({ unlockedIds: new Set(parsed) });
-      } else {
-        set({ unlockedIds: new Set<string>() });
-      }
+      const response = await fetch(`${API_URL}/achievements/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch achievements');
+      const data = await response.json();
+      const unlockedIds = new Set<string>(data.results.map((ach: any) => ach.name)); // Assuming name is the unique identifier used as ID
+      set({ unlockedIds });
     } catch (error) {
       console.error('Failed to load achievements:', error);
       set({ unlockedIds: new Set<string>() });
     }
   },
 
-  unlockAchievement: (id: string, email: string) => {
-    if (get().unlockedIds.has(id)) {
-      return; // Already unlocked
-    }
-
+  unlockAchievement: async (id: string) => {
+    const { unlockedIds, fetchAchievements } = get();
     const achievement = ALL_ACHIEVEMENTS.find(a => a.id === id);
-    if (!achievement) {
-      return; // Achievement not found
+
+    if (!achievement || unlockedIds.has(achievement.name)) {
+      return; // Not found or already unlocked
     }
 
-    const newUnlockedIds = new Set<string>(get().unlockedIds);
-    newUnlockedIds.add(id);
+    const token = authStore.getState().token;
+    if (!token) return;
 
-    // FIX: Property 'lastUnlocked' does not exist on type 'AchievementState'.
-    set({ unlockedIds: newUnlockedIds, lastUnlocked: achievement });
-    saveAchievements(email, newUnlockedIds);
+    try {
+      const response = await fetch(`${API_URL}/achievements/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          name: achievement.name, 
+          description: achievement.description 
+        }),
+      });
 
-    useNotificationStore.getState().addNotification({
-      title: 'Conquista Desbloqueada!',
-      message: achievement.name,
-      type: 'achievement',
-      icon: achievement.icon,
-    });
+      if (!response.ok) throw new Error('Failed to unlock achievement');
+      
+      // Refetch achievements to ensure consistency
+      await fetchAchievements();
+
+      set({ lastUnlocked: achievement });
+
+      useNotificationStore.getState().addNotification({
+        title: 'Conquista Desbloqueada!',
+        message: achievement.name,
+        type: 'achievement',
+        icon: achievement.icon,
+      });
+
+    } catch (error) {
+      console.error('Failed to unlock achievement:', error);
+    }
   },
 
   clearAchievements: () => {
-    // FIX: Clear last unlocked achievement as well.
     set({ unlockedIds: new Set<string>(), lastUnlocked: null });
   },
-  // FIX: Property 'clearLastUnlocked' does not exist on type 'AchievementState'.
+
   clearLastUnlocked: () => {
     set({ lastUnlocked: null });
   },

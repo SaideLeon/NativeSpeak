@@ -2,21 +2,25 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAchievementStore } from '../lib/achievementStore';
 import { ALL_ACHIEVEMENTS } from '../lib/achievements';
 import cn from 'classnames';
 import './AchievementsPanel.css';
 
 const AchievementsPanel: React.FC = () => {
-  const { unlockedIds } = useAchievementStore();
+  const { unlockedIds, fetchAchievements } = useAchievementStore();
+
+  useEffect(() => {
+    fetchAchievements();
+  }, [fetchAchievements]);
 
   return (
     <div className="achievements-container">
       <h4 className="sidebar-section-title">Conquistas</h4>
       <div className="achievements-list">
         {ALL_ACHIEVEMENTS.map(ach => {
-          const isUnlocked = unlockedIds.has(ach.id);
+          const isUnlocked = unlockedIds.has(ach.name); // Check by name
           return (
             <div
               key={ach.id}
