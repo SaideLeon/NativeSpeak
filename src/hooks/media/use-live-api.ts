@@ -25,7 +25,7 @@ import { AudioStreamer } from '../../lib/audio-streamer';
 import { audioContext } from '../../lib/utils';
 import VolMeterWorket from '../../lib/worklets/vol-meter';
 import { useLogStore, useSettings } from '@/lib/state';
-import { useTodoStore } from '@/lib/todoStore';
+import { useGoalsData } from '../useGoalsData';
 import { useEvaluationStore } from '@/lib/evaluationStore';
 
 export type UseLiveApiResults = {
@@ -103,7 +103,7 @@ export function useLiveApi({
     const onToolCall = (toolCall: LiveServerToolCall) => {
       const functionResponses: any[] = [];
       const { addTurn, addFunctionCall } = useLogStore.getState();
-      const { completeTaskByText } = useTodoStore.getState();
+      const { goals, updateGoal } = useGoalsData();
 
       for (const fc of toolCall.functionCalls) {
         // Add to the new separate history
@@ -123,12 +123,15 @@ export function useLiveApi({
         if (fc.name === 'mark_goal_as_completed') {
           const goalText = fc.args.goalText;
           if (typeof goalText === 'string') {
-            completeTaskByText(goalText);
-            addTurn({
-              role: 'system',
-              text: `A meta "${goalText}" foi marcada como concluída com base na conversa.`,
-              isFinal: true,
-            });
+            const goalToComplete = goals.find(g => g.text === goalText);
+            if (goalToComplete) {
+              updateGoal(goalToComplete.id, { status: 'completed' });
+              addTurn({
+                role: 'system',
+                text: `A meta "${goalText}" foi marcada como concluída com base na conversa.`,
+                isFinal: true,
+              });
+            }
           }
         }
 

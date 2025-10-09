@@ -7,7 +7,7 @@ import { useLiveAPIContext } from '../contexts/LiveAPIContext';
 import { useAuthStore } from '../lib/authStore';
 import { useAchievementStore } from '../lib/achievementStore';
 import { useLearningStore } from '../lib/learningStore';
-import { useTodoStore } from '../lib/todoStore';
+import { useGoalsData } from '../hooks/useGoalsData';
 
 const formatTime = (totalSeconds: number) => {
   const hours = Math.floor(totalSeconds / 3600);
