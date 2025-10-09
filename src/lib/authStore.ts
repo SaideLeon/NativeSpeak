@@ -161,7 +161,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Load other stores
       const history = loadHistory(user.email);
       useLogStore.getState().setTurns(history);
-      useAchievementStore.getState().loadAchievements(user.email);
+      useAchievementStore.getState().fetchAchievements();
       useLearningStore.getState().loadProgress();
       useEvaluationStore.getState().loadEvaluation();
       usePresenceStore.getState().setSelfOnline();
@@ -220,7 +220,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           // Load other stores
           const history = loadHistory(user.email);
           useLogStore.getState().setTurns(history);
-          useAchievementStore.getState().loadAchievements(user.email);
+          useAchievementStore.getState().fetchAchievements();
           useLearningStore.getState().loadProgress();
           useEvaluationStore.getState().loadEvaluation();
         } else {
