@@ -173,8 +173,13 @@ export function useLiveApi({
     if (!config) {
       throw new Error('config has not been set');
     }
+    const history = useLogStore.getState().turns;
+    const configWithHistory = {
+      ...config,
+      history: history || [],
+    };
     client.disconnect();
-    await client.connect(config);
+    await client.connect(configWithHistory);
   }, [client, config]);
 
   const disconnect = useCallback(async () => {

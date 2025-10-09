@@ -326,6 +326,26 @@ const clearHistory = () => {
   }
 };
 
+const loadHistory = (): ConversationTurn[] => {
+  const { user } = useAuthStore.getState();
+  if (user?.email) {
+    const historyKey = `nativespeak_history_${user.email}`;
+    try {
+      const savedHistory = localStorage.getItem(historyKey);
+      if (savedHistory) {
+        const parsedHistory = JSON.parse(savedHistory);
+        return parsedHistory.map((turn: any) => ({
+          ...turn,
+          timestamp: new Date(turn.timestamp),
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load conversation history:', error);
+    }
+  }
+  return [];
+};
+
 export const useLogStore = create<{
   turns: ConversationTurn[];
   functionCallHistory: FunctionCallLog[];
@@ -338,7 +358,7 @@ export const useLogStore = create<{
   clearTurns: () => void;
   resetTurnsForSession: () => void;
 }>((set, get) => ({
-  turns: [],
+  turns: loadHistory(),
   functionCallHistory: [],
   inputTokens: 0,
   outputTokens: 0,
