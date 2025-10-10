@@ -465,7 +465,7 @@ Abaixo estão os comandos curl para os endpoints testados e seus respectivos res
    54     },
    55     "true_false": {
    56       "count": 0,
-   57       "avg_score": 0
+   57       "avg_score": 0u
    58     }
    59   }
    60 }
