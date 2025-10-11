@@ -52,7 +52,11 @@ export function useLiveApi({
 
   const [volume, setVolume] = useState(0);
   const [connected, setConnected] = useState(false);
-  const [config, setConfig] = useState<LiveConnectConfig>({});
+  const sessionHandleRef = useRef<string | undefined>(undefined);
+  const [config, setConfig] = useState<LiveConnectConfig>({
+    contextWindowCompression: { slidingWindow: {} },
+    sessionResumption: { handle: sessionHandleRef.current },
+  });
 
   // register audio for streaming server -> speakers
   useEffect(() => {
@@ -99,6 +103,17 @@ export function useLiveApi({
     client.on('close', onClose);
     client.on('interrupted', stopAudioStreamer);
     client.on('audio', onAudio);
+
+    const onSessionResumptionUpdate = (newHandle: string) => {
+      sessionHandleRef.current = newHandle;
+    };
+
+    const onGoAway = (timeLeft: number) => {
+      console.log(`Connection will close in ${timeLeft}ms`);
+    };
+
+    client.on('sessionResumptionUpdate', onSessionResumptionUpdate);
+    client.on('goAway', onGoAway);
 
     const onToolCall = (toolCall: LiveServerToolCall) => {
       const functionResponses: any[] = [];
@@ -169,6 +184,8 @@ export function useLiveApi({
       client.off('interrupted', stopAudioStreamer);
       client.off('audio', onAudio);
       client.off('toolcall', onToolCall);
+      client.off('sessionResumptionUpdate', onSessionResumptionUpdate);
+      client.off('goAway', onGoAway);
     };
   }, [client]);
 

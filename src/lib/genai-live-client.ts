@@ -67,6 +67,8 @@ export interface LiveClientEventTypes {
   turncomplete: () => void;
   inputTranscription: (text: string, isFinal: boolean) => void;
   outputTranscription: (text: string, isFinal: boolean) => void;
+  sessionResumptionUpdate: (newHandle: string) => void;
+  goAway: (timeLeft: number) => void;
 }
 
 // FIX: Refactored to use composition over inheritance for EventEmitter
@@ -202,6 +204,19 @@ export class GenAILiveClient {
   }
 
   protected onMessage(message: LiveServerMessage) {
+    if (message.sessionResumptionUpdate?.newHandle) {
+      this.emitter.emit(
+        'sessionResumptionUpdate',
+        message.sessionResumptionUpdate.newHandle,
+      );
+      return;
+    }
+
+    if (message.goAway?.timeLeft) {
+      this.emitter.emit('goAway', message.goAway.timeLeft);
+      return;
+    }
+
     if (message.setupComplete) {
       // FIX: Changed this.emit to this.emitter.emit
       this.emitter.emit('setupcomplete');
