@@ -1,6 +1,6 @@
  # NativeSpeak: Seu Tutor de Inglês com IA 
 
-O NativeSpeak é uma aplicação web de demonstração que utiliza a API Gemini Live para criar um parceiro de conversação com IA, focado em ajudar falantes de português a praticar e melhorar sua fluência em inglês. A aplicação captura áudio do microfone em tempo real, transmite para a IA e reproduz a resposta em áudio, criando uma experiência de diálogo natural.
+NativeSpeak é uma aplicação web de demonstração que utiliza a API Gemini Live para criar um parceiro de conversação com IA, focado em ajudar falantes de português a praticar e melhorar sua fluência em inglês. A aplicação captura áudio do microfone em tempo real, transmite para a IA e reproduz a resposta em áudio, criando uma experiência de diálogo natural.
 
 ## ✨ Funcionalidades Principais
 
