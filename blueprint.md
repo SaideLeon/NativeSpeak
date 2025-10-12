@@ -48,3 +48,7 @@ I have implemented a set of SEO optimizations to improve the application's visib
     *   Open Graph (og) tags for social media sharing.
     *   A Twitter card tag.
 *   Enhanced the meta tags to include more specific keywords and a more detailed description related to learning English with an AI tutor. I also added `og:locale` and `og:type` properties to the Open Graph tags and changed the lang to `pt-BR` in the html tag.
+
+### TypeScript Configuration
+
+*   Created a `src/vite-env.d.ts` file to add type declarations for CSS modules (`.module.css`). This resolves TypeScript errors related to importing CSS modules.
