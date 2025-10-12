@@ -32,6 +32,7 @@ I have implemented a set of SEO optimizations to improve the application's visib
 
 *   Installed `vite-plugin-sitemap` as a dev dependency.
 *   Configured `vite.config.ts` to automatically generate a `sitemap.xml` file during the build process. The sitemap includes the routes: `/`, `/sobre`, and `/contato`.
+*   Corrected the import statement for `ViteSitemapPlugin` in `vite.config.ts` to use a default import, fixing a TypeScript error.
 
 #### 2. `robots.txt`
 
