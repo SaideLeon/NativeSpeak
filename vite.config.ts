@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
       react(),
       ViteSitemapPlugin({
         hostname: 'https://nativespeak.live',
-        routes: ['/', '/sobre', '/contato'], // personalize tuas rotas
+        dynamicRoutes: ['/', '/sobre', '/contato'],
       }),
     ],
     define: {
