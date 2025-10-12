@@ -7,7 +7,7 @@
   1. Listar Conquistas (GET)
 
   Este teste verifica a listagem de todas as conquistas para o usuário.
-
+.
    * Endpoint: GET /api/achievements/
    * Comando `curl`:
 
