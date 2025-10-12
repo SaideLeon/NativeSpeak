@@ -13,6 +13,7 @@ import {
   LiveServerToolCallCancellation,
   Part,
   Session,
+  SessionResumptionConfig,
 } from '@google/genai';
 import EventEmitter from 'eventemitter3';
 import { DEFAULT_LIVE_API_MODEL } from './constants';
@@ -84,6 +85,8 @@ export class GenAILiveClient {
 
   protected readonly client: GoogleGenAI;
   protected session?: Session;
+  private latestSessionHandle: string | null = null;
+  private lastConfig: LiveConnectConfig | null = null;
 
   private _status: 'connected' | 'disconnected' | 'connecting' = 'disconnected';
   public get status() {
@@ -103,10 +106,14 @@ export class GenAILiveClient {
     });
   }
 
-  public async connect(config: LiveConnectConfig): Promise<boolean> {
+  public async connect(
+    config: LiveConnectConfig,
+    previousSessionHandle?: string | null,
+  ): Promise<boolean> {
     if (this._status === 'connected' || this._status === 'connecting') {
       return false;
     }
+    this.lastConfig = config;
 
     this._status = 'connecting';
     const callbacks: LiveCallbacks = {
@@ -116,11 +123,19 @@ export class GenAILiveClient {
       onclose: this.onClose.bind(this),
     };
 
+    let sessionResumptionConfig: SessionResumptionConfig | undefined = undefined;
+    const handle = previousSessionHandle || this.latestSessionHandle;
+    if (handle) {
+      sessionResumptionConfig = { handle };
+    }
+
     try {
       this.session = await this.client.live.connect({
         model: this.model,
         config: {
           ...config,
+          contextWindowCompression: { slidingWindow: {} },
+          sessionResumption: sessionResumptionConfig,
         },
         callbacks,
       });
@@ -205,6 +220,7 @@ export class GenAILiveClient {
 
   protected onMessage(message: LiveServerMessage) {
     if (message.sessionResumptionUpdate?.newHandle) {
+      this.latestSessionHandle = message.sessionResumptionUpdate.newHandle;
       this.emitter.emit(
         'sessionResumptionUpdate',
         message.sessionResumptionUpdate.newHandle,
@@ -213,7 +229,15 @@ export class GenAILiveClient {
     }
 
     if (message.goAway?.timeLeft) {
+      this.log(
+        'server.goAway',
+        `Connection will close in ${message.goAway.timeLeft}s`,
+      );
       this.emitter.emit('goAway', message.goAway.timeLeft);
+      this.disconnect(); // Disconnect to prepare for reconnection
+      setTimeout(() => {
+        this.connect(this.lastConfig ?? {}); // Try to reconnect after a short delay
+      }, 1000); // Example of waiting 1s to reconnect
       return;
     }
 
