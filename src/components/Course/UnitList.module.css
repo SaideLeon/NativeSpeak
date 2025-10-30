@@ -25,7 +25,7 @@
 }
 
 .unitCard {
-  background: var(--bg-card);
+  background: var(--bg-secondary);
   padding: 2.5rem;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
@@ -34,13 +34,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-soft);
 }
 
 .unitCard:hover {
   transform: translateY(-8px);
   border-color: var(--primary-light);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-medium);
 }
 
 .unitIcon {
